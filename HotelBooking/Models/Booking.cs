@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HotelBooking.Models
 {
-    internal class __Booking
+    internal class Booking
     {
     }
 }
