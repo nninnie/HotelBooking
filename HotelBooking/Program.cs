@@ -21,7 +21,7 @@ namespace HotelBooking.App
             // 2. Dependency Injection container
             var services = new ServiceCollection();
 
-            services.AddDbContext<HotelContext>(options =>
+            services.AddDbContext<HotelDBContext>(options =>
                 options.UseSqlServer(connectionString));
 
             services.AddTransient<BuildDB>();

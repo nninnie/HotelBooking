@@ -4,9 +4,9 @@ namespace HotelBooking.Data
 {
     public class BuildDB
     {
-        private readonly HotelContext _context;
+        private readonly HotelDBContext _context;
 
-        public BuildDB(HotelContext context)
+        public BuildDB(HotelDBContext context)
         {
             _context = context;
         }

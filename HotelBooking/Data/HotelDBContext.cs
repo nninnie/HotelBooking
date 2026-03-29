@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking
 {
-    public class HotelContext : DbContext
+    public class HotelDBContext : DbContext
     {
-        public HotelContext(DbContextOptions<HotelContext> options)
+        public HotelDBContext(DbContextOptions<HotelDBContext> options)
             : base(options)
         {
         }
