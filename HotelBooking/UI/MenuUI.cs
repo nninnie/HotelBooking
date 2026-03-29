@@ -1,69 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Spectre.Console;
 
 namespace HotelBooking.UI
 {
     public static class MenuUI
     {
-        private const string Highlight = "\u001b[32m";
-
         public static int ShowMainMenu(bool isLoggedIn)
         {
-            int selected = 1;
-            Console.CursorVisible = false;
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
 
-            while (true)
+            var title = isLoggedIn ? "Inloggad" : "Huvudmeny";
+            BannerUI.PrintHeader(title);
+
+            var menu = new SelectionPrompt<string>()
+                .HighlightStyle(new Style(foreground: Color.Green))
+                .AddChoices(isLoggedIn
+                    ? new[]
+                    {
+                        "Ny bokning",
+                        "Hantera rum",
+                        "Hantera gäster",
+                        "Hantera bokningar",
+                        "Logga ut"
+                    }
+                    : new[]
+                    {
+                        "Logga in",
+                        "Visa rum",
+                        "Visa gäster",
+                        "Visa bokningar",
+                        "Avsluta"
+                    });
+
+            var choice = AnsiConsole.Prompt(menu);
+
+            return choice switch
             {
-                Console.Clear();
-                BannerUI.ShowLogo();
+                "Logga in" => 1,
+                "Visa rum" => 2,
+                "Visa gäster" => 3,
+                "Visa bokningar" => 4,
+                "Avsluta" => 5,
 
-                if (!isLoggedIn) 
-                {
-                    BannerUI.PrintHeader("Main Menu");
+                "Ny bokning" => 1,
+                "Hantera rum" => 2,
+                "Hantera gäster" => 3,
+                "Hantera bokningar" => 4,
+                "Logga ut" => 5,
 
-                    PrintOption(1, selected, "Log in");
-                    PrintOption(2, selected, "View rooms");
-                    PrintOption(3, selected, "View guests");
-                    PrintOption(4, selected, "View bookings");
-                    PrintOption(5, selected, "Exit");
-                }
-                else
-                {
-                    BannerUI.PrintHeader("Logged in");
-
-                    PrintOption(1, selected, "New booking");
-                    PrintOption(2, selected, "Manage rooms");
-                    PrintOption(3, selected, "Manage guests");
-                    PrintOption(4, selected, "Manage bookings");
-                    PrintOption(5, selected, "Log out");
-                }
-
-                ConsoleKeyInfo key = Console.ReadKey(true);
-
-                if (key.Key == ConsoleKey.DownArrow) selected++;
-                if (key.Key == ConsoleKey.UpArrow) selected--;
-
-                int max = 5;
-                if (selected < 1) selected = max;
-                if (selected > max) selected = 1;
-
-                if (key.Key == ConsoleKey.Enter)
-                {
-                    while (Console.KeyAvailable)
-                        Console.ReadKey(true);
-
-                    return selected;
-                }
-            }
-        }
-
-        private static void PrintOption(int index, int selected, string text)
-        {
-            if (index == selected)
-                Console.WriteLine($"·{Highlight}{text}\u001b[0m");
-            else
-                Console.WriteLine($"  {text}");
+                _ => 0
+            };
         }
     }
 }
