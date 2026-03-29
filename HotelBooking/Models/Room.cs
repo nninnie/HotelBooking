@@ -5,7 +5,7 @@
         public int Id { get; set; }
 
         // Typ av rum, t.ex. "Single", "Double", "Suite"
-        public string RoomType { get; set; }
+        public string? RoomType { get; set; }
 
         // Antal extrabäddar som kan läggas till
         public int ExtraBeds { get; set; }

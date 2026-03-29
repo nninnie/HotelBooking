@@ -8,11 +8,11 @@ namespace HotelBooking.Models
 
         // Relation till Room
         public int RoomId { get; set; }
-        public Room Room { get; set; }
+        public Room? Room { get; set; }
 
         // Relation till Guest
         public int GuestId { get; set; }
-        public Guest Guest { get; set; }
+        public Guest? Guest { get; set; }
 
         // Datumintervall
         public DateTime FromDate { get; set; }

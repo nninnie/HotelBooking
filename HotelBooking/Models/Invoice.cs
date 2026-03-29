@@ -8,11 +8,11 @@ namespace HotelBooking.Models
 
         // Relation till Booking
         public int BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public Booking? Booking { get; set; }
 
         // Relation till Guest
         public int GuestId { get; set; }
-        public Guest Guest { get; set; }
+        public Guest? Guest { get; set; }
 
         // Fakturadetaljer
         public DateTime CreatedDate { get; set; }
