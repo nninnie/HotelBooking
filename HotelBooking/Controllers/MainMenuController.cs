@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spectre.Console;
 using HotelBooking.Services;
 using HotelBooking.UI;
 
@@ -25,10 +26,7 @@ namespace HotelBooking
                 switch (choice)
                 {
                     case 1:
-                        if (!_isLoggedIn)
                             _isLoggedIn = Login();
-                        else
-                            RunCrud("Ny bokning");
                         break;
 
                     case 2:
@@ -61,8 +59,25 @@ namespace HotelBooking
 
         private bool Login()
         {
-            // enkel inloggning
-            return true;
+            if (_isLoggedIn)
+                return true;
+
+            var username = AnsiConsole.Ask<string>("Användarnamn:");
+            var password = AnsiConsole.Prompt(
+                new TextPrompt<string>("Lösenord:")
+                .PromptStyle("red")
+                .Secret()
+                );
+
+            if (username == "a" && password == "a")
+            {
+                _isLoggedIn = true;
+                AnsiConsole.MarkupLine("[green]Inloggning lyckades![/]");
+                Console.ReadKey();
+                return true;
+            }
+            AnsiConsole.MarkupLine("[red]Fel användarnamn eller lösenord.[/]");
+            return false;
         }
     }
 }

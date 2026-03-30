@@ -149,7 +149,12 @@ namespace HotelBooking.Migrations
                     b.Property<decimal>("PricePerNight")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("RoomNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("RoomType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

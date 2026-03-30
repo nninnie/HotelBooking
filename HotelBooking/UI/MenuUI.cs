@@ -13,6 +13,7 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader(title);
 
             var menu = new SelectionPrompt<string>()
+                .Title("[grey]Använd piltangenterna för att välja och tryck Enter för att fortsätta.[/]")
                 .HighlightStyle(new Style(foreground: Color.Green))
                 .AddChoices(isLoggedIn
                     ? new[]
