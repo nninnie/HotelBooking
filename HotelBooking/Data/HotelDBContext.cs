@@ -3,13 +3,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking
 {
+    // Arv från DbContext
     public class HotelDBContext : DbContext
     {
+        // Konstruktorn som hämtar base(options)
+        // Tar emot databasinställningar och skickar dem vidare till DbContext‑basen.
         public HotelDBContext(DbContextOptions<HotelDBContext> options)
             : base(options)
         {
         }
 
+        // Alla modellklasser byggs upp i OnModelCreating
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Guest> Guests { get; set; }
         public DbSet<Booking> Bookings { get; set; }
