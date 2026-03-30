@@ -162,13 +162,13 @@ namespace HotelBooking.Migrations
                     b.HasOne("HotelBooking.Models.Guest", "Guest")
                         .WithMany("Bookings")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HotelBooking.Models.Room", "Room")
                         .WithMany("Bookings")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Guest");
@@ -179,15 +179,15 @@ namespace HotelBooking.Migrations
             modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
                 {
                     b.HasOne("HotelBooking.Models.Booking", "Booking")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HotelBooking.Models.Guest", "Guest")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Booking");
@@ -198,7 +198,7 @@ namespace HotelBooking.Migrations
             modelBuilder.Entity("HotelBooking.Models.Payment", b =>
                 {
                     b.HasOne("HotelBooking.Models.Invoice", "Invoice")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -206,9 +206,21 @@ namespace HotelBooking.Migrations
                     b.Navigation("Invoice");
                 });
 
+            modelBuilder.Entity("HotelBooking.Models.Booking", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
             modelBuilder.Entity("HotelBooking.Models.Guest", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Room", b =>

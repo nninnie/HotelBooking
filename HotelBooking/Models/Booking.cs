@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HotelBooking.Models
 {
@@ -17,5 +18,8 @@ namespace HotelBooking.Models
         // Datumintervall
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
+
+        // Saknas – måste finnas för EF Core
+        public List<Invoice> Invoices { get; set; } = new();
     }
 }

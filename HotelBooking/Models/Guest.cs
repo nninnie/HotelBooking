@@ -4,12 +4,15 @@ namespace HotelBooking.Models
 {
     public class Guest
     {
-        public int Id { get; set; }                 // Primärnyckel
-        public string? FullName { get; set; }        // Gästens namn
-        public string? PhoneNumber { get; set; }     // Telefonnummer
-        public string? Email { get; set; }           // E-postadress
+        public int Id { get; set; }
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
 
-        // Relation: En gäst kan ha flera bokningar
+        // En gäst kan ha flera bokningar
         public List<Booking> Bookings { get; set; } = new();
+
+        // En gäst kan ha flera fakturor (saknades)
+        public List<Invoice> Invoices { get; set; } = new();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HotelBooking.Models
 {
@@ -18,5 +19,8 @@ namespace HotelBooking.Models
         public DateTime CreatedDate { get; set; }
         public decimal TotalAmount { get; set; }
         public bool IsPaid { get; set; }
+
+        // Navigation till Payments (saknades)
+        public List<Payment> Payments { get; set; } = new();
     }
 }

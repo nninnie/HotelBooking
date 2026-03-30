@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using HotelBooking.Data;
 
-namespace HotelBooking.App
+namespace HotelBooking
 {
     internal class Program
     {
@@ -25,16 +25,19 @@ namespace HotelBooking.App
                 options.UseSqlServer(connectionString));
 
             services.AddTransient<BuildDB>();
-            services.AddTransient<Application>();   
+            services.AddTransient<Application>();
 
-            var provider = services.BuildServiceProvider();
+            using var provider = services.BuildServiceProvider();
 
-            // 3. Kör applikationen (skapar DB + startar meny)
-            var app = provider.GetRequiredService<Application>();
+            // 3. Kör migrationer vid uppstart
+            var dbBuilder = provider.GetRequiredService<BuildDB>();
+            dbBuilder.Run();
 
+            // 4. Starta applikationen
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             BannerUI.ShowLogo();
 
+            var app = provider.GetRequiredService<Application>();
             app.Run();
         }
     }
