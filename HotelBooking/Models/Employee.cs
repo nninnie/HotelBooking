@@ -17,7 +17,7 @@ namespace HotelBooking.Models
         public string FullName { get; set; } = string.Empty;
 
         [Required]
-        public int PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
 
         public int RoleId { get; set; }
         public Role? Role { get; set; }

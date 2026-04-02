@@ -5,38 +5,42 @@ namespace HotelBooking
 {
     public class Application
     {
-        // BuildDB ansvarar för migrering + seedning (körs i Program.cs)
+        // BuildDB kör migrering + seed (startar databasen åt oss)
         private readonly BuildDB _buildDB;
 
-        // MainMenuController hanterar huvudmenyn efter inloggning
+        // Huvudmenyn som visas efter inloggning
         private readonly MainMenuController _mainMenuController;
 
-        // Dependency Injection: Application får sina beroenden automatiskt
-        public Application(BuildDB buildDB, MainMenuController mainMenuController)
+        // Databascontext – behövs för login och menyer
+        private readonly HotelDBContext _db;
+
+        // DI: allt injiceras automatiskt från Program.cs
+        public Application(BuildDB buildDB, MainMenuController mainMenuController, HotelDBContext db)
         {
             _buildDB = buildDB;
             _mainMenuController = mainMenuController;
+            _db = db;
         }
 
         public void Run()
         {
-            // Oändlig loop som håller applikationen igång
+            // Applikationen körs i en loop så man kan logga ut och in igen
             while (true)
             {
                 bool isLoggedIn = false;
 
-                // Kör login-processen
-                // LoginController sätter isLoggedIn = true om användaren loggar in korrekt
-                LoginController.Login(ref isLoggedIn);
+                // LoginController hanterar inloggning
+                // Skickar in db + flaggan som styr om login lyckades
+                LoginController.Login(_db, ref isLoggedIn);
 
-                // Om inloggningen misslyckas → börja om från början av loopen
+                // Om login misslyckas → börja om och visa login igen
                 if (!isLoggedIn)
                     continue;
 
-                // När användaren är inloggad → starta huvudmenyn
+                // När login lyckas - starta huvudmenyn
                 _mainMenuController.Run();
 
-                // När användaren loggar ut → loopen börjar om och visar login igen
+                // När användaren loggar ut → loopen fortsätter och login visas igen
             }
         }
     }

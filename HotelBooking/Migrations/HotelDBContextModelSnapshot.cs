@@ -75,8 +75,9 @@ namespace HotelBooking.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("PasswordHash")
-                        .HasColumnType("int");
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");

@@ -42,7 +42,7 @@ namespace HotelBooking.Data
 
         private void SeedEmployees(HotelDBContext db)
         {
-            // Seed roles om de saknas
+            // 1. Seed roles om de saknas
             if (!db.Roles.Any())
             {
                 db.Roles.AddRange(
@@ -51,23 +51,49 @@ namespace HotelBooking.Data
                     new Role { Name = "Dungeon Master" }
                 );
 
-                // Spara här så rollerna får sina Id från databasen
-                db.SaveChanges();
+                db.SaveChanges(); // rollerna får Id
             }
 
-            // Seed employees om de saknas
+            // 2. Seed employees om de saknas
             if (!db.Employees.Any())
             {
-                // Hämta rollerna med sina riktiga Id
+                // Hämta rollerna
                 var manager = db.Roles.First(r => r.Name == "Manager");
                 var receptionist = db.Roles.First(r => r.Name == "Receptionist");
                 var master = db.Roles.First(r => r.Name == "Dungeon Master");
 
+                // Enkel hash-funktion
+                string Hash(string input) => input.GetHashCode().ToString();
+
                 db.Employees.AddRange(
-                    new Employee { FullName = "Ninnie Dahlström", RoleId = manager.Id },
-                    new Employee { FullName = "My Jammeh", RoleId = receptionist.Id },
-                    new Employee { FullName = "Zoe Jammeh", RoleId = receptionist.Id },
-                    new Employee { FullName = "Richard Chalk", RoleId = master.Id }
+                    new Employee
+                    {
+                        Username = "ninnie",
+                        FullName = "Ninnie Dahlström",
+                        PasswordHash = Hash("0000"),
+                        RoleId = manager.Id
+                    },
+                    new Employee
+                    {
+                        Username = "my",
+                        FullName = "My Jammeh",
+                        PasswordHash = Hash("1234"),
+                        RoleId = receptionist.Id
+                    },
+                    new Employee
+                    {
+                        Username = "zoe",
+                        FullName = "Zoe Jammeh",
+                        PasswordHash = Hash("1234"),
+                        RoleId = receptionist.Id
+                    },
+                    new Employee
+                    {
+                        Username = "richard",
+                        FullName = "Richard Chalk",
+                        PasswordHash = Hash("bajskorv"),
+                        RoleId = master.Id
+                    }
                 );
             }
         }
