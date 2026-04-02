@@ -1,38 +1,54 @@
 ﻿using Autofac;
+using HotelBooking.Controllers;
 using HotelBooking.Data;
-using System.ComponentModel;
-using IContainer = Autofac.IContainer;
+using HotelBooking.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace HotelBooking
 {
-    //public static class AutofacConfig
-    //{
-    //    public static IContainer BuildContainer()
-    //    {
-    //        var builder = new ContainerBuilder();
+    public static class AutofacConfig
+    {
+        public static IContainer BuildContainer()
+        {
+            var builder = new ContainerBuilder();
 
-    //        // CRUD – Booking
-    //        builder.RegisterType<CreateBooking>().As<ICrud>();
-    //        builder.RegisterType<ReadBooking>().As<ICrud>();
-    //        builder.RegisterType<UpdateBooking>().As<ICrud>();
-    //        builder.RegisterType<DeleteBooking>().As<ICrud>();
+            // Läs appsettings.json
+            builder.Register(c =>
+            {
+                var config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json")
+                    .Build();
 
-    //        // CRUD – Room
-    //        builder.RegisterType<CreateRoom>().As<ICrud>();
+                var options = new DbContextOptionsBuilder<HotelDBContext>()
+                    .UseSqlServer(config.GetConnectionString("DefaultConnection"))
+                    .Options;
 
-    //        // CRUD – Customer
-    //        builder.RegisterType<CreateCustomer>().As<ICrud>();
+                return new HotelDBContext(options);
+            })
+            .AsSelf()
+            .InstancePerLifetimeScope();
 
-    //        // Database setup (migrations + seed)
-    //        builder.RegisterType<BuildDB>().AsSelf();
+            // Services
+            builder.RegisterType<BookingService>().AsSelf().SingleInstance();
+            builder.RegisterType<RoomService>().AsSelf().SingleInstance();
+            builder.RegisterType<GuestService>().AsSelf().SingleInstance();
+            builder.RegisterType<PaymentService>().AsSelf().SingleInstance();
 
-    //        // Meny
-    //        builder.RegisterType<MainMenu>().AsSelf();
+            // Controllers
+            builder.RegisterType<BookingController>().AsSelf();
+            builder.RegisterType<RoomController>().AsSelf();
+            builder.RegisterType<GuestController>().AsSelf();
+            builder.RegisterType<PaymentController>().AsSelf();
+            builder.RegisterType<MainMenuController>().AsSelf();
 
-    //        // Application
-    //        builder.RegisterType<Application>().AsSelf();
+            // DB Builder
+            builder.RegisterType<BuildDB>().AsSelf();
 
-    //        return builder.Build();
-    //    }
-    //}
+            // Application
+            builder.RegisterType<Application>().AsSelf();
+
+            return builder.Build();
+        }
+    }
 }

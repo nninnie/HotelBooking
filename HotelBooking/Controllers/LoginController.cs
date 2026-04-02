@@ -1,43 +1,44 @@
 ﻿using HotelBooking.Core.Service;
 using HotelBooking.UI;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Spectre.Console;
 
 namespace HotelBooking.Controllers
 {
-
     public static class LoginController
     {
         public static void Login(ref bool isLoggedIn)
         {
             while (true)
             {
-                Console.Clear();
+                AnsiConsole.Clear();
                 BannerUI.ShowLogo();
                 BannerUI.PrintHeader("LOGIN");
 
-                Console.Write("Anställningsnummer: ");
-                string employeeId = Console.ReadLine() ?? "";
-
+                // Frågar efter användarnamn.
+                // Tom input → använd "admin" som standard.
+                var employeeId = AnsiConsole.Ask<string>("Användarnamn:");
                 if (string.IsNullOrWhiteSpace(employeeId))
-                {
-                    ErrorService.Warning("Fältet får inte vara tomt..");
-                    continue;
-                }
+                    employeeId = "admin";
 
-                Console.Write("Lösenord: ");
-                string code = Console.ReadLine() ?? "";
+                // Frågar efter lösenord (dolt).
+                // Tom input → använd "admin" som standard.
+                var code = AnsiConsole.Prompt(
+                    new TextPrompt<string>("Lösenord:")
+                        .Secret()
+                );
+                if (string.IsNullOrWhiteSpace(code))
+                    code = "admin";
 
-                if (string.Equals(code, "bajskorv", StringComparison.OrdinalIgnoreCase) ||
-                    string.IsNullOrWhiteSpace(code))
+                // Godkänn admin/admin (eller tom/tom som blir admin/admin).
+                if (employeeId == "admin" && code == "admin")
                 {
                     LoginService.CurrentUserName = employeeId;
                     isLoggedIn = true;
                     return;
                 }
 
-                ErrorService.Show ("Tyvärr, det är såklart 'bajskorv'!");
+                // Felaktiga uppgifter → visa felmeddelande.
+                ErrorService.Show("Fel användarnamn eller lösenord.");
             }
         }
     }

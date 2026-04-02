@@ -119,5 +119,35 @@ namespace HotelBooking.Services
 
             return true;
         }
+
+        internal void Restore()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SoftDelete()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Update()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Create()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ShowDetails()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ShowAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

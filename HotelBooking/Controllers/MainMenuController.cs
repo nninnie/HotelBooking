@@ -1,83 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Spectre.Console;
-using HotelBooking.Services;
+﻿using HotelBooking.Core.Service;
 using HotelBooking.UI;
 
-namespace HotelBooking
+namespace HotelBooking.Controllers
 {
     public class MainMenuController
     {
-        private readonly IEnumerable<ICrud> _crudOperations;
-        private bool _isLoggedIn = false;
+        private readonly BookingController _bookingController;
+        private readonly RoomController _roomController;
+        private readonly GuestController _guestController;
+        private readonly PaymentController _paymentController;
 
-        public MainMenuController(IEnumerable<ICrud> crudOperations)
+        public MainMenuController(
+            BookingController bookingController,
+            RoomController roomController,
+            GuestController guestController,
+            PaymentController paymentController)
         {
-            _crudOperations = crudOperations;
+            _bookingController = bookingController;
+            _roomController = roomController;
+            _guestController = guestController;
+            _paymentController = paymentController;
         }
 
         public void Run()
         {
             while (true)
             {
-                int choice = MainMenuUI.ShowMainMenu(_isLoggedIn);
+                int choice = MainMenuUI.ShowMainMenu(LoginService.CurrentUserName);
 
                 switch (choice)
                 {
                     case 1:
-                            _isLoggedIn = Login();
+                        _bookingController.CreateDirect();
                         break;
 
                     case 2:
-                        RunCrud(_isLoggedIn ? "Hantera rum" : "Visa rum");
+                        _bookingController.RunCrudMenu();
                         break;
 
                     case 3:
-                        RunCrud(_isLoggedIn ? "Hantera gäster" : "Visa gäster");
+                        _roomController.RunCrudMenu();
                         break;
 
                     case 4:
-                        RunCrud(_isLoggedIn ? "Hantera bokningar" : "Visa bokningar");
+                        _guestController.RunCrudMenu();
                         break;
 
                     case 5:
-                        if (_isLoggedIn)
-                            _isLoggedIn = false;
-                        else
-                            return;
+                        _paymentController.RunCrudMenu();
+                        break;
+
+                    case 6:
+                        // Logga ut
+                        LoginService.CurrentUserName = "Okänd";
+                        return;
+
+                    case 7:
+                        Environment.Exit(0);
                         break;
                 }
             }
-        }
-
-        private void RunCrud(string menuName)
-        {
-            var crud = _crudOperations.FirstOrDefault(c => c.MenuName == menuName);
-            crud?.Run();
-        }
-
-        private bool Login()
-        {
-            if (_isLoggedIn)
-                return true;
-
-            var username = AnsiConsole.Ask<string>("Användarnamn:");
-            var password = AnsiConsole.Prompt(
-                new TextPrompt<string>("Lösenord:")
-                .PromptStyle("red")
-                .Secret()
-                );
-
-            if (username == "a" && password == "a")
-            {
-                _isLoggedIn = true;
-                AnsiConsole.MarkupLine("[green]Inloggning lyckades![/]");
-                Console.ReadKey();
-                return true;
-            }
-            AnsiConsole.MarkupLine("[red]Fel användarnamn eller lösenord.[/]");
-            return false;
         }
     }
 }

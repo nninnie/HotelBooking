@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HotelBooking.Services
 {
-    internal class InvoiceService
+    public class InvoiceService
     {
     }
 }

@@ -4,51 +4,36 @@ namespace HotelBooking.UI
 {
     public static class MainMenuUI
     {
-        public static int ShowMainMenu(bool isLoggedIn)
+        public static int ShowMainMenu(string currentUser)
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
-
-            var title = isLoggedIn ? "Inloggad" : "Huvudmeny";
-            BannerUI.PrintHeader(title);
+            BannerUI.PrintHeader($"Huvudmeny - Inloggad som {currentUser}");
 
             var menu = new SelectionPrompt<string>()
-                .Title("[grey]Använd piltangenterna för att välja och tryck Enter för att fortsätta.[/]")
+                .Title("[grey]Välj ett alternativ[/]")
                 .HighlightStyle(new Style(foreground: Color.Green))
-                .AddChoices(isLoggedIn
-                    ? new[]
-                    {
-                        "Ny bokning",
-                        "Hantera rum",
-                        "Hantera gäster",
-                        "Hantera bokningar",
-                        "Logga ut"
-                    }
-                    : new[]
-                    {
-                        "Logga in",
-                        "Visa rum",
-                        "Visa gäster",
-                        "Visa bokningar",
-                        "Avsluta"
-                    });
+                .AddChoices(
+                    "Ny bokning",
+                    "Hantera bokningar",
+                    "Hantera rum",
+                    "Hantera gäster",
+                    "Hantera betalningar",
+                    "Logga ut",
+                    "Avsluta"
+                );
 
             var choice = AnsiConsole.Prompt(menu);
 
             return choice switch
             {
-                "Logga in" => 1,
-                "Visa rum" => 2,
-                "Visa gäster" => 3,
-                "Visa bokningar" => 4,
-                "Avsluta" => 5,
-
                 "Ny bokning" => 1,
-                "Hantera rum" => 2,
-                "Hantera gäster" => 3,
-                "Hantera bokningar" => 4,
-                "Logga ut" => 5,
-
+                "Hantera bokningar" => 2,
+                "Hantera rum" => 3,
+                "Hantera gäster" => 4,
+                "Hantera betalningar" => 5,
+                "Logga ut" => 6,
+                "Avsluta" => 7,
                 _ => 0
             };
         }

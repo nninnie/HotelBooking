@@ -1,37 +1,38 @@
-﻿using HotelBooking.Data;
-using HotelBooking.UI;
+﻿using HotelBooking.Controllers;
+using HotelBooking.Data;
 
 namespace HotelBooking
 {
     public class Application
     {
         private readonly BuildDB _buildDB;
+        private readonly MainMenuController _mainMenuController;
 
-        public Application(BuildDB buildDB)
+        public Application(BuildDB buildDB, MainMenuController mainMenuController)
         {
             _buildDB = buildDB;
+            _mainMenuController = mainMenuController;
         }
 
         public void Run()
         {
-            _buildDB.Run(); // Skapar/uppdaterar databasen
-
-            bool isLoggedIn = false;
+            // Kör migrations + seed
+            _buildDB.Run();
 
             while (true)
             {
-                var choice = MainMenuUI.ShowMainMenu(isLoggedIn);
+                bool isLoggedIn = false;
 
-                switch (choice)
-                {
-                    case 1:
-                        // Logga in eller Ny bokning
-                        break;
+                // Login innan huvudmenyn
+                LoginController.Login(ref isLoggedIn);
 
-                    case 5:
-                        // Avsluta eller Logga ut
-                        return;
-                }
+                if (!isLoggedIn)
+                    continue;
+
+                // Starta huvudmenyn
+                _mainMenuController.Run();
+
+                // Om användaren loggar ut → loopar tillbaka till login
             }
         }
     }

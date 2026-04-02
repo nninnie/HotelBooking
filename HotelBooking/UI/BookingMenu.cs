@@ -69,10 +69,14 @@ public class BookingMenu
 
         while (true)
         {
-            Console.Clear();
+            AnsiConsole.Clear();
             RenderCalendar(selectedDate, minDate);
 
-            var key = Console.ReadKey(true).Key;
+            var keyInfo = AnsiConsole.Console.Input.ReadKey(true);
+            if (keyInfo == null)
+                continue;
+
+            var key = keyInfo.Value.Key;
 
             switch (key)
             {
@@ -196,14 +200,23 @@ public class BookingMenu
     // Visar en bekräftelse efter att bokningen skapats
     private void ShowConfirmation(Room room, DateTime checkIn, DateTime checkOut, int guests)
     {
-        var bookingConfirmation = new Panel($"[green]Bokning skapad![/]\n\n" +
+        var bookingConfirmation = new Panel(
+            $"[green]Bokning skapad![/]\n\n" +
             $"[bold]Rum:[/] {room.RoomNumber} - {room.RoomType}\n" +
             $"[bold]Incheckning:[/] {checkIn:yyyy-MM-dd}\n" +
             $"[bold]Utcheckning:[/] {checkOut:yyyy-MM-dd}\n" +
             $"[bold]Antal gäster:[/] {guests}\n" +
-            $"[bold]Pris per natt:[/] {room.PricePerNight:C}");
+            $"[bold]Pris per natt:[/] {room.PricePerNight:C}"
+        )
+        {
+            Border = BoxBorder.Rounded,
+            Padding = new Padding(1, 1),
+            Header = new PanelHeader("[green]Bekräftelse[/]", Justify.Center)
+        };
 
         AnsiConsole.Write(bookingConfirmation);
 
+        AnsiConsole.MarkupLine("\n[grey]Tryck Enter för att fortsätta...[/]");
+        Console.ReadLine();
     }
 }
