@@ -42,19 +42,32 @@ namespace HotelBooking.Data
 
         private void SeedEmployees(HotelDBContext db)
         {
-            if (!db.Employees.Any() && !db.Roles.Any())
+            // Seed roles om de saknas
+            if (!db.Roles.Any())
             {
-                var managerRole = new Role { Id = 1, Name = "Manager" };
-                var receptionistRole = new Role { Id = 2, Name = "Receptionist" };
-                var masterRole = new Role { Id = 3, Name = "Dungeon Master" };
+                db.Roles.AddRange(
+                    new Role { Name = "Manager" },
+                    new Role { Name = "Receptionist" },
+                    new Role { Name = "Dungeon Master" }
+                );
 
-                db.Roles.AddRange(managerRole, receptionistRole, masterRole);
+                // Spara här så rollerna får sina Id från databasen
+                db.SaveChanges();
+            }
+
+            // Seed employees om de saknas
+            if (!db.Employees.Any())
+            {
+                // Hämta rollerna med sina riktiga Id
+                var manager = db.Roles.First(r => r.Name == "Manager");
+                var receptionist = db.Roles.First(r => r.Name == "Receptionist");
+                var master = db.Roles.First(r => r.Name == "Dungeon Master");
 
                 db.Employees.AddRange(
-                    new Employee { FullName = "Ninnie Dahlström", RoleId = managerRole.Id },
-                    new Employee { FullName = "My Jammeh", RoleId = receptionistRole.Id },
-                    new Employee { FullName = "Zoe Jammeh", RoleId = receptionistRole.Id },
-                    new Employee { FullName = "Richard Chalk", RoleId = masterRole.Id }
+                    new Employee { FullName = "Ninnie Dahlström", RoleId = manager.Id },
+                    new Employee { FullName = "My Jammeh", RoleId = receptionist.Id },
+                    new Employee { FullName = "Zoe Jammeh", RoleId = receptionist.Id },
+                    new Employee { FullName = "Richard Chalk", RoleId = master.Id }
                 );
             }
         }

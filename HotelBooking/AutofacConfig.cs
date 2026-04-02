@@ -35,6 +35,8 @@ namespace HotelBooking
             builder.RegisterType<GuestService>().AsSelf().SingleInstance();
             builder.RegisterType<PaymentService>().AsSelf().SingleInstance();
 
+            builder.RegisterType<DataInitializer>().AsSelf().SingleInstance();
+
             // Controllers
             builder.RegisterType<BookingController>().AsSelf();
             builder.RegisterType<RoomController>().AsSelf();
