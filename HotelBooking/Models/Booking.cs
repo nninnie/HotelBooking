@@ -1,36 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HotelBooking.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelBooking.Models
+public class Booking
 {
-    public class Booking
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        // Relation till Room
-        [Required]
-        public int RoomId { get; set; }
+    // Relation till Room
+    [Required]
+    public int RoomId { get; set; }
 
-        [ForeignKey(nameof(RoomId))]
-        public Room? Room { get; set; }
+    [ForeignKey(nameof(RoomId))]
+    public Room? Room { get; set; }
 
-        // Relation till Guest
-        [Required]
-        public int GuestId { get; set; }
+    // Relation till Guest
+    [Required]
+    public int GuestId { get; set; }
 
-        [ForeignKey(nameof(GuestId))]
-        public Guest? Guest { get; set; }
+    [ForeignKey(nameof(GuestId))]
+    public Guest? Guest { get; set; }
 
-        // Datumintervall
-        [Required]
-        public DateTime FromDate { get; set; }
+    // Antal gäster i bokningen
+    public int NumberOfGuests { get; set; }
 
-        [Required]
-        public DateTime ToDate { get; set; }
+    // Datumintervall
+    [Required]
+    public DateTime FromDate { get; set; }
 
-        // Saknas – måste finnas för EF Core
-        public List<Invoice> Invoices { get; set; } = new();
-    }
+    [Required]
+    public DateTime ToDate { get; set; }
+
+    // Datum då bokningen skapades (viktigt för betalningsdeadline)
+    public DateTime BookingDate { get; set; } = DateTime.Now;
+
+    // Relation till Invoice
+    public List<Invoice> Invoices { get; set; } = new();
 }

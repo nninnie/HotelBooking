@@ -17,9 +17,16 @@ namespace HotelBooking.Models
         [MaxLength(50)]
         public string RoomType { get; set; } = string.Empty;
 
-        // Antal extrabäddar som kan läggas till
-        [Range(0, 10)]
+        // Grundkapacitet: 1 för Single, 2 för Double, 4 för Suite
+        [Range(1, 10)]
+        public int BaseGuests { get; set; }
+
+        // Antal extrabäddar som kan läggas till (0–2)
+        [Range(0, 2)]
         public int ExtraBeds { get; set; }
+
+        // Max antal gäster rummet klarar
+        public int MaxGuests => BaseGuests + ExtraBeds;
 
         // Pris per natt
         [Required]

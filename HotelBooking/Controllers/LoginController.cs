@@ -22,7 +22,7 @@ namespace HotelBooking.Controllers
 
                 if (string.IsNullOrWhiteSpace(employeeId))
                 {
-                    ErrorService.Warning("The field cannot be empty.");
+                    ErrorService.Warning("Fältet får inte vara tomt..");
                     continue;
                 }
 

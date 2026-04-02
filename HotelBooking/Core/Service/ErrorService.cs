@@ -11,7 +11,7 @@ namespace HotelBooking.Core.Service
             Console.ResetColor();
         }
 
-        // Generic
+        // Generiska meddelanden
         public static void Show(string message) =>
             PrintMessage("✖", ConsoleColor.Red, message);
 
@@ -21,23 +21,23 @@ namespace HotelBooking.Core.Service
         public static void Success(string message) =>
             PrintMessage("✔", ConsoleColor.Green, message);
 
-        // Predefined errors
+        // Fördefinierade felmeddelanden
         public static void FieldEmpty() =>
-            Show("The field cannot be empty.");
+            Show("Fältet får inte vara tomt.");
 
         public static void InvalidNumber() =>
-            Show("Please enter a valid number.");
+            Show("Vänligen ange ett giltigt nummer.");
 
         public static void InvalidDate() =>
-            Show("Please enter a valid date (YYYY-MM-DD).");
+            Show("Vänligen ange ett giltigt datum (ÅÅÅÅ-MM-DD).");
 
         public static void NotFound(string itemName) =>
-            Show($"{itemName} was not found.");
+            Show($"{itemName} hittades inte.");
 
         public static void AlreadyExists(string itemName) =>
-            Show($"{itemName} already exists.");
+            Show($"{itemName} finns redan.");
 
         public static void Unauthorized() =>
-            Show("You must be logged in to perform this action.");
+            Show("Du måste vara inloggad för att utföra denna åtgärd.");
     }
 }

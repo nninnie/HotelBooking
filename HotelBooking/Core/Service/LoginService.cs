@@ -3,12 +3,12 @@
 namespace HotelBooking.Core.Service
 {
     /// <summary>
-    /// Stores the name of the currently logged-in user.
-    /// Used so the system always knows who is operating the hotel system.
+    /// Lagrar namnet på den användare som för tillfället är inloggad.
+    /// Används för att systemet alltid ska veta vem som använder hotellsystemet.
     /// </summary>
     public static class LoginService
     {
-        private static string _currentUserName = "Unknown";
+        private static string _currentUserName = "Okänd";
 
         public static string CurrentUserName
         {
@@ -16,16 +16,16 @@ namespace HotelBooking.Core.Service
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    _currentUserName = "Unknown";
+                    _currentUserName = "Okänd";
                 else
                     _currentUserName = value.Trim();
             }
         }
 
         /// <summary>
-        /// Returns true if a user is logged in.
+        /// Returnerar true om en användare är inloggad.
         /// </summary>
         public static bool IsLoggedIn =>
-            _currentUserName != "Unknown";
+            _currentUserName != "Okänd";
     }
 }
