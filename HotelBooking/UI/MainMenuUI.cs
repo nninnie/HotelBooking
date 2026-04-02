@@ -2,7 +2,7 @@
 
 namespace HotelBooking.UI
 {
-    public static class MenuUI
+    public static class MainMenuUI
     {
         public static int ShowMainMenu(bool isLoggedIn)
         {

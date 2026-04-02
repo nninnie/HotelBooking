@@ -22,7 +22,7 @@ namespace HotelBooking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("HotelBooking.Models.Booking", b =>
+            modelBuilder.Entity("Booking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,10 +30,16 @@ namespace HotelBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GuestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfGuests")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomId")
@@ -148,6 +154,9 @@ namespace HotelBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("BaseGuests")
+                        .HasColumnType("int");
+
                     b.Property<int>("ExtraBeds")
                         .HasColumnType("int");
 
@@ -169,7 +178,7 @@ namespace HotelBooking.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("HotelBooking.Models.Booking", b =>
+            modelBuilder.Entity("Booking", b =>
                 {
                     b.HasOne("HotelBooking.Models.Guest", "Guest")
                         .WithMany("Bookings")
@@ -190,7 +199,7 @@ namespace HotelBooking.Migrations
 
             modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
                 {
-                    b.HasOne("HotelBooking.Models.Booking", "Booking")
+                    b.HasOne("Booking", "Booking")
                         .WithMany("Invoices")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -218,7 +227,7 @@ namespace HotelBooking.Migrations
                     b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("HotelBooking.Models.Booking", b =>
+            modelBuilder.Entity("Booking", b =>
                 {
                     b.Navigation("Invoices");
                 });

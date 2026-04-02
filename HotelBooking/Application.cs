@@ -20,7 +20,7 @@ namespace HotelBooking
 
             while (true)
             {
-                var choice = MenuUI.ShowMainMenu(isLoggedIn);
+                var choice = MainMenuUI.ShowMainMenu(isLoggedIn);
 
                 switch (choice)
                 {

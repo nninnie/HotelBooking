@@ -21,7 +21,7 @@ namespace HotelBooking
         {
             while (true)
             {
-                int choice = MenuUI.ShowMainMenu(_isLoggedIn);
+                int choice = MainMenuUI.ShowMainMenu(_isLoggedIn);
 
                 switch (choice)
                 {
