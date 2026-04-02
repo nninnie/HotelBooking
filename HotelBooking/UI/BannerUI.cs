@@ -9,18 +9,18 @@ namespace HotelBooking.UI
         public static void ShowLogo()
         {
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.ForegroundColor = ConsoleColor.Yellow;
 
             string[] logoLines =
             {
-    "╔╗ ╔╗     ╔╗     ╔╗ ╔╗     ╔═╗╔═╗     ╔════╗    ",
-    "║║ ║║    ╔╝╚╗    ║║ ║║     ║║╚╝║║     ╚══╗ ║    ",
-    "║╚═╝║╔══╗╚╗╔╝╔══╗║║ ║║     ║╔╗╔╗║╔╗ ╔╗  ╔╝╔╝╔══╗",
-    "║╔═╗║║╔╗║ ║║ ║╔╗║║║ ║║     ║║║║║║║║ ║║ ╔╝╔╝ ║╔╗║",
-    "║║ ║║║╚╝║ ║╚╗║║═╣║╚╗║╚╗    ║║║║║║║╚═╝║╔╝ ╚═╗║╚╝║",
-    "╚╝ ╚╝╚══╝ ╚═╝╚══╝╚═╝╚═╝    ╚╝╚╝╚╝╚═╗╔╝╚════╝╚══╝",
-    "                                 ╔═╝║           ",
-    "                                 ╚══╝           "
+"▀██▀  ▀██▀           ▄           ▀██  ▀██     ▀██    ██▀ █▀▀▀▀▀██  ",
+ "██    ██    ▄▄▄   ▄██▄    ▄▄▄▄   ██   ██      ███  ███      ▄█▀   ",
+ "██▀▀▀▀██  ▄█  ▀█▄  ██   ▄█▄▄▄██  ██   ██      █▀█▄▄▀██     ██     ",
+ "██    ██  ██   ██  ██   ██       ██   ██      █ ▀█▀ ██   ▄█▀      ",
+"▄██▄  ▄██▄  ▀█▄▄█▀  ▀█▄▀  ▀█▄▄▄▀ ▄██▄ ▄██▄    ▄█▄ █ ▄██▄ ██▄▄▄▄▄▄█ ",
+"                                                                   "
+                                                                   
+
 };
 
             foreach (var line in logoLines)
@@ -31,13 +31,8 @@ namespace HotelBooking.UI
 
         public static void PrintHeader(string title)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            string line = new string('=', BannerWidth);
-            
-
-            Console.WriteLine(line);
+            Console.WriteLine();
             PrintCentered(title.ToUpper());
-            Console.WriteLine(line);
             Console.WriteLine();
             Console.ResetColor();
         }

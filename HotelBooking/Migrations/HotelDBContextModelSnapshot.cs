@@ -33,6 +33,9 @@ namespace HotelBooking.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
 
@@ -50,11 +53,44 @@ namespace HotelBooking.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeId");
+
                     b.HasIndex("GuestId");
 
                     b.HasIndex("RoomId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("PasswordHash")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Guest", b =>
@@ -146,6 +182,24 @@ namespace HotelBooking.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("HotelBooking.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("HotelBooking.Models.Room", b =>
                 {
                     b.Property<int>("Id")
@@ -180,6 +234,10 @@ namespace HotelBooking.Migrations
 
             modelBuilder.Entity("Booking", b =>
                 {
+                    b.HasOne("HotelBooking.Models.Employee", null)
+                        .WithMany("BookingsCreated")
+                        .HasForeignKey("EmployeeId");
+
                     b.HasOne("HotelBooking.Models.Guest", "Guest")
                         .WithMany("Bookings")
                         .HasForeignKey("GuestId")
@@ -195,6 +253,17 @@ namespace HotelBooking.Migrations
                     b.Navigation("Guest");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Employee", b =>
+                {
+                    b.HasOne("HotelBooking.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
@@ -230,6 +299,11 @@ namespace HotelBooking.Migrations
             modelBuilder.Entity("Booking", b =>
                 {
                     b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("HotelBooking.Models.Employee", b =>
+                {
+                    b.Navigation("BookingsCreated");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Guest", b =>

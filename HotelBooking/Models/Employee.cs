@@ -1,0 +1,27 @@
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace HotelBooking.Models
+{
+    public class Employee
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(150)]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required]
+        public int PasswordHash { get; set; }
+
+        public int RoleId { get; set; }
+        public Role? Role { get; set; }
+
+        public List<Booking> BookingsCreated { get; set; } = new();
+    }
+}

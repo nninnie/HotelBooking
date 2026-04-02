@@ -10,6 +10,7 @@ namespace HotelBooking.Data
             db.Database.Migrate();
             SeedRooms(db);
             SeedGuests(db);
+            SeedEmployees(db);
             db.SaveChanges();
         }
 
@@ -35,6 +36,25 @@ namespace HotelBooking.Data
                     new Guest { FullName = "Markus Lindgren", PhoneNumber = "0709876543", Email = "markus@example.com" },
                     new Guest { FullName = "Sara Ekström", PhoneNumber = "0735551122", Email = "sara@example.com" },
                     new Guest { FullName = "David Holm", PhoneNumber = "0764442211", Email = "david@example.com" }
+                );
+            }
+        }
+
+        private void SeedEmployees(HotelDBContext db)
+        {
+            if (!db.Employees.Any() && !db.Roles.Any())
+            {
+                var managerRole = new Role { Id = 1, Name = "Manager" };
+                var receptionistRole = new Role { Id = 2, Name = "Receptionist" };
+                var masterRole = new Role { Id = 3, Name = "Dungeon Master" };
+
+                db.Roles.AddRange(managerRole, receptionistRole, masterRole);
+
+                db.Employees.AddRange(
+                    new Employee { FullName = "Ninnie Dahlström", RoleId = managerRole.Id },
+                    new Employee { FullName = "My Jammeh", RoleId = receptionistRole.Id },
+                    new Employee { FullName = "Zoe Jammeh", RoleId = receptionistRole.Id },
+                    new Employee { FullName = "Richard Chalk", RoleId = masterRole.Id }
                 );
             }
         }
