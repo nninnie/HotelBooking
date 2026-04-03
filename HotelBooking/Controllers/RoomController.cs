@@ -1,49 +1,45 @@
 ﻿using HotelBooking.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
 {
     public class RoomController
     {
-        private readonly RoomService _roomService;
+        private readonly RoomUI _roomUI;
 
-        public RoomController(RoomService roomService)
+        public RoomController(RoomUI roomUI)
         {
-            _roomService = roomService;
+            _roomUI = roomUI;
         }
 
         public void RunCrudMenu()
         {
             while (true)
             {
-                int choise = UI.CrudMenuUI.Show("Hantera rum");
+                int choice = CrudMenuUI.Show("Hantera rum");
 
-                switch (choise)
+                switch (choice)
                 {
                     case 1:
-                        _roomService.ShowAll();
+                        _roomUI.ShowAll();
                         break;
                     case 2:
-                        _roomService.ShowDetails();
+                        _roomUI.ShowDetails();
                         break;
                     case 3:
-                        _roomService.Create();
+                        _roomUI.Create();
                         break;
                     case 4:
-                        _roomService.Update();
+                        _roomUI.Update();
                         break;
                     case 5:
-                        _roomService.SoftDelete();
+                        _roomUI.SoftDelete();
                         break;
                     case 6:
-                        _roomService.Restore();
+                        _roomUI.Restore();
                         break;
                     case 7:
                         return; // Tillbaka till huvudmenyn
-                    default:
-                        break;
                 }
             }
         }

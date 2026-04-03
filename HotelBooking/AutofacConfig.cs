@@ -36,6 +36,7 @@ namespace HotelBooking
             builder.RegisterType<RoomService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<GuestService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PaymentService>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<InvoiceService>().AsSelf().InstancePerLifetimeScope();   // <-- Lades till
 
             builder.RegisterType<DataInitializer>().AsSelf().InstancePerLifetimeScope();
 
@@ -44,12 +45,14 @@ namespace HotelBooking
             builder.RegisterType<RoomUI>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<GuestUI>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PaymentUI>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<InvoiceUI>().AsSelf().InstancePerLifetimeScope();        // <-- Lades till
 
             // Controllers
             builder.RegisterType<BookingController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<RoomController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<GuestController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PaymentController>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<InvoiceController>().AsSelf().InstancePerLifetimeScope(); // <-- Lades till
             builder.RegisterType<MainMenuController>().AsSelf().InstancePerLifetimeScope();
 
             // DB Builder

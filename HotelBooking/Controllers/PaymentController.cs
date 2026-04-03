@@ -1,49 +1,37 @@
-﻿using HotelBooking.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Autofac.Core;
+using HotelBooking.UI;
+using Spectre.Console;
 
 namespace HotelBooking.Controllers
 {
     public class PaymentController
     {
+        private readonly PaymentUI _paymentUI;
 
-        private readonly PaymentService _paymentService;
-
-        public PaymentController(PaymentService paymentService)
+        public PaymentController(PaymentUI paymentUI)
         {
-            _paymentService = paymentService;
+            _paymentUI = paymentUI;
         }
+
         public void RunCrudMenu()
         {
             while (true)
             {
-                int choise = UI.CrudMenuUI.Show("Hantera betalning");
+                int choice = CrudMenuUI.Show("Hantera betalning");
 
-                switch (choise)
+                switch (choice)
                 {
                     case 1:
-                        _paymentService.ShowAll();
+                        _paymentUI.Show();       // Visa betalning via faktura-ID
                         break;
                     case 2:
-                        _paymentService.ShowDetails();
+                        _paymentUI.Create();     // Om du vill lägga till Create i PaymentUI
                         break;
                     case 3:
-                        _paymentService.Create();
+                        _paymentUI.ShowAll();    // Om du vill lägga till ShowAll i PaymentUI
                         break;
                     case 4:
-                        _paymentService.Update();
-                        break;
-                    case 5:
-                        _paymentService.SoftDelete();
-                        break;
-                    case 6:
-                        _paymentService.Restore();
-                        break;
-                    case 7:
-                        return; // Tillbaka till huvudmenyn
-                    default:
-                        break;
+                        return;                  // Tillbaka till huvudmenyn
                 }
             }
         }

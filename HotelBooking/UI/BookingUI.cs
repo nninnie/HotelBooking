@@ -14,19 +14,100 @@ namespace HotelBooking.UI
 
         public void Create()
         {
-            int guestId = AnsiConsole.Ask<int>("Gäst-ID:");
-            int roomId = AnsiConsole.Ask<int>("Rum-ID:");
+            // 1. Hämta alla gäster
+            var guests = _service.GetAllGuests(); 
 
+            // 2. Låt användaren välja gäst
+            var guestChoices = guests
+                .Select(g => $"{g.Id}. {g.FullName} – {g.Email} – {g.PhoneNumber}")
+                .ToList();
+
+            guestChoices.Add("Skapa ny gäst");
+
+            var selectedGuest = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Välj [yellow]gäst[/]:")
+                    .AddChoices(guestChoices)
+            );
+
+            int guestId;
+
+            // 3. Om användaren vill skapa ny gäst
+            if (selectedGuest == "Skapa ny gäst")
+            {
+                string fullName = AnsiConsole.Ask<string>("Fullständigt namn:");
+                string email = AnsiConsole.Ask<string>("E-post:");
+                string phone = AnsiConsole.Ask<string>("Telefonnummer:");
+
+                var newGuest = _service.CreateGuest(fullName, email, phone); // Lägg till i BookingService
+                guestId = newGuest.Id;
+
+                AnsiConsole.MarkupLine($"[green]Ny gäst skapad![/] ID: {guestId}");
+            }
+            else
+            {
+                guestId = int.Parse(selectedGuest.Split('.')[0]);
+            }
+
+            // 4. Välj datum
             DateOnly checkIn = AnsiConsole.Ask<DateOnly>("Incheckning (YYYY-MM-DD):");
             DateOnly checkOut = AnsiConsole.Ask<DateOnly>("Utcheckning (YYYY-MM-DD):");
-            int guests = AnsiConsole.Ask<int>("Antal gäster:");
 
+            // 5. Hämta lediga rum
+            var availableRooms = _service.GetAvailableRooms(
+                checkIn.ToDateTime(TimeOnly.MinValue),
+                checkOut.ToDateTime(TimeOnly.MinValue)
+            );
+
+            if (!availableRooms.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga lediga rum för dessa datum.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            // 6. Låt användaren välja rum
+            var roomChoices = availableRooms
+                .Select(r => $"{r.Id}. Rum {r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt – Max {r.MaxGuests} gäster")
+                .ToList();
+
+            var selectedRoom = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Välj [yellow]ledigt rum[/]:")
+                    .AddChoices(roomChoices)
+            );
+
+            int roomId = int.Parse(selectedRoom.Split('.')[0]);
+
+            // 7. Beräkna pris
+            var room = availableRooms.First(r => r.Id == roomId);
+            int nights = (checkOut.ToDateTime(TimeOnly.MinValue) - checkIn.ToDateTime(TimeOnly.MinValue)).Days;
+            decimal totalPrice = nights * room.PricePerNight;
+
+            AnsiConsole.MarkupLine($@"
+[green]Prisberäkning[/]
+Pris per natt: {room.PricePerNight} kr
+Antal nätter: {nights}
+Totalpris: [yellow]{totalPrice} kr[/]
+");
+
+            // 8. Antal gäster
+            int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
+
+            if (guestsCount > room.MaxGuests)
+            {
+                AnsiConsole.MarkupLine("[red]För många gäster för detta rum.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            // 9. Skapa bokningen
             var booking = _service.CreateBooking(
                 guestId,
                 roomId,
                 checkIn.ToDateTime(TimeOnly.MinValue),
                 checkOut.ToDateTime(TimeOnly.MinValue),
-                guests
+                guestsCount
             );
 
             AnsiConsole.MarkupLine($"[green]Bokning skapad![/] ID: {booking.Id}");

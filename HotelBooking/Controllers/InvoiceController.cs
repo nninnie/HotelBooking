@@ -1,52 +1,40 @@
-﻿using HotelBooking.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
 {
     public class InvoiceController
     {
-        private readonly InvoiceService _invoiceService;
+        private readonly InvoiceUI _invoiceUI;
 
-        public InvoiceController(InvoiceService invoiceService)
+        public InvoiceController(InvoiceUI invoiceUI)
         {
-            _invoiceService = invoiceService;
+            _invoiceUI = invoiceUI;
         }
 
         public void RunCrudMenu()
         {
             while (true)
             {
-                int choise = UI.CrudMenuUI.Show("Hantera faktura");
+                int choice = CrudMenuUI.Show("Hantera faktura");
 
-                switch (choise)
+                switch (choice)
                 {
                     case 1:
-                        _invoiceService.ShowAll();
+                        _invoiceUI.ShowAll();
                         break;
                     case 2:
-                        _invoiceService.ShowDetails();
+                        _invoiceUI.ShowDetails();
                         break;
                     case 3:
-                        _invoiceService.Create();
+                        _invoiceUI.Create();
                         break;
                     case 4:
-                        _invoiceService.Update();
+                        _invoiceUI.MarkAsPaid();
                         break;
                     case 5:
-                        _invoiceService.SoftDelete();
-                        break;
-                    case 6:
-                        _invoiceService.Restore();
-                        break;
-                    case 7:
                         return; // Tillbaka till huvudmenyn
-                    default:
-                        break;
                 }
             }
         }
-
     }
 }

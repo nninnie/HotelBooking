@@ -1,40 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using HotelBooking.Data;
+using HotelBooking.Models;
 
 namespace HotelBooking.Services
 {
     public class InvoiceService
     {
+        private readonly HotelDBContext _db;
 
-        public void Restore()
+        public InvoiceService(HotelDBContext db)
         {
-
+            _db = db;
         }
 
-        public void SoftDelete()
+        // Hämta en specifik faktura
+        public Invoice? GetInvoice(int id)
         {
-
+            return _db.Invoices
+                .FirstOrDefault(i => i.Id == id);
         }
 
-        public void Update()
+        // Hämta alla fakturor
+        public List<Invoice> GetAllInvoices()
         {
-
+            return _db.Invoices
+                .OrderBy(i => i.Id)
+                .ToList();
         }
 
-        public void Create()
+        // Skapa en faktura kopplad till en bokning
+        public Invoice CreateInvoice(int bookingId, int guestId, decimal totalAmount)
         {
+            var invoice = new Invoice
+            {
+                BookingId = bookingId,
+                GuestId = guestId,
+                TotalAmount = totalAmount,
+                CreatedDate = DateTime.Now,
+                IsPaid = false
+            };
 
+            _db.Invoices.Add(invoice);
+            _db.SaveChanges();
+
+            return invoice;
         }
 
-        public void ShowDetails()
+        // Markera faktura som betald
+        public bool MarkAsPaid(int invoiceId)
         {
+            var invoice = GetInvoice(invoiceId);
+            if (invoice == null)
+                return false;
 
-        }
-
-        public void ShowAll()
-        {
-
+            invoice.IsPaid = true;
+            _db.SaveChanges();
+            return true;
         }
     }
 }

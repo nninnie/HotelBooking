@@ -121,5 +121,33 @@ namespace HotelBooking.Services
             _db.SaveChanges();
             return true;
         }
+
+        public List<Guest> GetAllGuests()
+        {
+            return _db.Guests.OrderBy(g => g.FullName).ToList();
+        }
+
+        public Guest CreateGuest(string fullName, string email, string phone)
+        {
+            var guest = new Guest
+            {
+                FullName = fullName,
+                Email = email,
+                PhoneNumber = phone
+            };
+
+            _db.Guests.Add(guest);
+            _db.SaveChanges();
+
+            return guest;
+        }
+
+        public List<Room> GetAvailableRooms(DateTime from, DateTime to)
+        {
+            return _db.Rooms
+                .Where(r => !r.Bookings.Any(b =>
+                    (from < b.ToDate && to > b.FromDate) && !b.IsDeleted))
+                .ToList();
+        }
     }
 }
