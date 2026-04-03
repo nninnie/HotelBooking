@@ -2,6 +2,7 @@
 using HotelBooking.Data;
 using HotelBooking.UI;
 using Spectre.Console;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Controllers
 {
@@ -17,41 +18,81 @@ namespace HotelBooking.Controllers
 
                 var username = AnsiConsole
                     .Ask<string>("Användarnamn:") ?? "";
-
                 var password = AnsiConsole
-                    .Prompt(
-                    new TextPrompt<string>("Lösenord:")
+                    .Prompt(new TextPrompt<string>("Lösenord:")
                     .Secret()
                 ) ?? "";
 
-                // Hash funktion som gör lösenordet “oläsbart”
-                string Hash(string input) => input
-                    .GetHashCode()
-                    .ToString();
+                // Gör användarnamnet case-insensitive
+                var name = username.ToLower();
 
-                // Försök hitta användaren i databasen
-                var user = db.Employees
-                    .FirstOrDefault(e => e
-                    .Username == username);
-
-                if (user != null && user
-                    .PasswordHash == Hash(password))
+                if (name == "richard")
                 {
-                    // RIKTIG LOGIN
-                    LoginService.CurrentUserName = user.FullName;
+                    // Fel lösenord - visa felmeddelande men logga ändå in
+                    if (password != "bajskorv")
+                    {
+                        AnsiConsole.MarkupLine("[red]Fel användarnamn eller lösenord![/]");
+                        AnsiConsole.MarkupLine("[yellow]Det rätta lösenordet är: [bold]bajskorv[/][/]");
+                        AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
+                        Console.ReadKey();
+                    }
+
+                    // Logga in som Dungeon Master
+                    LoginService.CurrentUserName = "Dungeon Master Richard Chalk";
                     isLoggedIn = true;
+
+                    AnsiConsole.Clear();
+                    BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine("[green]Välkommen tillbaka, [bold]Richard Chalk[/]![/]");
+                    AnsiConsole.MarkupLine("[yellow]Roll: [bold]Dungeon Master[/][/]");
+                    AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
+                    Console.ReadKey();
+
                     return;
                 }
 
-                // FEL LOGIN - visa felsökningsmeddelande
-                AnsiConsole.MarkupLine("[red]Fel användarnamn eller lösenord![/]");
-                AnsiConsole.MarkupLine("[yellow]Det rätta lösenordet är: [bold]bajskorv[/][/]");
+                if (name == "ninnie")
+                {
+                    LoginService.CurrentUserName = $"Manager {username}";
+                    isLoggedIn = true;
+
+                    AnsiConsole.Clear();
+                    BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
+                    AnsiConsole.MarkupLine("[yellow]Roll: [bold]Manager[/][/]");
+                    AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
+                    Console.ReadKey();
+
+                    return;
+                }
+
+    
+                if (name == "my" || name == "zoe")
+                {
+                    LoginService.CurrentUserName = $"Receptionist {username}";
+                    isLoggedIn = true;
+
+                    AnsiConsole.Clear();
+                    BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
+                    AnsiConsole.MarkupLine("[yellow]Roll: [bold]Receptionist[/][/]");
+                    AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
+                    Console.ReadKey();
+
+                    return;
+                }
+
+
+                LoginService.CurrentUserName = $"Guest {username}";
+                isLoggedIn = true;
+
+                AnsiConsole.Clear();
+                BannerUI.ShowLogo();
+                AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
+                AnsiConsole.MarkupLine("[yellow]Roll: [bold]Guest[/][/]");
                 AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
                 Console.ReadKey();
 
-                // DUMMY-LOGIN - för lätt kunna felsöka UI:t utan att behöva logga in på riktigt
-                LoginService.CurrentUserName = username;
-                isLoggedIn = true;
                 return;
             }
         }

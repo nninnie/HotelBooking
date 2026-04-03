@@ -76,7 +76,8 @@ namespace HotelBooking.Services
         /// </summary>
         public bool CancelBooking(int bookingId)
         {
-            var booking = _db.Bookings.Find(bookingId);
+            var booking = _db.Bookings
+                .Find(bookingId);
             if (booking == null)
                 return false;
 
@@ -91,11 +92,15 @@ namespace HotelBooking.Services
         public bool UpgradeBooking(int bookingId)
         {
             // 1. Hitta bokningen
-            var booking = _db.Bookings.Find(bookingId);
+            var booking = _db
+                .Bookings
+                .Find(bookingId);
             if (booking == null)
                 return false;
 
-            var currentRoom = _db.Rooms.Find(booking.RoomId);
+            var currentRoom = _db.Rooms
+                .Find(booking
+                .RoomId);
             if (currentRoom == null)
                 return false;
 
@@ -108,7 +113,9 @@ namespace HotelBooking.Services
 
             // 3. Hitta första rummet som är dyrare
             var upgradedRoom = availableRooms
-                .FirstOrDefault(r => r.PricePerNight > currentRoom.PricePerNight);
+                .FirstOrDefault(r => r
+                .PricePerNight > currentRoom
+                .PricePerNight);
 
             if (upgradedRoom == null)
                 return false;
@@ -120,34 +127,34 @@ namespace HotelBooking.Services
             return true;
         }
 
-        internal void Restore()
+        public void Restore()
         {
-            throw new NotImplementedException();
+ 
         }
 
-        internal void SoftDelete()
+        public void SoftDelete()
         {
-            throw new NotImplementedException();
+
         }
 
-        internal void Update()
+        public void Update()
         {
-            throw new NotImplementedException();
+
         }
 
-        internal void Create()
+        public void Create()
         {
-            throw new NotImplementedException();
+            
         }
 
-        internal void ShowDetails()
+        public void ShowDetails()
         {
-            throw new NotImplementedException();
+            
         }
 
-        internal void ShowAll()
+        public void ShowAll()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
