@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Services;
+using HotelBooking.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,11 +8,11 @@ namespace HotelBooking.Controllers
 {
     public class GuestController
     {
-        private readonly GuestService _guestService;
+        private readonly GuestUI _guestUI;
 
-        public GuestController(GuestService guestService)
+        public GuestController(GuestUI guestUI)
         {
-            _guestService = guestService;
+            _guestUI = guestUI;
         }
 
         public void RunCrudMenu()
@@ -22,24 +23,18 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _guestService.ShowAll();
+                        _guestUI.ShowAll();
                         break;
                     case 2:
-                        _guestService.ShowDetails();
+                        _guestUI.ShowDetails();
                         break;
                     case 3:
-                        _guestService.Create();
+                        _guestUI.Create();
                         break;
                     case 4:
-                        _guestService.Update();
+                        _guestUI.Update();
                         break;
                     case 5:
-                        _guestService.SoftDelete();
-                        break;
-                    case 6:
-                        _guestService.Restore();
-                        break;
-                    case 7:
                         return; // Tillbaka till huvudmenyn
                     default:
                         break;
