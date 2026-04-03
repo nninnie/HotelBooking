@@ -1,17 +1,7 @@
 ﻿using HotelBooking.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HotelBooking.Services
 {
-    /// <summary>
-    /// Provides booking-related operations for hotel rooms, including searching for available rooms, creating bookings,
-    /// canceling bookings, and upgrading existing bookings.
-    /// </summary>
-    /// <remarks>This service acts as the main entry point for managing hotel room bookings and related
-    /// actions. It requires a valid HotelDBContext instance for database access. All methods assume that the provided
-    /// identifiers and parameters correspond to valid entities and values within the database context.</remarks>
     public class BookingService
     {
         private readonly HotelDBContext _db;
@@ -21,21 +11,15 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        /// <summary>
-        /// Returns all rooms that are available between the given dates
-        /// and can accommodate the specified number of guests.
-        /// </summary>
         public List<Room> GetAvailableRooms(DateTime checkIn, DateTime checkOut, int guests)
         {
-            // 1. Datumkontroll
             if (checkIn.Date < DateTime.Today)
                 throw new Exception("Incheckningsdatum kan inte vara i det förflutna.");
 
             if (checkOut <= checkIn)
                 throw new Exception("Utcheckningsdatum måste vara efter incheckningsdatum.");
 
-            // 2. Hämta lediga rum
-            var availableRooms = _db.Rooms
+            return _db.Rooms
                 .Where(r => r.MaxGuests >= guests)
                 .Where(r => !_db.Bookings.Any(b =>
                     b.RoomId == r.Id &&
@@ -47,14 +31,9 @@ namespace HotelBooking.Services
                 ))
                 .OrderBy(r => r.PricePerNight)
                 .ToList();
-
-            return availableRooms;
         }
 
-        /// <summary>
-        /// Creates a new booking and stores NumberOfGuests + BookingDate.
-        /// </summary>
-        public Booking CreateBooking(int guestId, int roomId, DateTime checkIn, DateTime checkOut, int numberOfGuests)
+        public Booking CreateBooking(int guestId, int roomId, DateTime checkIn, DateTime checkOut, int guests)
         {
             var booking = new Booking
             {
@@ -62,7 +41,7 @@ namespace HotelBooking.Services
                 RoomId = roomId,
                 FromDate = checkIn,
                 ToDate = checkOut,
-                NumberOfGuests = numberOfGuests,
+                NumberOfGuests = guests,
                 BookingDate = DateTime.Now
             };
 
@@ -71,90 +50,76 @@ namespace HotelBooking.Services
             return booking;
         }
 
-        /// <summary>
-        /// Cancels a booking by ID.
-        /// </summary>
-        public bool CancelBooking(int bookingId)
+        public Booking? GetBooking(int id)
         {
-            var booking = _db.Bookings
-                .Find(bookingId);
-            if (booking == null)
-                return false;
+            return _db.Bookings.FirstOrDefault(b => b.Id == id);
+        }
+
+        public List<Booking> GetAll()
+        {
+            return _db.Bookings.OrderBy(b => b.Id).ToList();
+        }
+
+        public bool CancelBooking(int id)
+        {
+            var booking = GetBooking(id);
+            if (booking == null) return false;
 
             _db.Bookings.Remove(booking);
             _db.SaveChanges();
             return true;
         }
 
-        /// <summary>
-        /// Upgrades a booking to a more expensive available room.
-        /// </summary>
-        public bool UpgradeBooking(int bookingId)
+        public bool SoftDelete(int id)
         {
-            // 1. Hitta bokningen
-            var booking = _db
-                .Bookings
-                .Find(bookingId);
-            if (booking == null)
-                return false;
+            var booking = GetBooking(id);
+            if (booking == null || booking.IsDeleted) return false;
 
-            var currentRoom = _db.Rooms
-                .Find(booking
-                .RoomId);
-            if (currentRoom == null)
-                return false;
-
-            // 2. Hämta lediga rum baserat på antal gäster
-            var availableRooms = GetAvailableRooms(
-                booking.FromDate,
-                booking.ToDate,
-                booking.NumberOfGuests
-            );
-
-            // 3. Hitta första rummet som är dyrare
-            var upgradedRoom = availableRooms
-                .FirstOrDefault(r => r
-                .PricePerNight > currentRoom
-                .PricePerNight);
-
-            if (upgradedRoom == null)
-                return false;
-
-            // 4. Uppgradera
-            booking.RoomId = upgradedRoom.Id;
+            booking.IsDeleted = true;
             _db.SaveChanges();
-
             return true;
         }
 
-        public void Restore()
+        public bool Restore(int id)
         {
- 
+            var booking = GetBooking(id);
+            if (booking == null || !booking.IsDeleted) return false;
+
+            booking.IsDeleted = false;
+            _db.SaveChanges();
+            return true;
         }
 
-        public void SoftDelete()
+        public bool UpdateBooking(int id, int? guestId, DateTime? from, DateTime? to, int? guests)
         {
+            var booking = GetBooking(id);
+            if (booking == null) return false;
 
+            if (guestId.HasValue) booking.GuestId = guestId.Value;
+            if (from.HasValue) booking.FromDate = from.Value;
+            if (to.HasValue) booking.ToDate = to.Value;
+            if (guests.HasValue) booking.NumberOfGuests = guests.Value;
+
+            _db.SaveChanges();
+            return true;
         }
 
-        public void Update()
+        public bool UpgradeBooking(int id)
         {
+            var booking = GetBooking(id);
+            if (booking == null) return false;
 
-        }
+            var currentRoom = _db.Rooms.Find(booking.RoomId);
+            if (currentRoom == null) return false;
 
-        public void Create()
-        {
-            
-        }
+            var available = GetAvailableRooms(booking.FromDate, booking.ToDate, booking.NumberOfGuests);
 
-        public void ShowDetails()
-        {
-            
-        }
+            var upgraded = available.FirstOrDefault(r => r.PricePerNight > currentRoom.PricePerNight);
+            if (upgraded == null) return false;
 
-        public void ShowAll()
-        {
-            
+            booking.RoomId = upgraded.Id;
+            _db.SaveChanges();
+            return true;
         }
     }
 }

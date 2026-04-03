@@ -6,5 +6,35 @@ namespace HotelBooking.Services
 {
     public class PaymentService
     {
+
+        public void Restore()
+        {
+
+        }
+
+        public void SoftDelete()
+        {
+
+        }
+
+        public void Update()
+        {
+
+        }
+
+        public void Create()
+        {
+
+        }
+
+        public void ShowDetails()
+        {
+
+        }
+
+        public void ShowAll()
+        {
+
+        }
     }
 }

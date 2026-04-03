@@ -19,5 +19,36 @@ namespace HotelBooking.Services
             return _db.Guests.ToArray();
 
         }
+
+
+        public void Restore()
+        {
+
+        }
+
+        public void SoftDelete()
+        {
+
+        }
+
+        public void Update()
+        {
+
+        }
+
+        public void Create()
+        {
+
+        }
+
+        public void ShowDetails()
+        {
+
+        }
+
+        public void ShowAll()
+        {
+
+        }
     }
 }

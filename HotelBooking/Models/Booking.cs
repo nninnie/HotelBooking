@@ -32,6 +32,8 @@ public class Booking
 
     // Datum då bokningen skapades (viktigt för betalningsdeadline)
     public DateTime BookingDate { get; set; } = DateTime.Now;
+    
+    public bool IsDeleted { get; set; } = false;
 
     // Relation till Invoice
     public List<Invoice> Invoices { get; set; } = new();
