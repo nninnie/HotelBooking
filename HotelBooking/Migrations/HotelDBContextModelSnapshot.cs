@@ -42,6 +42,9 @@ namespace HotelBooking.Migrations
                     b.Property<int>("GuestId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("int");
 
@@ -214,6 +217,9 @@ namespace HotelBooking.Migrations
 
                     b.Property<int>("ExtraBeds")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsOutOfService")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("PricePerNight")
                         .HasColumnType("decimal(18,2)");

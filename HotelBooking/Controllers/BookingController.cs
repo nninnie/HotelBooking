@@ -1,54 +1,56 @@
-﻿using Autofac.Core;
-using HotelBooking.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using HotelBooking.Services;
+using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
 {
     public class BookingController
     {
-        private readonly BookingService _bookingService;
+        private readonly BookingUI _bookingUI;
 
-        public BookingController(BookingService bookingService)
+        public BookingController(BookingUI bookingUI)
         {
-            _bookingService = bookingService;
+            _bookingUI = bookingUI;
         }
 
         public void CreateDirect()
         {
-            _bookingService.Create(); // “Ny bokning” från huvudmenyn
+            _bookingUI.Create(); // “Ny bokning” från huvudmenyn
         }
 
         public void RunCrudMenu()
         {
             while (true)
             {
-                int choice = UI.CrudMenuUI.Show("Hantera bokningar");
+                int choice = CrudMenuUI.Show("Hantera bokningar");
+
                 switch (choice)
                 {
                     case 1:
-                        _bookingService.ShowAll();
+                        _bookingUI.ShowAll();
                         break;
+
                     case 2:
-                        _bookingService.ShowDetails();
+                        _bookingUI.ShowDetails();
                         break;
+
                     case 3:
-                        _bookingService.Create();
+                        _bookingUI.Create();
                         break;
+
                     case 4:
-                        _bookingService.Update();
+                        _bookingUI.Update();
                         break;
+
                     case 5:
-                        _bookingService.SoftDelete();
+                        _bookingUI.SoftDelete();
                         break;
+
                     case 6:
-                        _bookingService.Restore();
+                        _bookingUI.Restore();
                         break;
+
                     case 7:
                         return; // Tillbaka till huvudmenyn
-                    default:
-                        break;
                 }
             }
         }

@@ -32,6 +32,8 @@ namespace HotelBooking.Models
         [Required]
         [Range(0, 999999)]
         public decimal PricePerNight { get; set; }
+        // Om rummet är ur funktion och inte kan bokas
+        public bool IsOutOfService { get; set; } = false;
 
         // Relation: ett rum kan ha många bokningar
         public List<Booking> Bookings { get; set; } = new();

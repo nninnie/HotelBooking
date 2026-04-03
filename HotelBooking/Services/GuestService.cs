@@ -1,7 +1,4 @@
 ﻿using HotelBooking.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HotelBooking.Services
 {
@@ -16,39 +13,42 @@ namespace HotelBooking.Services
 
         public Guest[] GetAllGuests()
         {
-            return _db.Guests.ToArray();
-
+            return _db.Guests
+                .OrderBy(g => g.Id)
+                .ToArray();
         }
 
-
-        public void Restore()
+        public Guest? GetGuest(int id)
         {
-
+            return _db.Guests.FirstOrDefault(g => g.Id == id);
         }
 
-        public void SoftDelete()
+        public Guest CreateGuest(string fullName, string? phone, string? email)
         {
+            var guest = new Guest
+            {
+                FullName = fullName,
+                PhoneNumber = phone,
+                Email = email
+            };
 
+            _db.Guests.Add(guest);
+            _db.SaveChanges();
+            return guest;
         }
 
-        public void Update()
+        public bool UpdateGuest(int id, string? fullName, string? phone, string? email)
         {
+            var guest = GetGuest(id);
+            if (guest == null)
+                return false;
 
-        }
+            if (!string.IsNullOrWhiteSpace(fullName)) guest.FullName = fullName;
+            if (!string.IsNullOrWhiteSpace(phone)) guest.PhoneNumber = phone;
+            if (!string.IsNullOrWhiteSpace(email)) guest.Email = email;
 
-        public void Create()
-        {
-
-        }
-
-        public void ShowDetails()
-        {
-
-        }
-
-        public void ShowAll()
-        {
-
+            _db.SaveChanges();
+            return true;
         }
     }
 }
