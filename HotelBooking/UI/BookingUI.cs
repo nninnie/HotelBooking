@@ -5,9 +5,10 @@ namespace HotelBooking.UI
 {
     public class BookingUI
     {
-        private readonly BookingService _service;
+        // BookingUI använder ett interface istället för en konkret klass (SOLID: DIP)
+        private readonly IBookingService _service;
 
-        public BookingUI(BookingService service)
+        public BookingUI(IBookingService service)
         {
             _service = service;
         }
@@ -15,7 +16,7 @@ namespace HotelBooking.UI
         public void Create()
         {
             // 1. Hämta alla gäster
-            var guests = _service.GetAllGuests(); 
+            var guests = _service.GetAllGuests();
 
             // 2. Låt användaren välja gäst
             var guestChoices = guests
@@ -39,7 +40,7 @@ namespace HotelBooking.UI
                 string email = AnsiConsole.Ask<string>("E-post:");
                 string phone = AnsiConsole.Ask<string>("Telefonnummer:");
 
-                var newGuest = _service.CreateGuest(fullName, email, phone); // Lägg till i BookingService
+                var newGuest = _service.CreateGuest(fullName, email, phone);
                 guestId = newGuest.Id;
 
                 AnsiConsole.MarkupLine($"[green]Ny gäst skapad![/] ID: {guestId}");
@@ -49,15 +50,15 @@ namespace HotelBooking.UI
                 guestId = int.Parse(selectedGuest.Split('.')[0]);
             }
 
-            // 4. Välj datum
-            DateOnly checkIn = AnsiConsole.Ask<DateOnly>("Incheckning (YYYY-MM-DD):");
-            DateOnly checkOut = AnsiConsole.Ask<DateOnly>("Utcheckning (YYYY-MM-DD):");
+            // 4. Välj datum via kalender
+            var checkIn = ShowCalendarAndPickDate(DateTime.Today, DateTime.Today);
+            var checkOut = ShowCalendarAndPickDate(checkIn.AddDays(1), checkIn.AddDays(1));
 
-            // 5. Hämta lediga rum
-            var availableRooms = _service.GetAvailableRooms(
-                checkIn.ToDateTime(TimeOnly.MinValue),
-                checkOut.ToDateTime(TimeOnly.MinValue)
-            );
+            // 5. Antal gäster (behövs för att filtrera rum)
+            int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
+
+            // 6. Hämta lediga rum baserat på datum + antal gäster
+            var availableRooms = _service.GetAvailableRooms(checkIn, checkOut, guestsCount);
 
             if (!availableRooms.Any())
             {
@@ -66,7 +67,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // 6. Låt användaren välja rum
+            // 7. Låt användaren välja rum
             var roomChoices = availableRooms
                 .Select(r => $"{r.Id}. Rum {r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt – Max {r.MaxGuests} gäster")
                 .ToList();
@@ -78,10 +79,18 @@ namespace HotelBooking.UI
             );
 
             int roomId = int.Parse(selectedRoom.Split('.')[0]);
-
-            // 7. Beräkna pris
             var room = availableRooms.First(r => r.Id == roomId);
-            int nights = (checkOut.ToDateTime(TimeOnly.MinValue) - checkIn.ToDateTime(TimeOnly.MinValue)).Days;
+
+            // 8. Kontrollera att antal gäster får plats i rummet
+            if (guestsCount > room.MaxGuests)
+            {
+                AnsiConsole.MarkupLine("[red]För många gäster för detta rum.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            // 9. Beräkna pris
+            int nights = (checkOut - checkIn).Days;
             decimal totalPrice = nights * room.PricePerNight;
 
             AnsiConsole.MarkupLine($@"
@@ -91,22 +100,12 @@ Antal nätter: {nights}
 Totalpris: [yellow]{totalPrice} kr[/]
 ");
 
-            // 8. Antal gäster
-            int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
-
-            if (guestsCount > room.MaxGuests)
-            {
-                AnsiConsole.MarkupLine("[red]För många gäster för detta rum.[/]");
-                Console.ReadKey();
-                return;
-            }
-
-            // 9. Skapa bokningen
+            // 10. Skapa bokningen
             var booking = _service.CreateBooking(
                 guestId,
                 roomId,
-                checkIn.ToDateTime(TimeOnly.MinValue),
-                checkOut.ToDateTime(TimeOnly.MinValue),
+                checkIn,
+                checkOut,
                 guestsCount
             );
 
@@ -114,123 +113,94 @@ Totalpris: [yellow]{totalPrice} kr[/]
             Console.ReadKey();
         }
 
-        public void ShowDetails()
-        {
-            int id = AnsiConsole.Ask<int>("Ange boknings-ID:");
+        // --- Kalenderfunktioner (UI-ansvar, inte service) ---
 
-            var booking = _service.GetBooking(id);
-            if (booking == null)
+        private DateTime ShowCalendarAndPickDate(DateTime startDate, DateTime minDate)
+        {
+            DateTime selectedDate = startDate;
+
+            while (true)
             {
-                AnsiConsole.MarkupLine("[red]Bokning hittades inte[/]");
-                Console.ReadKey();
-                return;
+                AnsiConsole.Clear();
+                RenderCalendar(selectedDate, minDate);
+
+                var keyInfo = AnsiConsole.Console.Input.ReadKey(true);
+                if (keyInfo == null)
+                    continue;
+
+                var key = keyInfo.Value.Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.RightArrow:
+                        selectedDate = selectedDate.AddDays(1);
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        selectedDate = selectedDate.AddDays(-1);
+                        break;
+
+                    case ConsoleKey.UpArrow:
+                        selectedDate = selectedDate.AddDays(-7);
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        selectedDate = selectedDate.AddDays(7);
+                        break;
+
+                    case ConsoleKey.Enter:
+                        if (selectedDate >= minDate)
+                            return selectedDate;
+                        break;
+
+                    case ConsoleKey.Escape:
+                        return minDate;
+                }
+
+                if (selectedDate < minDate)
+                    selectedDate = minDate;
+            }
+        }
+
+        private void RenderCalendar(DateTime selectedDate, DateTime minDate)
+        {
+            var sw = new StringWriter();
+
+            sw.WriteLine($"[red]{selectedDate:MMMM}[/]".ToUpper());
+            sw.WriteLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
+            sw.WriteLine("─────────────────────────────────");
+
+            DateTime firstDay = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+            int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
+            int startDay = (int)firstDay.DayOfWeek;
+            startDay = (startDay == 0) ? 6 : startDay - 1;
+
+            for (int i = 0; i < startDay; i++)
+                sw.Write("     ");
+
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                DateTime current = new DateTime(selectedDate.Year, selectedDate.Month, day);
+
+                if (current == selectedDate)
+                    sw.Write($"[green]{day,2}[/]   ");
+                else if (current < minDate)
+                    sw.Write($"[grey]{day,2}[/]   ");
+                else
+                    sw.Write($"{day,2}   ");
+
+                if ((startDay + day) % 7 == 0)
+                    sw.WriteLine();
             }
 
-            var panel = new Panel($@"
-ID: {booking.Id}
-Gäst-ID: {booking.GuestId}
-Rum-ID: {booking.RoomId}
-Från: {booking.FromDate:yyyy-MM-dd}
-Till: {booking.ToDate:yyyy-MM-dd}
-Antal gäster: {booking.NumberOfGuests}
-Bokad: {booking.BookingDate}
-")
+            var panel = new Panel(sw.ToString())
             {
-                Header = new PanelHeader("[green]Bokningsdetaljer[/]"),
-                Border = BoxBorder.Rounded
+                Border = BoxBorder.Double,
+                Header = new PanelHeader($"[red]{selectedDate:yyyy}[/]", Justify.Center)
             };
 
             AnsiConsole.Write(panel);
-            Console.ReadKey();
-        }
-
-        public void ShowAll()
-        {
-            var bookings = _service.GetAll();
-
-            if (!bookings.Any())
-            {
-                AnsiConsole.MarkupLine("[red]Inga bokningar hittades[/]");
-                Console.ReadKey();
-                return;
-            }
-
-            var table = new Table().RoundedBorder();
-
-            table.AddColumn("ID");
-            table.AddColumn("Gäst-ID");
-            table.AddColumn("Rum-ID");
-            table.AddColumn("Från");
-            table.AddColumn("Till");
-            table.AddColumn("Gäster");
-
-            foreach (var b in bookings)
-            {
-                table.AddRow(
-                    b.Id.ToString(),
-                    b.GuestId.ToString(),
-                    b.RoomId.ToString(),
-                    b.FromDate.ToString("yyyy-MM-dd"),
-                    b.ToDate.ToString("yyyy-MM-dd"),
-                    b.NumberOfGuests.ToString()
-                );
-            }
-
-            AnsiConsole.Write(table);
-            Console.ReadKey();
-        }
-
-        public void SoftDelete()
-        {
-            int id = AnsiConsole.Ask<int>("ID att ta bort:");
-
-            if (_service.SoftDelete(id))
-                AnsiConsole.MarkupLine("[green]Markerad som borttagen[/]");
-            else
-                AnsiConsole.MarkupLine("[red]Kunde inte ta bort[/]");
-
-            Console.ReadKey();
-        }
-
-        public void Restore()
-        {
-            int id = AnsiConsole.Ask<int>("ID att återställa:");
-
-            if (_service.Restore(id))
-                AnsiConsole.MarkupLine("[green]Återställd[/]");
-            else
-                AnsiConsole.MarkupLine("[red]Kunde inte återställa[/]");
-
-            Console.ReadKey();
-        }
-
-        public void Update()
-        {
-            int id = AnsiConsole.Ask<int>("ID att uppdatera:");
-
-            var booking = _service.GetBooking(id);
-            if (booking == null)
-            {
-                AnsiConsole.MarkupLine("[red]Bokning hittades inte[/]");
-                Console.ReadKey();
-                return;
-            }
-
-            string newGuest = AnsiConsole.Ask<string>("Nytt Gäst-ID (tomt = behåll):");
-            string newFrom = AnsiConsole.Ask<string>("Ny incheckning (YYYY-MM-DD, tomt = behåll):");
-            string newTo = AnsiConsole.Ask<string>("Ny utcheckning (YYYY-MM-DD, tomt = behåll):");
-            string newGuests = AnsiConsole.Ask<string>("Nytt antal gäster (tomt = behåll):");
-
-            _service.UpdateBooking(
-                id,
-                string.IsNullOrWhiteSpace(newGuest) ? null : int.Parse(newGuest),
-                string.IsNullOrWhiteSpace(newFrom) ? null : DateTime.Parse(newFrom),
-                string.IsNullOrWhiteSpace(newTo) ? null : DateTime.Parse(newTo),
-                string.IsNullOrWhiteSpace(newGuests) ? null : int.Parse(newGuests)
-            );
-
-            AnsiConsole.MarkupLine("[green]Bokning uppdaterad[/]");
-            Console.ReadKey();
+            AnsiConsole.MarkupLine("\nNavigera med [blue]piltangenter[/], välj med [green]Enter[/].");
         }
     }
 }

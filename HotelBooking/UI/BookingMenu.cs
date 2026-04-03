@@ -40,7 +40,7 @@ public class BookingMenu
         var room = AskRoomSelection(rooms);
 
         // 7. Skapa bokningen i databasen via BookingService
-        _bookingService.CreateBooking(room.Id, guest.Id, checkIn, checkOut, guests);
+        _bookingService.CreateBooking(guest.Id, room.Id, checkIn, checkOut, guests);
 
         // 8. Visa en snygg bekräftelse
         ShowConfirmation(room, checkIn, checkOut, guests);

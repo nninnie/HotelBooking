@@ -16,7 +16,7 @@ namespace HotelBooking.Services
         public List<Room> GetAllRooms()
         {
             return _db.Rooms
-                .OrderBy(r => r.Id)
+                .OrderBy(r => r.RoomNumber)
                 .ToList();
         }
 

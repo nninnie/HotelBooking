@@ -14,7 +14,7 @@ namespace HotelBooking.Services
         public Guest[] GetAllGuests()
         {
             return _db.Guests
-                .OrderBy(g => g.Id)
+                .OrderBy(g => g.FullName)
                 .ToArray();
         }
 
