@@ -1,13 +1,13 @@
-﻿using HotelBooking.Services;
+﻿using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
 namespace HotelBooking.UI
 {
     public class PaymentUI
     {
-        private readonly PaymentService _service;
+        private readonly IPaymentService _service;
 
-        public PaymentUI(PaymentService service)
+        public PaymentUI(IPaymentService service)
         {
             _service = service;
         }
@@ -16,29 +16,34 @@ namespace HotelBooking.UI
         {
             int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
 
-            var payment = _service.GetPayment(invoiceId);
+            var payments = _service.GetPaymentsForInvoice(invoiceId);
 
-            if (payment == null)
+            if (!payments.Any())
             {
-                AnsiConsole.MarkupLine("[red]Ingen betalning hittades för den fakturan.[/]");
+                AnsiConsole.MarkupLine("[red]Inga betalningar hittades för den fakturan.[/]");
                 Console.ReadKey();
                 return;
             }
 
-            var panel = new Panel($@"
-[white]Betalnings-ID:[/] {payment.Id}
-[white]Faktura-ID:[/] {payment.InvoiceId}
-[white]Belopp:[/] {payment.Amount} kr
-[white]Datum:[/] {payment.PaymentDate:yyyy-MM-dd}
-[white]Metod:[/] {payment.PaymentMethod}
-[white]Status:[/] {(payment.IsSuccessful ? "Genomförd" : "Misslyckad")}
-")
-            {
-                Header = new PanelHeader("[green]Betalningsinformation[/]"),
-                Border = BoxBorder.Rounded
-            };
+            var table = new Table().RoundedBorder();
+            table.AddColumn("[yellow]ID[/]");
+            table.AddColumn("[yellow]Belopp[/]");
+            table.AddColumn("[yellow]Datum[/]");
+            table.AddColumn("[yellow]Metod[/]");
+            table.AddColumn("[yellow]Status[/]");
 
-            AnsiConsole.Write(panel);
+            foreach (var p in payments)
+            {
+                table.AddRow(
+                    p.Id.ToString(),
+                    $"{p.Amount} kr",
+                    p.PaymentDate.ToString("yyyy-MM-dd"),
+                    p.PaymentMethod ?? "Okänd",
+                    p.IsSuccessful ? "[green]Genomförd[/]" : "[red]Misslyckad[/]"
+                );
+            }
+
+            AnsiConsole.Write(table);
             Console.ReadKey();
         }
 

@@ -2,6 +2,7 @@
 using HotelBooking.Controllers;
 using HotelBooking.Data;
 using HotelBooking.Services;
+using HotelBooking.Services.Interfaces;
 using HotelBooking.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

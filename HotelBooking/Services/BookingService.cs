@@ -1,5 +1,7 @@
 ﻿using HotelBooking.Data;
 using HotelBooking.Models;
+using HotelBooking.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services
 {
@@ -71,15 +73,18 @@ namespace HotelBooking.Services
         // Hämta en specifik bokning via ID
         public Booking? GetBooking(int id)
         {
-            return _db.Bookings.FirstOrDefault(b => b.Id == id);
+            return _db.Bookings
+                .Include(b => b.Guest)
+                .Include(b => b.Room)
+                .FirstOrDefault(b => b.Id == id);
         }
 
         // Hämta alla bokningar sorterade efter datum och rum
         public List<Booking> GetAll()
         {
             return _db.Bookings
-                .OrderBy(b => b.FromDate)
-                .ThenBy(b => b.RoomId)
+                .Include(b => b.Guest)
+                .Include(b => b.Room)
                 .ToList();
         }
 
@@ -151,30 +156,6 @@ namespace HotelBooking.Services
             booking.RoomId = upgraded.Id;
             _db.SaveChanges();
             return true;
-        }
-
-        // Hämta alla gäster sorterade alfabetiskt
-        public List<Guest> GetAllGuests()
-        {
-            return _db.Guests
-                .OrderBy(g => g.FullName)
-                .ToList();
-        }
-
-        // Skapa en ny gäst
-        public Guest CreateGuest(string fullName, string email, string phone)
-        {
-            var guest = new Guest
-            {
-                FullName = fullName,
-                Email = email,
-                PhoneNumber = phone
-            };
-
-            _db.Guests.Add(guest);
-            _db.SaveChanges();
-
-            return guest;
         }
     }
 }

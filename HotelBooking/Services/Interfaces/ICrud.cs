@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HotelBooking.Services
+namespace HotelBooking.Services.Interfaces
 {
     public interface ICrud
     {

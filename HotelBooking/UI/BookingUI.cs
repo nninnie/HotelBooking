@@ -1,23 +1,24 @@
 ﻿using HotelBooking.Models;
-using HotelBooking.Services;
+using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
 namespace HotelBooking.UI
 {
     public class BookingUI
     {
-        // BookingUI använder ett interface istället för en konkret klass (SOLID: DIP)
-        private readonly IBookingService _service;
+        private readonly IBookingService _bookingService;
+        private readonly IGuestService _guestService;
 
-        public BookingUI(IBookingService service)
+        public BookingUI(IBookingService bookingService, IGuestService guestService)
         {
-            _service = service;
+            _bookingService = bookingService;
+            _guestService = guestService;
         }
 
         public void Create()
         {
             // 1. Hämta alla gäster
-            var guests = _service.GetAllGuests();
+            var guests = _guestService.GetAllGuests();
 
             // 2. Låt användaren välja gäst
             var guestChoices = guests
@@ -41,7 +42,7 @@ namespace HotelBooking.UI
                 string email = AnsiConsole.Ask<string>("E-post:");
                 string phone = AnsiConsole.Ask<string>("Telefonnummer:");
 
-                var newGuest = _service.CreateGuest(fullName, email, phone);
+                var newGuest = _guestService.CreateGuest(fullName, email, phone);
                 guestId = newGuest.Id;
 
                 AnsiConsole.MarkupLine($"[green]Ny gäst skapad![/] ID: {guestId}");
@@ -59,7 +60,8 @@ namespace HotelBooking.UI
             int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
 
             // 6. Hämta lediga rum baserat på datum + antal gäster
-            var availableRooms = _service.GetAvailableRooms(checkIn, checkOut, guestsCount);
+            var availableRooms = _bookingService
+                .GetAvailableRooms(checkIn, checkOut, guestsCount);
 
             if (!availableRooms.Any())
             {
@@ -102,7 +104,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
 ");
 
             // 10. Skapa bokningen
-            var booking = _service.CreateBooking(
+            var booking = _bookingService.CreateBooking(
                 guestId,
                 roomId,
                 checkIn,
@@ -208,7 +210,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att återställa:");
 
-            bool success = _service.Restore(id);
+            bool success = _bookingService.Restore(id);
 
             if (success)
                 AnsiConsole.MarkupLine("[green]Bokningen är nu återställt![/]");
@@ -223,7 +225,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att ta bort:");
 
-            bool success = _service.SoftDelete(id);
+            bool success = _bookingService.SoftDelete(id);
 
             if (success)
                 AnsiConsole.MarkupLine("[yellow]Bokningen är nu markerat som ur funktion.[/]");
@@ -238,7 +240,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att uppdatera:");
 
-            var booking = _service.GetBooking(id);
+            var booking = _bookingService.GetBooking(id);
             if (booking == null)
             {
                 AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
@@ -270,7 +272,7 @@ Antal gäster: {booking.NumberOfGuests}
             DateTime? toDate = string.IsNullOrWhiteSpace(newTo) ? null : DateTime.Parse(newTo);
             int? guests = string.IsNullOrWhiteSpace(newGuests) ? null : int.Parse(newGuests);
 
-            bool success = _service.UpdateBooking(id, guestId, fromDate, toDate, guests);
+            bool success = _bookingService.UpdateBooking(id, guestId, fromDate, toDate, guests);
 
             if (success)
                 AnsiConsole.MarkupLine("[green]Bokningen uppdaterades![/]");
@@ -282,7 +284,7 @@ Antal gäster: {booking.NumberOfGuests}
 
         public void ShowAll()
         {
-            var bookings = _service.GetAll();
+            var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
             {
@@ -326,7 +328,7 @@ Antal gäster: {booking.NumberOfGuests}
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
 
-            var booking = _service.GetBooking(id);
+            var booking = _bookingService.GetBooking(id);
 
             if (booking == null)
             {

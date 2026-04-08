@@ -1,4 +1,4 @@
-﻿using HotelBooking.Services;
+﻿using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
 namespace HotelBooking.UI

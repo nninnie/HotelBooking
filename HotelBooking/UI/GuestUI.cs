@@ -1,13 +1,13 @@
 ﻿using Spectre.Console;
-using HotelBooking.Services;
+using HotelBooking.Services.Interfaces;
 
 namespace HotelBooking.UI
 {
     public class GuestUI
     {
-        private readonly GuestService _service;
+        private readonly IGuestService _service;
 
-        public GuestUI(GuestService service)
+        public GuestUI(IGuestService service)
         {
             _service = service;
         }
