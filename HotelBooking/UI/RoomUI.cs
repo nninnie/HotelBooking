@@ -40,7 +40,7 @@ namespace HotelBooking.UI
                     r.Id.ToString(),
                     r.RoomNumber,
                     r.RoomType,
-                    r.BaseGuests.ToString(),
+                    r.Capacity.ToString(),
                     r.ExtraBeds.ToString(),
                     r.MaxGuests.ToString(),
                     $"{r.PricePerNight} kr",
@@ -70,7 +70,7 @@ namespace HotelBooking.UI
 [white]Rums-ID:[/] {room.Id}
 [white]Nummer:[/] {room.RoomNumber}
 [white]Typ:[/] {room.RoomType}
-[white]Grundkapacitet:[/] {room.BaseGuests}
+[white]Grundkapacitet:[/] {room.Capacity}
 [white]Extrabäddar:[/] {room.ExtraBeds}
 [white]Max gäster:[/] {room.MaxGuests}
 [white]Pris per natt:[/] {room.PricePerNight} kr
@@ -116,7 +116,7 @@ namespace HotelBooking.UI
 
             string number = AnsiConsole.Ask<string>($"Rumsnummer ({existing.RoomNumber}):");
             string type = AnsiConsole.Ask<string>($"Rumstyp ({existing.RoomType}):");
-            int baseGuests = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.BaseGuests}):");
+            int baseGuests = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.Capacity}):");
             int extraBeds = AnsiConsole.Ask<int>($"Extrabäddar ({existing.ExtraBeds}):");
             decimal price = AnsiConsole.Ask<decimal>($"Pris per natt ({existing.PricePerNight}):");
             bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");

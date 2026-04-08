@@ -23,13 +23,13 @@ namespace HotelBooking.Services
             return _db.Rooms.FirstOrDefault(r => r.Id == id);
         }
 
-        public Room CreateRoom(string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService)
+        public Room CreateRoom(string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
         {
             var room = new Room
             {
                 RoomNumber = number,
                 RoomType = type,
-                BaseGuests = baseGuests,
+                Capacity = capacity,
                 ExtraBeds = extraBeds,
                 PricePerNight = price,
                 IsOutOfService = outOfService
@@ -40,14 +40,14 @@ namespace HotelBooking.Services
             return room;
         }
 
-        public bool UpdateRoom(int id, string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService)
+        public bool UpdateRoom(int id, string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
         {
             var room = GetRoom(id);
             if (room == null) return false;
 
             room.RoomNumber = number;
             room.RoomType = type;
-            room.BaseGuests = baseGuests;
+            room.Capacity = capacity;
             room.ExtraBeds = extraBeds;
             room.PricePerNight = price;
             room.IsOutOfService = outOfService;

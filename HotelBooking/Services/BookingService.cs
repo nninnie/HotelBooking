@@ -30,7 +30,7 @@ namespace HotelBooking.Services
             // 2. Rummet får inte vara ur bruk
             // 3. Rummet får inte ha en aktiv bokning som överlappar datumintervallet
             return _db.Rooms
-                .Where(r => r.MaxGuests >= guests && !r.IsOutOfService)
+                .Where(r => (r.Capacity + r.ExtraBeds) >= guests && !r.IsOutOfService)
                 .Where(r => !r.Bookings.Any(b =>
                     !b.IsDeleted &&
                     (

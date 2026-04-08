@@ -19,10 +19,10 @@ namespace HotelBooking.Data
             if (!db.Rooms.Any())
             {
                 db.Rooms.AddRange(
-                    new Room { RoomNumber = "101", RoomType = "Single", BaseGuests = 1, ExtraBeds = 0, PricePerNight = 850m },
-                    new Room { RoomNumber = "102", RoomType = "Double", BaseGuests = 2, ExtraBeds = 1, PricePerNight = 1200m },
-                    new Room { RoomNumber = "201", RoomType = "Double", BaseGuests = 2, ExtraBeds = 2, PricePerNight = 1400m },
-                    new Room { RoomNumber = "202", RoomType = "Single", BaseGuests = 1, ExtraBeds = 0, PricePerNight = 900m }
+                    new Room { RoomNumber = "101", RoomType = "Single", Capacity = 1, ExtraBeds = 0, PricePerNight = 850m },
+                    new Room { RoomNumber = "102", RoomType = "Double", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
+                    new Room { RoomNumber = "201", RoomType = "Double", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m },
+                    new Room { RoomNumber = "202", RoomType = "Single", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m }
                 );
             }
         }

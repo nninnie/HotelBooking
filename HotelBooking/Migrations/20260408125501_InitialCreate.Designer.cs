@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20260403195230_InitialCreate")]
+    [Migration("20260408125501_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -215,7 +215,7 @@ namespace HotelBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BaseGuests")
+                    b.Property<int>("Capacity")
                         .HasColumnType("int");
 
                     b.Property<int>("ExtraBeds")

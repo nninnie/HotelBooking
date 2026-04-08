@@ -47,7 +47,7 @@ namespace HotelBooking.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     RoomType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    BaseGuests = table.Column<int>(type: "int", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
                     ExtraBeds = table.Column<int>(type: "int", nullable: false),
                     PricePerNight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsOutOfService = table.Column<bool>(type: "bit", nullable: false)
