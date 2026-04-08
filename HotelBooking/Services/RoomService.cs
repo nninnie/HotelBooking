@@ -25,6 +25,8 @@ namespace HotelBooking.Services
 
         public Room CreateRoom(string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
         {
+            var existingRoom = _db.Rooms.FirstOrDefault(r => r.RoomNumber == number);   
+
             var room = new Room
             {
                 RoomNumber = number,

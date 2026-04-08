@@ -1,4 +1,5 @@
-﻿using HotelBooking.Services.Interfaces;
+﻿using HotelBooking.Models;
+using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
 namespace HotelBooking.UI
@@ -12,18 +13,9 @@ namespace HotelBooking.UI
             _roomService = roomService;
         }
 
-        // Visa alla rum
-        public void ShowAll()
+        // Visa lista med alla rum i början av all Roomm CRUD, så att användaren ser vilka rum som finns och deras ID:n.
+        private void ShowRoomTable(IEnumerable<Room> rooms)
         {
-            var rooms = _roomService.GetAllRooms();
-
-            if (!rooms.Any())
-            {
-                AnsiConsole.MarkupLine("[red]Inga rum hittades.[/]");
-                WaitForEsc();
-                return;
-            }
-
             var table = new Table().RoundedBorder();
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
@@ -49,14 +41,26 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
+        }
+
+        public void ShowAll()
+        {
+            var rooms = _roomService.GetAllRooms();
+
+            if (!rooms.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga rum hittades.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            ShowRoomTable(rooms);
             WaitForEsc();
         }
 
-        // Visa detaljer för ett rum
         public void ShowDetails()
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/]:");
-
             var room = _roomService.GetRoom(id);
 
             if (room == null)
@@ -85,9 +89,18 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Skapa nytt rum
         public void Create()
         {
+            var rooms = _roomService.GetAllRooms();
+            AnsiConsole.MarkupLine("[yellow]Befintliga rum:[/]\n");
+
+            if (rooms.Any())
+                ShowRoomTable(rooms);
+            else
+                AnsiConsole.MarkupLine("[grey]Inga rum finns ännu.[/]");
+
+            AnsiConsole.WriteLine();
+
             string number = AnsiConsole.Ask<string>("Ange [yellow]rumsnummer[/]:");
             string type = AnsiConsole.Ask<string>("Ange [yellow]rumstyp[/] (Single/Double/Suite):");
             int capacity = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
@@ -101,12 +114,25 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Uppdatera rum
         public void Update()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att uppdatera:");
+            var rooms = _roomService.GetAllRooms();
+            AnsiConsole.MarkupLine("[yellow]Befintliga rum:[/]\n");
 
+            if (rooms.Any())
+                ShowRoomTable(rooms);
+            else
+            {
+                AnsiConsole.MarkupLine("[grey]Inga rum finns ännu.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            AnsiConsole.WriteLine();
+
+            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att uppdatera:");
             var existing = _roomService.GetRoom(id);
+
             if (existing == null)
             {
                 AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
@@ -123,40 +149,61 @@ namespace HotelBooking.UI
 
             bool success = _roomService.UpdateRoom(id, number, type, capacity, extraBeds, price, outOfService);
 
-            if (success)
-                AnsiConsole.MarkupLine("[green]Rummet uppdaterades![/]");
-            else
-                AnsiConsole.MarkupLine("[red]Uppdatering misslyckades.[/]");
+            AnsiConsole.MarkupLine(success
+                ? "[green]Rummet uppdaterades![/]"
+                : "[red]Uppdatering misslyckades.[/]");
 
             WaitForEsc();
         }
 
-        // Soft delete
         public void SoftDelete()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att markera som ur funktion:");
+            var rooms = _roomService.GetAllRooms();
+            AnsiConsole.MarkupLine("[yellow]Befintliga rum:[/]\n");
 
+            if (rooms.Any())
+                ShowRoomTable(rooms);
+            else
+            {
+                AnsiConsole.MarkupLine("[grey]Inga rum finns ännu.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            AnsiConsole.WriteLine();
+
+            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att markera som ur funktion:");
             bool success = _roomService.SoftDelete(id);
 
-            if (success)
-                AnsiConsole.MarkupLine("[yellow]Rummet är nu markerat som ur funktion.[/]");
-            else
-                AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
+            AnsiConsole.MarkupLine(success
+                ? "[yellow]Rummet är nu markerat som ur funktion.[/]"
+                : "[red]Rummet hittades inte.[/]");
 
             WaitForEsc();
         }
 
-        // Restore
         public void Restore()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att återställa:");
+            var rooms = _roomService.GetAllRooms();
+            AnsiConsole.MarkupLine("[yellow]Befintliga rum:[/]\n");
 
+            if (rooms.Any())
+                ShowRoomTable(rooms);
+            else
+            {
+                AnsiConsole.MarkupLine("[grey]Inga rum finns ännu.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            AnsiConsole.WriteLine();
+
+            int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att återställa:");
             bool success = _roomService.Restore(id);
 
-            if (success)
-                AnsiConsole.MarkupLine("[green]Rummet är nu återställt![/]");
-            else
-                AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
+            AnsiConsole.MarkupLine(success
+                ? "[green]Rummet är nu återställt![/]"
+                : "[red]Rummet hittades inte.[/]");
 
             WaitForEsc();
         }
