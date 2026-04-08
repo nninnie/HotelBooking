@@ -12,11 +12,6 @@ namespace HotelBooking.Controllers
             _bookingUI = bookingUI;
         }
 
-        public void CreateDirect()
-        {
-            _bookingUI.Create(); // “Ny bokning” från huvudmenyn
-        }
-
         public void RunCrudMenu()
         {
             while (true)
@@ -26,31 +21,31 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _bookingUI.ShowAll();
+                        _bookingUI.Create();  
                         break;
 
                     case 2:
-                        _bookingUI.ShowDetails();
+                        _bookingUI.ShowAll();     
                         break;
 
                     case 3:
-                        _bookingUI.Create();
+                        _bookingUI.ShowDetails(); 
                         break;
 
                     case 4:
-                        _bookingUI.Update();
+                        _bookingUI.Update();      
                         break;
 
                     case 5:
-                        _bookingUI.SoftDelete();
+                        _bookingUI.SoftDelete();  
                         break;
 
                     case 6:
-                        _bookingUI.Restore();
+                        _bookingUI.Restore();    
                         break;
 
                     case 7:
-                        return; // Tillbaka till huvudmenyn
+                        return;                 
                 }
             }
         }

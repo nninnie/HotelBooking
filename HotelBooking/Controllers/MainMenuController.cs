@@ -31,31 +31,32 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _bookingController.CreateDirect();
-                        break;
-
-                    case 2:
+                        // Hantera bokningar
                         _bookingController.RunCrudMenu();
                         break;
 
-                    case 3:
+                    case 2:
+                        // Hantera rum
                         _roomController.RunCrudMenu();
                         break;
 
-                    case 4:
+                    case 3:
+                        // Hantera gäster
                         _guestController.RunCrudMenu();
                         break;
 
-                    case 5:
+                    case 4:
+                        // Hantera betalningar
                         _paymentController.RunCrudMenu();
                         break;
 
-                    case 6:
+                    case 5:
                         // Logga ut
                         LoginService.CurrentUserName = "Okänd";
                         return;
 
-                    case 7:
+                    case 6:
+                        // Avsluta
                         Environment.Exit(0);
                         break;
                 }

@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Models;
+using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
@@ -8,32 +9,62 @@ namespace HotelBooking.UI
     {
         private readonly IBookingService _bookingService;
         private readonly IGuestService _guestService;
+        private readonly IRoomService _roomService; 
 
-        public BookingUI(IBookingService bookingService, IGuestService guestService)
+        public BookingUI(IBookingService bookingService, IGuestService guestService, IRoomService roomService)
         {
             _bookingService = bookingService;
             _guestService = guestService;
+            _roomService = roomService;
         }
 
         public void Create()
         {
-            var guests = _guestService.GetAllGuests();
-
-            var guestChoices = guests
-                .Select(g => $"{g.Id}. {g.FullName} – {g.Email} – {g.PhoneNumber}")
-                .ToList();
-
-            guestChoices.Add("Skapa ny gäst");
-
-            var selectedGuest = AnsiConsole.Prompt(
+            // Fråga användaren vad de vill göra
+            var action = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("Välj [yellow]gäst[/]:")
-                    .AddChoices(guestChoices)
+                    .Title("Vill du:")
+                    .AddChoices("Sök efter gäst", "Skapa ny gäst")
             );
 
-            int guestId;
+            int guestId = 0; 
 
-            if (selectedGuest == "Skapa ny gäst")
+            // Om användaren vill söka efter gäst
+            if (action == "Sök efter gäst")
+            {
+                string search = AnsiConsole.Ask<string>("Sök på namn, e-post eller telefon:");
+
+                var matches = _guestService.GetAllGuests()
+                    .Where(g =>
+                        g.FullName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        (g.Email ?? "").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        (g.PhoneNumber ?? "").Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                if (!matches.Any())
+                {
+                    AnsiConsole.MarkupLine("[yellow]Ingen gäst hittades.[/]");
+
+                    if (!AnsiConsole.Confirm("Vill du skapa en ny gäst?"))
+                        return;
+
+                    action = "Skapa ny gäst"; // hoppa vidare till nästa block
+                }
+                else
+                {
+                    var choice = AnsiConsole.Prompt(
+                        new SelectionPrompt<Guest>()
+                            .Title("Välj gäst:")
+                            .UseConverter(g => $"{g.FullName} – {g.Email} – {g.PhoneNumber}")
+                            .AddChoices(matches)
+                    );
+
+                    guestId = choice.Id;
+                }
+            }
+
+            // Om användaren vill skapa ny gäst (antingen direkt eller efter sökning)
+            if (action == "Skapa ny gäst")
             {
                 string fullName = AnsiConsole.Ask<string>("Fullständigt namn:");
                 string email = AnsiConsole.Ask<string>("E-post:");
@@ -44,18 +75,18 @@ namespace HotelBooking.UI
 
                 AnsiConsole.MarkupLine($"[green]Ny gäst skapad![/] ID: {guestId}");
             }
-            else
-            {
-                guestId = int.Parse(selectedGuest.Split('.')[0]);
-            }
 
+            // --- Resten av Create() fortsätter som vanligt ---
+
+            // Välj datum
             var checkIn = ShowCalendarAndPickDate(DateTime.Today, DateTime.Today);
             var checkOut = ShowCalendarAndPickDate(checkIn.AddDays(1), checkIn.AddDays(1));
 
+            // Antal gäster
             int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
 
-            var availableRooms = _bookingService
-                .GetAvailableRooms(checkIn, checkOut, guestsCount);
+            // Hämta lediga rum
+            var availableRooms = _bookingService.GetAvailableRooms(checkIn, checkOut, guestsCount);
 
             if (!availableRooms.Any())
             {
@@ -84,6 +115,7 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Prisberäkning
             int nights = (checkOut - checkIn).Days;
             decimal totalPrice = nights * room.PricePerNight;
 
@@ -94,6 +126,7 @@ Antal nätter: {nights}
 Totalpris: [yellow]{totalPrice} kr[/]
 ");
 
+            // Skapa bokning
             var booking = _bookingService.CreateBooking(
                 guestId,
                 roomId,
@@ -279,8 +312,9 @@ Antal gäster: {booking.NumberOfGuests}
             var table = new Table().RoundedBorder();
 
             table.AddColumn("[yellow]ID[/]");
-            table.AddColumn("[yellow]Gäst-ID[/]");
-            table.AddColumn("[yellow]Rum-ID[/]");
+            table.AddColumn("[yellow]Gäst[/]");
+            table.AddColumn("[yellow]Kontakt[/]");
+            table.AddColumn("[yellow]Rum[/]");
             table.AddColumn("[yellow]Från[/]");
             table.AddColumn("[yellow]Till[/]");
             table.AddColumn("[yellow]Gäster[/]");
@@ -289,10 +323,14 @@ Antal gäster: {booking.NumberOfGuests}
 
             foreach (var b in bookings)
             {
+                var guest = _guestService.GetGuest(b.GuestId);
+                var room = _roomService.GetRoom(b.RoomId); 
+
                 table.AddRow(
                     b.Id.ToString(),
-                    b.GuestId.ToString(),
-                    b.RoomId.ToString(),
+                    guest?.FullName ?? "Okänd",
+                    $"{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}",
+                    room != null ? $"{room.RoomNumber} ({room.RoomType})" : b.RoomId.ToString(),
                     b.FromDate.ToString("yyyy-MM-dd"),
                     b.ToDate.ToString("yyyy-MM-dd"),
                     b.NumberOfGuests.ToString(),
@@ -307,24 +345,65 @@ Antal gäster: {booking.NumberOfGuests}
 
         public void ShowDetails()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
+            // Hämta alla bokningar
+            var bookings = _bookingService.GetAll();
 
-            var booking = _bookingService.GetBooking(id);
-
-            if (booking == null)
+            if (!bookings.Any())
             {
-                AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
+                AnsiConsole.MarkupLine("[red]Inga bokningar hittades.[/]");
                 WaitForEsc();
                 return;
             }
 
+            // Låt användaren välja en bokning från listan
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<Booking>()
+                    .Title("Välj bokning att visa:")
+                    .UseConverter(b =>
+                    {
+                        var g = _guestService.GetGuest(b.GuestId);
+                        return $"{b.Id} – {g?.FullName ?? "Okänd"} – {b.FromDate:yyyy-MM-dd}";
+                    })
+                    .AddChoices(bookings)
+            );
+
+            // Hämta vald bokning
+            var booking = _bookingService.GetBooking(choice.Id);
+
+            if (booking == null)
+            {
+                AnsiConsole.MarkupLine("[red]Bokningen kunde inte hittas.[/]");
+                return;
+            }
+
+            // Hämta gäst och rum
+            var guest = _guestService.GetGuest(booking.GuestId);
+            if (guest == null)
+            {
+                AnsiConsole.MarkupLine("[red]Gästen kunde inte hittas.[/]");
+                return;
+            }
+
+            var room = _roomService.GetRoom(booking.RoomId);
+            if (room == null)
+            {
+                AnsiConsole.MarkupLine("[red]Rummet kunde inte hittas.[/]");
+                return;
+            }
+
+            // Visa detaljer
             var panel = new Panel($@"
 [white]ID:[/] {booking.Id}
-[white]Gäst-ID:[/] {booking.GuestId}
-[white]Rum-ID:[/] {booking.RoomId}
+
+[white]Gäst:[/] {guest?.FullName ?? "Okänd"}
+[white]Kontakt:[/] {guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}
+
+[white]Rum:[/] {(room != null ? $"{room.RoomNumber} ({room.RoomType})" : booking.RoomId.ToString())}
+
 [white]Från:[/] {booking.FromDate:yyyy-MM-dd}
 [white]Till:[/] {booking.ToDate:yyyy-MM-dd}
 [white]Antal gäster:[/] {booking.NumberOfGuests}
+
 [white]Bokad:[/] {booking.BookingDate:yyyy-MM-dd HH:mm}
 [white]Status:[/] {(booking.IsDeleted ? "[red]Raderad[/]" : "[green]Aktiv[/]")}
 ")
