@@ -4,8 +4,9 @@ namespace HotelBooking.Services
 {
     public interface IInvoiceService
     {
-        Invoice CreateInvoice(int bookingId);
+        Invoice CreateInvoice(int bookingId, int guestId, decimal totalAmount);
         Invoice? GetInvoice(int id);
         IEnumerable<Invoice> GetAllInvoices();
+        bool MarkAsPaid(int invoiceId);
     }
 }

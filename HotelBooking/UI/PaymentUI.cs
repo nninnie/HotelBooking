@@ -16,7 +16,7 @@ namespace HotelBooking.UI
         {
             int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
 
-            var payment = _service.GetPaymentByInvoiceId(invoiceId);
+            var payment = _service.GetPayment(invoiceId);
 
             if (payment == null)
             {

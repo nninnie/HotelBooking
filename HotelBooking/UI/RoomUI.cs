@@ -5,9 +5,9 @@ namespace HotelBooking.UI
 {
     public class RoomUI
     {
-        private readonly RoomService _roomService;
+        private readonly IRoomService _roomService;
 
-        public RoomUI(RoomService roomService)
+        public RoomUI(IRoomService roomService)
         {
             _roomService = roomService;
         }
@@ -93,8 +93,9 @@ namespace HotelBooking.UI
             int baseGuests = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
             int extraBeds = AnsiConsole.Ask<int>("Ange [yellow]extrabäddar[/] (0–2):");
             decimal price = AnsiConsole.Ask<decimal>("Ange [yellow]pris per natt[/] (kr):");
+            bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
 
-            var room = _roomService.CreateRoom(number, type, baseGuests, extraBeds, price);
+            var room = _roomService.CreateRoom(number, type, baseGuests, extraBeds, price, outOfService);
 
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
             Console.ReadKey();
@@ -135,7 +136,7 @@ namespace HotelBooking.UI
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att markera som ur funktion:");
 
-            bool success = _roomService.SoftDeleteRoom(id);
+            bool success = _roomService.SoftDelete(id);
 
             if (success)
                 AnsiConsole.MarkupLine("[yellow]Rummet är nu markerat som ur funktion.[/]");
@@ -150,7 +151,7 @@ namespace HotelBooking.UI
         {
             int id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att återställa:");
 
-            bool success = _roomService.RestoreRoom(id);
+            bool success = _roomService.Restore(id);
 
             if (success)
                 AnsiConsole.MarkupLine("[green]Rummet är nu återställt![/]");

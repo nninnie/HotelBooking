@@ -4,7 +4,7 @@ namespace HotelBooking.Services
 {
     public interface IPaymentService
     {
-        Payment CreatePayment(int bookingId, decimal amount, string method);
-        IEnumerable<Payment> GetPaymentsForBooking(int bookingId);
+        Payment CreatePayment(int invoiceId, decimal amount, string method);
+        IEnumerable<Payment> GetPaymentsForInvoice(int invoiceId);
     }
 }

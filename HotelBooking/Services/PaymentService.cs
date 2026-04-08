@@ -3,7 +3,7 @@ using HotelBooking.Models;
 
 namespace HotelBooking.Services
 {
-    public class PaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly HotelDBContext _db;
 
@@ -13,10 +13,11 @@ namespace HotelBooking.Services
         }
 
         // Hämta betalning kopplad till en faktura
-        public Payment? GetPaymentByInvoiceId(int invoiceId)
+        public IEnumerable<Payment> GetPaymentsForInvoice(int invoiceId)
         {
             return _db.Payments
-                .FirstOrDefault(p => p.InvoiceId == invoiceId);
+                .Where(p => p.InvoiceId == invoiceId)
+                .ToList();
         }
 
         // Skapa en betalning

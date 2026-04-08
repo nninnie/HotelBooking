@@ -3,7 +3,7 @@ using HotelBooking.Models;
 
 namespace HotelBooking.Services
 {
-    public class InvoiceService
+    public class InvoiceService : IInvoiceService
     {
         private readonly HotelDBContext _db;
 
@@ -20,7 +20,7 @@ namespace HotelBooking.Services
         }
 
         // Hämta alla fakturor
-        public List<Invoice> GetAllInvoices()
+        public IEnumerable<Invoice> GetAllInvoices()
         {
             return _db.Invoices
                 .OrderBy(i => i.Id)

@@ -3,7 +3,7 @@ using HotelBooking.Models;
 
 namespace HotelBooking.Services
 {
-    public class RoomService
+    public class RoomService : IRoomService
     {
         private readonly HotelDBContext _db;
 
@@ -12,76 +12,63 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        // Hämta alla rum
-        public List<Room> GetAllRooms()
+        public IEnumerable<Room> GetAllRooms()
         {
-            return _db.Rooms
-                .OrderBy(r => r.RoomNumber)
-                .ToList();
+            return _db.Rooms.ToList();
         }
 
-        // Hämta ett specifikt rum
         public Room? GetRoom(int id)
         {
-            return _db.Rooms
-                .FirstOrDefault(r => r.Id == id);
+            return _db.Rooms.FirstOrDefault(r => r.Id == id);
         }
 
-        // Skapa nytt rum
-        public Room CreateRoom(string roomNumber, string roomType, int baseGuests, int extraBeds, decimal price)
+        public Room CreateRoom(string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService)
         {
             var room = new Room
             {
-                RoomNumber = roomNumber,
-                RoomType = roomType,
+                RoomNumber = number,
+                RoomType = type,
                 BaseGuests = baseGuests,
                 ExtraBeds = extraBeds,
                 PricePerNight = price,
-                IsOutOfService = false
+                IsOutOfService = outOfService
             };
 
             _db.Rooms.Add(room);
             _db.SaveChanges();
-
             return room;
         }
 
-        // Uppdatera rum
-        public bool UpdateRoom(int id, string roomNumber, string roomType, int baseGuests, int extraBeds, decimal price, bool isOutOfService)
+        public bool UpdateRoom(int id, string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService)
         {
             var room = GetRoom(id);
-            if (room == null)
-                return false;
+            if (room == null) return false;
 
-            room.RoomNumber = roomNumber;
-            room.RoomType = roomType;
+            room.RoomNumber = number;
+            room.RoomType = type;
             room.BaseGuests = baseGuests;
             room.ExtraBeds = extraBeds;
             room.PricePerNight = price;
-            room.IsOutOfService = isOutOfService;
+            room.IsOutOfService = outOfService;
 
             _db.SaveChanges();
             return true;
         }
 
-        // Soft delete (sätt OutOfService = true)
-        public bool SoftDeleteRoom(int id)
+        public bool SoftDelete(int id)
         {
             var room = GetRoom(id);
-            if (room == null)
-                return false;
+            if (room == null) return false;
 
             room.IsOutOfService = true;
             _db.SaveChanges();
             return true;
         }
 
-        // Restore (sätt OutOfService = false)
-        public bool RestoreRoom(int id)
+        public bool Restore(int id)
         {
             var room = GetRoom(id);
-            if (room == null)
-                return false;
+            if (room == null) return false;
 
             room.IsOutOfService = false;
             _db.SaveChanges();

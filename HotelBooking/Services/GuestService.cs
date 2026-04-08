@@ -2,7 +2,7 @@
 
 namespace HotelBooking.Services
 {
-    public class GuestService
+    public class GuestService : IGuestService
     {
         private readonly HotelDBContext _db;
 
@@ -11,13 +11,12 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        public Guest[] GetAllGuests()
+        public IEnumerable<Guest> GetAllGuests()
         {
             return _db.Guests
                 .OrderBy(g => g.FullName)
-                .ToArray();
+                .ToList();
         }
-
         public Guest? GetGuest(int id)
         {
             return _db.Guests.FirstOrDefault(g => g.Id == id);
