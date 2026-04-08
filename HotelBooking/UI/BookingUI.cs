@@ -1,5 +1,6 @@
-﻿using Spectre.Console;
+﻿using HotelBooking.Models;
 using HotelBooking.Services;
+using Spectre.Console;
 
 namespace HotelBooking.UI
 {
@@ -201,6 +202,156 @@ Totalpris: [yellow]{totalPrice} kr[/]
 
             AnsiConsole.Write(panel);
             AnsiConsole.MarkupLine("\nNavigera med [blue]piltangenter[/], välj med [green]Enter[/].");
+        }
+
+        public void Restore()
+        {
+            int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att återställa:");
+
+            bool success = _service.Restore(id);
+
+            if (success)
+                AnsiConsole.MarkupLine("[green]Bokningen är nu återställt![/]");
+            else
+                AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
+
+            Console.ReadKey();
+
+        }
+
+        public void SoftDelete()
+        {
+            int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att ta bort:");
+
+            bool success = _service.SoftDelete(id);
+
+            if (success)
+                AnsiConsole.MarkupLine("[yellow]Bokningen är nu markerat som ur funktion.[/]");
+            else
+                AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
+
+            Console.ReadKey();
+
+        }
+
+        public void Update()
+        {
+            int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/] att uppdatera:");
+
+            var booking = _service.GetBooking(id);
+            if (booking == null)
+            {
+                AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            // Visa nuvarande värden
+            AnsiConsole.MarkupLine($@"
+[green]Nuvarande värden:[/]
+Gäst-ID: {booking.GuestId}
+Rum-ID: {booking.RoomId}
+Från: {booking.FromDate:yyyy-MM-dd}
+Till: {booking.ToDate:yyyy-MM-dd}
+Antal gäster: {booking.NumberOfGuests}
+");
+
+            // Fråga efter nya värden (tomt = behåll)
+            string newGuest = AnsiConsole.Ask<string>($"Ny gäst-ID (tomt = {booking.GuestId}):");
+            string newRoom = AnsiConsole.Ask<string>($"Nytt rum-ID (tomt = {booking.RoomId}):");
+            string newFrom = AnsiConsole.Ask<string>($"Nytt från-datum (yyyy-MM-dd, tomt = {booking.FromDate:yyyy-MM-dd}):");
+            string newTo = AnsiConsole.Ask<string>($"Nytt till-datum (yyyy-MM-dd, tomt = {booking.ToDate:yyyy-MM-dd}):");
+            string newGuests = AnsiConsole.Ask<string>($"Nytt antal gäster (tomt = {booking.NumberOfGuests}):");
+
+            // Konvertera bara om användaren skrev något
+            int? guestId = string.IsNullOrWhiteSpace(newGuest) ? null : int.Parse(newGuest);
+            int? roomId = string.IsNullOrWhiteSpace(newRoom) ? null : int.Parse(newRoom);
+            DateTime? fromDate = string.IsNullOrWhiteSpace(newFrom) ? null : DateTime.Parse(newFrom);
+            DateTime? toDate = string.IsNullOrWhiteSpace(newTo) ? null : DateTime.Parse(newTo);
+            int? guests = string.IsNullOrWhiteSpace(newGuests) ? null : int.Parse(newGuests);
+
+            bool success = _service.UpdateBooking(id, guestId, fromDate, toDate, guests);
+
+            if (success)
+                AnsiConsole.MarkupLine("[green]Bokningen uppdaterades![/]");
+            else
+                AnsiConsole.MarkupLine("[red]Uppdatering misslyckades.[/]");
+
+            Console.ReadKey();
+        }
+
+        public void ShowAll()
+        {
+            var bookings = _service.GetAll();
+
+            if (!bookings.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga bokningar hittades.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            var table = new Table().RoundedBorder();
+
+            table.AddColumn("[yellow]ID[/]");
+            table.AddColumn("[yellow]Gäst-ID[/]");
+            table.AddColumn("[yellow]Rum-ID[/]");
+            table.AddColumn("[yellow]Från[/]");
+            table.AddColumn("[yellow]Till[/]");
+            table.AddColumn("[yellow]Gäster[/]");
+            table.AddColumn("[yellow]Bokad[/]");
+            table.AddColumn("[yellow]Status[/]");
+
+            foreach (var b in bookings)
+            {
+                table.AddRow(
+                    b.Id.ToString(),
+                    b.GuestId.ToString(),
+                    b.RoomId.ToString(),
+                    b.FromDate.ToString("yyyy-MM-dd"),
+                    b.ToDate.ToString("yyyy-MM-dd"),
+                    b.NumberOfGuests.ToString(),
+                    b.BookingDate.ToString("yyyy-MM-dd"),
+                    b.IsDeleted ? "[red]Raderad[/]" : "[green]Aktiv[/]"
+                );
+            }
+
+            AnsiConsole.Write(table);
+            Console.ReadKey();
+        }
+
+
+
+        public void ShowDetails()
+        {
+            int id = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
+
+            var booking = _service.GetBooking(id);
+
+            if (booking == null)
+            {
+                AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
+                Console.ReadKey();
+                return;
+            }
+
+            var panel = new Panel($@"
+[white]ID:[/] {booking.Id}
+[white]Gäst-ID:[/] {booking.GuestId}
+[white]Rum-ID:[/] {booking.RoomId}
+[white]Från:[/] {booking.FromDate:yyyy-MM-dd}
+[white]Till:[/] {booking.ToDate:yyyy-MM-dd}
+[white]Antal gäster:[/] {booking.NumberOfGuests}
+[white]Bokad:[/] {booking.BookingDate:yyyy-MM-dd HH:mm}
+[white]Status:[/] {(booking.IsDeleted ? "[red]Raderad[/]" : "[green]Aktiv[/]")}
+")
+            {
+                Header = new PanelHeader("[green]Bokningsinformation[/]"),
+                Border = BoxBorder.Rounded
+            };
+
+            AnsiConsole.Write(panel);
+            Console.ReadKey();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using HotelBooking.Controllers;
 using HotelBooking.Data;
-using HotelBooking.Models;
 using HotelBooking.Services;
 using HotelBooking.UI;
 using Microsoft.EntityFrameworkCore;
@@ -31,28 +30,44 @@ namespace HotelBooking
             .AsSelf()
             .InstancePerLifetimeScope();
 
-            // Services (ren logik)
-            builder.RegisterType<BookingService>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<RoomService>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<GuestService>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<PaymentService>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<InvoiceService>().AsSelf().InstancePerLifetimeScope();   // <-- Lades till
+            // Services (registrera som interface!)
+            builder.RegisterType<BookingService>()
+                .As<IBookingService>()
+                .InstancePerLifetimeScope();
 
-            builder.RegisterType<DataInitializer>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<RoomService>()
+                .As<IRoomService>()
+                .InstancePerLifetimeScope();
 
-            // UI-lager (Spectre.Console)
+            builder.RegisterType<GuestService>()
+                .As<IGuestService>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<PaymentService>()
+                .As<IPaymentService>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<InvoiceService>()
+                .As<IInvoiceService>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<DataInitializer>()
+                .AsSelf()
+                .InstancePerLifetimeScope();
+
+            // UI-lager
             builder.RegisterType<BookingUI>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<RoomUI>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<GuestUI>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PaymentUI>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<InvoiceUI>().AsSelf().InstancePerLifetimeScope();        // <-- Lades till
+            builder.RegisterType<InvoiceUI>().AsSelf().InstancePerLifetimeScope();
 
             // Controllers
             builder.RegisterType<BookingController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<RoomController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<GuestController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<PaymentController>().AsSelf().InstancePerLifetimeScope();
-            builder.RegisterType<InvoiceController>().AsSelf().InstancePerLifetimeScope(); // <-- Lades till
+            builder.RegisterType<InvoiceController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<MainMenuController>().AsSelf().InstancePerLifetimeScope();
 
             // DB Builder

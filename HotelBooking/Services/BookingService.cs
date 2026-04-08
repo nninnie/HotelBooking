@@ -3,7 +3,8 @@ using HotelBooking.Models;
 
 namespace HotelBooking.Services
 {
-    public class BookingService
+    // BookingService implementerar IBookingService (SOLID: DIP)
+    public class BookingService : IBookingService
     {
         private readonly HotelDBContext _db;
 
@@ -12,17 +13,20 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        // Hämta lediga rum baserat på datum och antal gäster
+        // Hämta alla rum som är lediga för ett visst datumintervall och antal gäster
         public List<Room> GetAvailableRooms(DateTime checkIn, DateTime checkOut, int guests)
         {
-            // Datumvalidering
+            // Grundläggande datumvalidering
             if (checkIn.Date < DateTime.Today)
                 throw new Exception("Incheckningsdatum kan inte vara i det förflutna.");
 
             if (checkOut <= checkIn)
                 throw new Exception("Utcheckningsdatum måste vara efter incheckningsdatum.");
 
-            // Hämta rum som klarar antal gäster, inte är ur bruk och inte är bokade
+            // Filtrera rum:
+            // 1. Rummet måste klara antal gäster
+            // 2. Rummet får inte vara ur bruk
+            // 3. Rummet får inte ha en aktiv bokning som överlappar datumintervallet
             return _db.Rooms
                 .Where(r => r.MaxGuests >= guests && !r.IsOutOfService)
                 .Where(r => !r.Bookings.Any(b =>
@@ -33,13 +37,21 @@ namespace HotelBooking.Services
                         (checkIn <= b.FromDate && checkOut >= b.ToDate)
                     )
                 ))
-                .OrderBy(r => r.PricePerNight) // Sortera billigast först
+                .OrderBy(r => r.PricePerNight) // Visa billigaste först
                 .ToList();
         }
 
-        // Skapa ny bokning
+        // Skapa en ny bokning
         public Booking CreateBooking(int guestId, int roomId, DateTime checkIn, DateTime checkOut, int guests)
         {
+            // Datumvalidering
+            if (checkIn < DateTime.Today)
+                throw new Exception("Incheckning kan inte vara i det förflutna.");
+
+            if (checkOut <= checkIn)
+                throw new Exception("Utcheckning måste vara efter incheckning.");
+
+            // Skapa bokningsobjektet
             var booking = new Booking
             {
                 GuestId = guestId,
@@ -56,22 +68,22 @@ namespace HotelBooking.Services
             return booking;
         }
 
-        // Hämta en specifik bokning
+        // Hämta en specifik bokning via ID
         public Booking? GetBooking(int id)
         {
             return _db.Bookings.FirstOrDefault(b => b.Id == id);
         }
 
-        // Hämta alla bokningar
+        // Hämta alla bokningar sorterade efter datum och rum
         public List<Booking> GetAll()
         {
             return _db.Bookings
-                .OrderBy(b => b.FromDate)   // Sortera efter incheckning
-                .ThenBy(b => b.RoomId)      // Sekundär sortering
+                .OrderBy(b => b.FromDate)
+                .ThenBy(b => b.RoomId)
                 .ToList();
         }
 
-        // Ta bort bokning permanent
+        // Ta bort bokning permanent (hard delete)
         public bool CancelBooking(int id)
         {
             var booking = GetBooking(id);
@@ -82,7 +94,7 @@ namespace HotelBooking.Services
             return true;
         }
 
-        // Soft delete (markera som borttagen)
+        // Soft delete – markera bokningen som borttagen utan att radera den
         public bool SoftDelete(int id)
         {
             var booking = GetBooking(id);
@@ -93,7 +105,7 @@ namespace HotelBooking.Services
             return true;
         }
 
-        // Återställ soft-deleted bokning
+        // Återställ en soft-deleted bokning
         public bool Restore(int id)
         {
             var booking = GetBooking(id);
@@ -104,12 +116,13 @@ namespace HotelBooking.Services
             return true;
         }
 
-        // Uppdatera bokning
+        // Uppdatera valfria delar av en bokning
         public bool UpdateBooking(int id, int? guestId, DateTime? from, DateTime? to, int? guests)
         {
             var booking = GetBooking(id);
             if (booking == null) return false;
 
+            // Endast de värden som skickas in uppdateras
             if (guestId.HasValue) booking.GuestId = guestId.Value;
             if (from.HasValue) booking.FromDate = from.Value;
             if (to.HasValue) booking.ToDate = to.Value;
@@ -119,7 +132,7 @@ namespace HotelBooking.Services
             return true;
         }
 
-        // Uppgradera bokning till dyrare rum
+        // Försök uppgradera till ett dyrare rum som är ledigt
         public bool UpgradeBooking(int id)
         {
             var booking = GetBooking(id);
@@ -128,8 +141,10 @@ namespace HotelBooking.Services
             var currentRoom = _db.Rooms.Find(booking.RoomId);
             if (currentRoom == null) return false;
 
+            // Hämta alla lediga rum för samma datumintervall
             var available = GetAvailableRooms(booking.FromDate, booking.ToDate, booking.NumberOfGuests);
 
+            // Hitta första rummet som är dyrare än nuvarande
             var upgraded = available.FirstOrDefault(r => r.PricePerNight > currentRoom.PricePerNight);
             if (upgraded == null) return false;
 
@@ -138,15 +153,15 @@ namespace HotelBooking.Services
             return true;
         }
 
-        // Hämta alla gäster (används i BookingUI)
+        // Hämta alla gäster sorterade alfabetiskt
         public List<Guest> GetAllGuests()
         {
             return _db.Guests
-                .OrderBy(g => g.FullName) // Sortera alfabetiskt
+                .OrderBy(g => g.FullName)
                 .ToList();
         }
 
-        // Skapa ny gäst (används i BookingUI)
+        // Skapa en ny gäst
         public Guest CreateGuest(string fullName, string email, string phone)
         {
             var guest = new Guest
