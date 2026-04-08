@@ -21,13 +21,13 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _roomUI.ShowAll();
+                        _roomUI.Create();
                         break;
                     case 2:
-                        _roomUI.ShowDetails();
+                        _roomUI.ShowAll();
                         break;
                     case 3:
-                        _roomUI.Create();
+                        _roomUI.ShowDetails();
                         break;
                     case 4:
                         _roomUI.Update();
@@ -39,7 +39,7 @@ namespace HotelBooking.Controllers
                         _roomUI.Restore();
                         break;
                     case 7:
-                        return; // Tillbaka till huvudmenyn
+                        return; 
                 }
             }
         }

@@ -90,12 +90,12 @@ namespace HotelBooking.UI
         {
             string number = AnsiConsole.Ask<string>("Ange [yellow]rumsnummer[/]:");
             string type = AnsiConsole.Ask<string>("Ange [yellow]rumstyp[/] (Single/Double/Suite):");
-            int baseGuests = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
+            int capacity = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
             int extraBeds = AnsiConsole.Ask<int>("Ange [yellow]extrabäddar[/] (0–2):");
             decimal price = AnsiConsole.Ask<decimal>("Ange [yellow]pris per natt[/] (kr):");
             bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
 
-            var room = _roomService.CreateRoom(number, type, baseGuests, extraBeds, price, outOfService);
+            var room = _roomService.CreateRoom(number, type, capacity, extraBeds, price, outOfService);
 
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
             WaitForEsc();
@@ -116,12 +116,12 @@ namespace HotelBooking.UI
 
             string number = AnsiConsole.Ask<string>($"Rumsnummer ({existing.RoomNumber}):");
             string type = AnsiConsole.Ask<string>($"Rumstyp ({existing.RoomType}):");
-            int baseGuests = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.Capacity}):");
+            int capacity = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.Capacity}):");
             int extraBeds = AnsiConsole.Ask<int>($"Extrabäddar ({existing.ExtraBeds}):");
             decimal price = AnsiConsole.Ask<decimal>($"Pris per natt ({existing.PricePerNight}):");
             bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
 
-            bool success = _roomService.UpdateRoom(id, number, type, baseGuests, extraBeds, price, outOfService);
+            bool success = _roomService.UpdateRoom(id, number, type, capacity, extraBeds, price, outOfService);
 
             if (success)
                 AnsiConsole.MarkupLine("[green]Rummet uppdaterades![/]");
