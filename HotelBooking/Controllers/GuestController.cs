@@ -20,24 +20,23 @@ namespace HotelBooking.Controllers
             while (true)
             {
                 int choice = UI.CrudMenuUI.Show("Hantera gäster");
+
                 switch (choice)
                 {
                     case 1:
-                        _guestUI.ShowAll();
+                        _guestUI.Create();
                         break;
                     case 2:
-                        _guestUI.ShowDetails();
+                        _guestUI.ShowAll();
                         break;
                     case 3:
-                        _guestUI.Create();
+                        _guestUI.ShowDetails();
                         break;
                     case 4:
                         _guestUI.Update();
                         break;
                     case 5:
-                        return; // Tillbaka till huvudmenyn
-                    default:
-                        break;
+                        return; 
                 }
             }
         }

@@ -22,16 +22,16 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _paymentUI.Show();       // Visa betalning via faktura-ID
+                        _paymentUI.Create();    
                         break;
                     case 2:
-                        _paymentUI.Create();     // Om du vill lägga till Create i PaymentUI
+                        _paymentUI.Show();      
                         break;
                     case 3:
-                        _paymentUI.ShowAll();    // Om du vill lägga till ShowAll i PaymentUI
+                        _paymentUI.ShowAll();   
                         break;
                     case 4:
-                        return;                  // Tillbaka till huvudmenyn
+                        return;                 
                 }
             }
         }

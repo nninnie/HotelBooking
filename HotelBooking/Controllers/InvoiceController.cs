@@ -20,19 +20,19 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        _invoiceUI.ShowAll();
+                        _invoiceUI.Create();
                         break;
                     case 2:
-                        _invoiceUI.ShowDetails();
+                        _invoiceUI.ShowAll();
                         break;
                     case 3:
-                        _invoiceUI.Create();
+                        _invoiceUI.ShowDetails();
                         break;
                     case 4:
                         _invoiceUI.MarkAsPaid();
                         break;
                     case 5:
-                        return; // Tillbaka till huvudmenyn
+                        return; 
                 }
             }
         }
