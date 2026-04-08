@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace HotelBooking.UI
 {
-    public class RoomUI
+    public class RoomUI : EscUI
     {
         private readonly IRoomService _roomService;
 
@@ -20,7 +20,7 @@ namespace HotelBooking.UI
             if (!rooms.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga rum hittades.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Visa detaljer för ett rum
@@ -62,7 +62,7 @@ namespace HotelBooking.UI
             if (room == null)
             {
                 AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -82,7 +82,7 @@ namespace HotelBooking.UI
             };
 
             AnsiConsole.Write(panel);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Skapa nytt rum
@@ -98,7 +98,7 @@ namespace HotelBooking.UI
             var room = _roomService.CreateRoom(number, type, baseGuests, extraBeds, price, outOfService);
 
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Uppdatera rum
@@ -110,7 +110,7 @@ namespace HotelBooking.UI
             if (existing == null)
             {
                 AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -128,7 +128,7 @@ namespace HotelBooking.UI
             else
                 AnsiConsole.MarkupLine("[red]Uppdatering misslyckades.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Soft delete
@@ -143,7 +143,7 @@ namespace HotelBooking.UI
             else
                 AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Restore
@@ -158,7 +158,7 @@ namespace HotelBooking.UI
             else
                 AnsiConsole.MarkupLine("[red]Rummet hittades inte.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
     }
 }

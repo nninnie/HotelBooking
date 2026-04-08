@@ -3,7 +3,7 @@ using HotelBooking.Services.Interfaces;
 
 namespace HotelBooking.UI
 {
-    public class GuestUI
+    public class GuestUI : EscUI
     {
         private readonly IGuestService _service;
 
@@ -19,7 +19,7 @@ namespace HotelBooking.UI
             if (!guests.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         public void ShowDetails()
@@ -53,7 +53,7 @@ namespace HotelBooking.UI
             if (guest == null)
             {
                 AnsiConsole.MarkupLine("[red]Gäst hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace HotelBooking.UI
             };
 
             AnsiConsole.Write(panel);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         public void Create()
@@ -81,7 +81,7 @@ namespace HotelBooking.UI
             var guest = _service.CreateGuest(fullName, phone, email);
 
             AnsiConsole.MarkupLine($"[green]Gäst skapad![/] ID: {guest.Id}");
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         public void Update()
@@ -92,7 +92,7 @@ namespace HotelBooking.UI
             if (guest == null)
             {
                 AnsiConsole.MarkupLine("[red]Gäst hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -112,7 +112,7 @@ namespace HotelBooking.UI
             else
                 AnsiConsole.MarkupLine("[red]Misslyckades med att uppdatera gäst.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
     }
 }

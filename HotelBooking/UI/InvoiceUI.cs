@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace HotelBooking.UI
 {
-    public class InvoiceUI
+    public class InvoiceUI : EscUI
     {
         private readonly InvoiceService _invoiceService;
 
@@ -20,7 +20,7 @@ namespace HotelBooking.UI
             if (!invoices.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga fakturor hittades.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -45,7 +45,7 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Visa detaljer för en faktura
@@ -58,7 +58,7 @@ namespace HotelBooking.UI
             if (invoice == null)
             {
                 AnsiConsole.MarkupLine("[red]Faktura hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -76,7 +76,7 @@ namespace HotelBooking.UI
             };
 
             AnsiConsole.Write(panel);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Skapa faktura
@@ -89,7 +89,7 @@ namespace HotelBooking.UI
             var invoice = _invoiceService.CreateInvoice(bookingId, guestId, amount);
 
             AnsiConsole.MarkupLine($"[green]Faktura skapad![/] ID: {invoice.Id}");
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         // Markera faktura som betald
@@ -104,7 +104,7 @@ namespace HotelBooking.UI
             else
                 AnsiConsole.MarkupLine("[red]Faktura hittades inte.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
     }
 }

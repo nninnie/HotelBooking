@@ -3,7 +3,7 @@ using Spectre.Console;
 
 namespace HotelBooking.UI
 {
-    public class PaymentUI
+    public class PaymentUI : EscUI
     {
         private readonly IPaymentService _service;
 
@@ -21,7 +21,7 @@ namespace HotelBooking.UI
             if (!payments.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga betalningar hittades för den fakturan.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         public void ShowAll()
@@ -54,7 +54,7 @@ namespace HotelBooking.UI
             if (!payments.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga betalningar hittades.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -79,8 +79,9 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
+
         public void Create()
         {
             int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
@@ -90,8 +91,7 @@ namespace HotelBooking.UI
             var payment = _service.CreatePayment(invoiceId, amount, method);
 
             AnsiConsole.MarkupLine($"[green]Betalning skapad![/] ID: {payment.Id}");
-            Console.ReadKey();
+            WaitForEsc();
         }
-
     }
 }

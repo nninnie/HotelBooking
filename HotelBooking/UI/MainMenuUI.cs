@@ -23,6 +23,12 @@ namespace HotelBooking.UI
                     "Avsluta"
                 );
 
+            // 🔹 ESC-stöd
+            AnsiConsole.MarkupLine("[grey]Tryck ESC för att gå tillbaka[/]");
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.Escape)
+                return 0;
+
             var choice = AnsiConsole.Prompt(menu);
 
             return choice switch

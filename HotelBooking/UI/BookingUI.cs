@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace HotelBooking.UI
 {
-    public class BookingUI
+    public class BookingUI : EscUI
     {
         private readonly IBookingService _bookingService;
         private readonly IGuestService _guestService;
@@ -17,10 +17,8 @@ namespace HotelBooking.UI
 
         public void Create()
         {
-            // 1. Hämta alla gäster
             var guests = _guestService.GetAllGuests();
 
-            // 2. Låt användaren välja gäst
             var guestChoices = guests
                 .Select(g => $"{g.Id}. {g.FullName} – {g.Email} – {g.PhoneNumber}")
                 .ToList();
@@ -35,7 +33,6 @@ namespace HotelBooking.UI
 
             int guestId;
 
-            // 3. Om användaren vill skapa ny gäst
             if (selectedGuest == "Skapa ny gäst")
             {
                 string fullName = AnsiConsole.Ask<string>("Fullständigt namn:");
@@ -52,25 +49,21 @@ namespace HotelBooking.UI
                 guestId = int.Parse(selectedGuest.Split('.')[0]);
             }
 
-            // 4. Välj datum via kalender
             var checkIn = ShowCalendarAndPickDate(DateTime.Today, DateTime.Today);
             var checkOut = ShowCalendarAndPickDate(checkIn.AddDays(1), checkIn.AddDays(1));
 
-            // 5. Antal gäster (behövs för att filtrera rum)
             int guestsCount = AnsiConsole.Ask<int>("Antal gäster:");
 
-            // 6. Hämta lediga rum baserat på datum + antal gäster
             var availableRooms = _bookingService
                 .GetAvailableRooms(checkIn, checkOut, guestsCount);
 
             if (!availableRooms.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga lediga rum för dessa datum.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
-            // 7. Låt användaren välja rum
             var roomChoices = availableRooms
                 .Select(r => $"{r.Id}. Rum {r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt – Max {r.MaxGuests} gäster")
                 .ToList();
@@ -84,15 +77,13 @@ namespace HotelBooking.UI
             int roomId = int.Parse(selectedRoom.Split('.')[0]);
             var room = availableRooms.First(r => r.Id == roomId);
 
-            // 8. Kontrollera att antal gäster får plats i rummet
             if (guestsCount > room.MaxGuests)
             {
                 AnsiConsole.MarkupLine("[red]För många gäster för detta rum.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
-            // 9. Beräkna pris
             int nights = (checkOut - checkIn).Days;
             decimal totalPrice = nights * room.PricePerNight;
 
@@ -103,7 +94,6 @@ Antal nätter: {nights}
 Totalpris: [yellow]{totalPrice} kr[/]
 ");
 
-            // 10. Skapa bokningen
             var booking = _bookingService.CreateBooking(
                 guestId,
                 roomId,
@@ -113,10 +103,8 @@ Totalpris: [yellow]{totalPrice} kr[/]
             );
 
             AnsiConsole.MarkupLine($"[green]Bokning skapad![/] ID: {booking.Id}");
-            Console.ReadKey();
+            WaitForEsc();
         }
-
-        // --- Kalenderfunktioner (UI-ansvar, inte service) ---
 
         private DateTime ShowCalendarAndPickDate(DateTime startDate, DateTime minDate)
         {
@@ -217,8 +205,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
             else
                 AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
 
-            Console.ReadKey();
-
+            WaitForEsc();
         }
 
         public void SoftDelete()
@@ -232,8 +219,7 @@ Totalpris: [yellow]{totalPrice} kr[/]
             else
                 AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
 
-            Console.ReadKey();
-
+            WaitForEsc();
         }
 
         public void Update()
@@ -244,11 +230,10 @@ Totalpris: [yellow]{totalPrice} kr[/]
             if (booking == null)
             {
                 AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
-            // Visa nuvarande värden
             AnsiConsole.MarkupLine($@"
 [green]Nuvarande värden:[/]
 Gäst-ID: {booking.GuestId}
@@ -258,14 +243,12 @@ Till: {booking.ToDate:yyyy-MM-dd}
 Antal gäster: {booking.NumberOfGuests}
 ");
 
-            // Fråga efter nya värden (tomt = behåll)
             string newGuest = AnsiConsole.Ask<string>($"Ny gäst-ID (tomt = {booking.GuestId}):");
             string newRoom = AnsiConsole.Ask<string>($"Nytt rum-ID (tomt = {booking.RoomId}):");
             string newFrom = AnsiConsole.Ask<string>($"Nytt från-datum (yyyy-MM-dd, tomt = {booking.FromDate:yyyy-MM-dd}):");
             string newTo = AnsiConsole.Ask<string>($"Nytt till-datum (yyyy-MM-dd, tomt = {booking.ToDate:yyyy-MM-dd}):");
             string newGuests = AnsiConsole.Ask<string>($"Nytt antal gäster (tomt = {booking.NumberOfGuests}):");
 
-            // Konvertera bara om användaren skrev något
             int? guestId = string.IsNullOrWhiteSpace(newGuest) ? null : int.Parse(newGuest);
             int? roomId = string.IsNullOrWhiteSpace(newRoom) ? null : int.Parse(newRoom);
             DateTime? fromDate = string.IsNullOrWhiteSpace(newFrom) ? null : DateTime.Parse(newFrom);
@@ -279,7 +262,7 @@ Antal gäster: {booking.NumberOfGuests}
             else
                 AnsiConsole.MarkupLine("[red]Uppdatering misslyckades.[/]");
 
-            Console.ReadKey();
+            WaitForEsc();
         }
 
         public void ShowAll()
@@ -289,7 +272,7 @@ Antal gäster: {booking.NumberOfGuests}
             if (!bookings.Any())
             {
                 AnsiConsole.MarkupLine("[red]Inga bokningar hittades.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -319,10 +302,8 @@ Antal gäster: {booking.NumberOfGuests}
             }
 
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            WaitForEsc();
         }
-
-
 
         public void ShowDetails()
         {
@@ -333,7 +314,7 @@ Antal gäster: {booking.NumberOfGuests}
             if (booking == null)
             {
                 AnsiConsole.MarkupLine("[red]Bokningen hittades inte.[/]");
-                Console.ReadKey();
+                WaitForEsc();
                 return;
             }
 
@@ -353,7 +334,7 @@ Antal gäster: {booking.NumberOfGuests}
             };
 
             AnsiConsole.Write(panel);
-            Console.ReadKey();
+            WaitForEsc();
         }
     }
 }
