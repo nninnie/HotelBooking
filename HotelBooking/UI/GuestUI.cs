@@ -1,5 +1,6 @@
 ﻿using Spectre.Console;
 using HotelBooking.Services.Interfaces;
+using HotelBooking.Models;
 
 namespace HotelBooking.UI
 {
@@ -12,17 +13,9 @@ namespace HotelBooking.UI
             _service = service;
         }
 
-        public void ShowAll()
+        // Gemensam metod för att visa gäster i tabellform
+        private void ShowGuestTable(IEnumerable<Guest> guests)
         {
-            var guests = _service.GetAllGuests();
-
-            if (!guests.Any())
-            {
-                AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
-                WaitForEsc();
-                return;
-            }
-
             var table = new Table().RoundedBorder();
 
             table.AddColumn("[yellow]ID[/]");
@@ -41,13 +34,29 @@ namespace HotelBooking.UI
             }
 
             AnsiConsole.Write(table);
+        }
+
+        public void ShowAll()
+        {
+            var guests = _service.GetAllGuests();
+
+            if (!guests.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            ShowGuestTable(guests);
             WaitForEsc();
         }
 
         public void ShowDetails()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
+            var guests = _service.GetAllGuests();
+            ShowGuestTable(guests);
 
+            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
             var guest = _service.GetGuest(id);
 
             if (guest == null)
@@ -86,9 +95,12 @@ namespace HotelBooking.UI
 
         public void Update()
         {
-            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
+            var guests = _service.GetAllGuests();
+            ShowGuestTable(guests);
 
+            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/] att uppdatera:");
             var guest = _service.GetGuest(id);
+
             if (guest == null)
             {
                 AnsiConsole.MarkupLine("[red]Gäst hittades inte.[/]");
@@ -107,10 +119,9 @@ namespace HotelBooking.UI
                 string.IsNullOrWhiteSpace(email) ? null : email
             );
 
-            if (success)
-                AnsiConsole.MarkupLine("[green]Gäst uppdaterad![/]");
-            else
-                AnsiConsole.MarkupLine("[red]Misslyckades med att uppdatera gäst.[/]");
+            AnsiConsole.MarkupLine(success
+                ? "[green]Gäst uppdaterad![/]"
+                : "[red]Misslyckades med att uppdatera gäst.[/]");
 
             WaitForEsc();
         }

@@ -19,10 +19,14 @@ namespace HotelBooking.Data
             if (!db.Rooms.Any())
             {
                 db.Rooms.AddRange(
-                    new Room { RoomNumber = "101", RoomType = "Single", Capacity = 1, ExtraBeds = 0, PricePerNight = 850m },
-                    new Room { RoomNumber = "102", RoomType = "Double", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
-                    new Room { RoomNumber = "201", RoomType = "Double", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m },
-                    new Room { RoomNumber = "202", RoomType = "Single", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m }
+                    new Room { RoomNumber = "101", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m },
+                    new Room { RoomNumber = "102", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 1, PricePerNight = 1050m },
+                    new Room { RoomNumber = "103", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m },
+                    new Room { RoomNumber = "104", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 1, PricePerNight = 1050m },
+                    new Room { RoomNumber = "201", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
+                    new Room { RoomNumber = "202", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
+                    new Room { RoomNumber = "203", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m },
+                    new Room { RoomNumber = "204", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m }
                 );
             }
         }
@@ -42,7 +46,7 @@ namespace HotelBooking.Data
 
         private void SeedEmployees(HotelDBContext db)
         {
-            // 1. Seed roles om de saknas
+            // Seed roles
             if (!db.Roles.Any())
             {
                 db.Roles.AddRange(
@@ -54,7 +58,7 @@ namespace HotelBooking.Data
                 db.SaveChanges(); // rollerna får Id
             }
 
-            // 2. Seed employees om de saknas
+            // Seed employees 
             if (!db.Employees.Any())
             {
                 // Hämta rollerna

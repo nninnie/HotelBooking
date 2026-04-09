@@ -1,4 +1,4 @@
-﻿using HotelBooking.Services;
+﻿using HotelBooking.Services.Interfaces;
 using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
@@ -6,17 +6,20 @@ namespace HotelBooking.Controllers
     public class RoomController
     {
         private readonly RoomUI _roomUI;
+        private readonly IRoomService _roomService;
 
-        public RoomController(RoomUI roomUI)
+        public RoomController(RoomUI roomUI, IRoomService roomService)
         {
             _roomUI = roomUI;
+            _roomService = roomService;
         }
 
         public void RunCrudMenu()
         {
             while (true)
             {
-                int choice = CrudMenuUI.Show("Hantera rum");
+                var rooms = _roomService.GetAllRooms();
+                int choice = CrudMenuUI.Show("Hantera rum", rooms);
 
                 switch (choice)
                 {

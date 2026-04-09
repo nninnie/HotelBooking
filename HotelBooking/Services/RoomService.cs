@@ -13,9 +13,22 @@ namespace HotelBooking.Services
             _db = db;
         }
 
+        // Hämtar alla rum (både aktiva och ur funktion)
         public IEnumerable<Room> GetAllRooms()
         {
             return _db.Rooms.ToList();
+        }
+
+        // Hämtar endast aktiva rum
+        public IEnumerable<Room> GetActiveRooms()
+        {
+            return _db.Rooms.Where(r => !r.IsOutOfService).ToList();
+        }
+
+        // Hämtar endast rum som är markerade som ur funktion (soft deleted)
+        public IEnumerable<Room> GetDeletedRooms()
+        {
+            return _db.Rooms.Where(r => r.IsOutOfService).ToList();
         }
 
         public Room? GetRoom(int id)
@@ -25,8 +38,6 @@ namespace HotelBooking.Services
 
         public Room CreateRoom(string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
         {
-            var existingRoom = _db.Rooms.FirstOrDefault(r => r.RoomNumber == number);   
-
             var room = new Room
             {
                 RoomNumber = number,
@@ -58,6 +69,7 @@ namespace HotelBooking.Services
             return true;
         }
 
+        // Soft delete = markera som ur funktion
         public bool SoftDelete(int id)
         {
             var room = GetRoom(id);
@@ -68,6 +80,7 @@ namespace HotelBooking.Services
             return true;
         }
 
+        // Återställ soft deleted rum
         public bool Restore(int id)
         {
             var room = GetRoom(id);
