@@ -77,7 +77,13 @@ namespace HotelBooking.UI
                 phone = ui.AskWithEsc("Telefonnummer:");
                 if (phone == null) return null;
 
-                if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
+                if (string.IsNullOrWhiteSpace(phone))
+                {
+                    AnsiConsole.MarkupLine("[red]Telefonnummer är obligatoriskt![/]");
+                    continue;
+                }
+
+                if (phone.Any(c => !char.IsDigit(c)))
                 {
                     AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
                     continue;
@@ -92,7 +98,13 @@ namespace HotelBooking.UI
                 email = ui.AskWithEsc("Email:");
                 if (email == null) return null;
 
-                if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    AnsiConsole.MarkupLine("[red]Email är obligatoriskt![/]");
+                    continue;
+                }
+
+                if (!email.Contains("@"))
                 {
                     AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
                     continue;
