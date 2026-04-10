@@ -29,7 +29,7 @@ namespace HotelBooking.UI
 
                 table.AddRow(
                     b.Id.ToString(),
-                    guest?.FullName ?? "Okänd",
+                    guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd", // ändrat
                     $"{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}",
                     room != null ? $"{room.RoomNumber} ({room.RoomType})" : b.RoomId.ToString(),
                     b.FromDate.ToString("yyyy-MM-dd"),
@@ -49,7 +49,7 @@ namespace HotelBooking.UI
             var panel = new Panel($@"
 [white]ID:[/] {booking.Id}
 
-[white]Gäst:[/] {guest?.FullName ?? "Okänd"}
+[white]Gäst:[/] {(guest != null ? $"{guest.LastName}, {guest.FirstName}" : "Okänd")}
 [white]Kontakt:[/] {guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}
 
 [white]Rum:[/] {(room != null ? $"{room.RoomNumber} ({room.RoomType})" : booking.RoomId)}
@@ -69,19 +69,16 @@ namespace HotelBooking.UI
             AnsiConsole.Write(panel);
         }
 
-        // Visa felmeddelande
         public static void ShowError(string message)
         {
             AnsiConsole.MarkupLine($"[red]{message}[/]");
         }
 
-        // Visa lyckat meddelande
         public static void ShowSuccess(string message)
         {
             AnsiConsole.MarkupLine($"[green]{message}[/]");
         }
 
-        // Visa resultat (true/false)
         public static void ShowResult(bool success, string successMessage, string failMessage)
         {
             if (success)

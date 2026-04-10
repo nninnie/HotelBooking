@@ -74,6 +74,7 @@ namespace HotelBooking.Services
         public Booking? GetBooking(int id)
         {
             return _db.Bookings
+                .Where(b => !b.IsDeleted)
                 .Include(b => b.Guest)
                 .Include(b => b.Room)
                 .FirstOrDefault(b => b.Id == id);
@@ -83,6 +84,7 @@ namespace HotelBooking.Services
         public List<Booking> GetAll()
         {
             return _db.Bookings
+                .Where(b => !b.IsDeleted)
                 .Include(b => b.Guest)
                 .Include(b => b.Room)
                 .ToList();

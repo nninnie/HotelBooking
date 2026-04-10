@@ -40,55 +40,68 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine("");
             AnsiConsole.MarkupLine("[green]Ange information för den nya kunden. Tryck ESC för att avbryta.[/]");
 
-            string? fullName;
+            // Förnamn
+            string? firstName;
             while (true)
             {
-                fullName = ui.AskWithEsc("\nFullständigt namn:");
-                if (fullName == null) return null;
+                firstName = ui.AskWithEsc("\nFörnamn:");
+                if (firstName == null) return null;
 
-                // VALIDATION
-                if (string.IsNullOrWhiteSpace(fullName))
+                if (string.IsNullOrWhiteSpace(firstName))
                 {
-                    AnsiConsole.MarkupLine("[red]Namn får inte vara tomt![/]");
+                    AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
                     continue;
                 }
-
                 break;
             }
 
+            // Efternamn
+            string? lastName;
+            while (true)
+            {
+                lastName = ui.AskWithEsc("Efternamn:");
+                if (lastName == null) return null;
+
+                if (string.IsNullOrWhiteSpace(lastName))
+                {
+                    AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
+                    continue;
+                }
+                break;
+            }
+
+            // Telefon
             string? phone;
             while (true)
             {
                 phone = ui.AskWithEsc("Telefonnummer:");
                 if (phone == null) return null;
 
-                // VALIDATION
                 if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
                 {
                     AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
                     continue;
                 }
-
                 break;
             }
 
+            // Email
             string? email;
             while (true)
             {
                 email = ui.AskWithEsc("Email:");
                 if (email == null) return null;
 
-                // VALIDATION
                 if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
                 {
                     AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
                     continue;
                 }
-
                 break;
             }
 
-            var guest = guestService.CreateGuest(fullName, phone, email);
+            // Skapa gäst
+            var guest = guestService.CreateGuest(firstName, lastName, phone, email);
             return guest.Id;
         }
 
@@ -102,7 +115,7 @@ namespace HotelBooking.UI
 
             var selected = ui.SelectWithEsc(
                 guests.ToList(),
-                g => $"{g.FullName} – {g.Email} – {g.PhoneNumber}"
+                g => $"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}"
             );
 
             return selected?.Id;
@@ -116,12 +129,10 @@ namespace HotelBooking.UI
 
             if (!int.TryParse(input, out int count))
             {
-                // VALIDATION
                 AnsiConsole.MarkupLine("[red]Du måste ange ett heltal![/]");
                 return null;
             }
 
-            // VALIDATION
             if (count <= 0)
             {
                 AnsiConsole.MarkupLine("[red]Antal gäster måste vara minst 1![/]");
@@ -150,12 +161,10 @@ namespace HotelBooking.UI
 
             if (!int.TryParse(input, out int id))
             {
-                // VALIDATION
                 AnsiConsole.MarkupLine("[red]Du måste ange ett heltal![/]");
                 return null;
             }
 
-            // VALIDATION
             if (id <= 0)
             {
                 AnsiConsole.MarkupLine("[red]ID måste vara ett positivt tal![/]");
@@ -183,7 +192,6 @@ namespace HotelBooking.UI
             string? newGuest = ui.AskWithEsc($"Ny gäst-ID (tomt = {booking.GuestId}):");
             if (newGuest == null) return null;
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(newGuest) && !int.TryParse(newGuest, out _))
             {
                 AnsiConsole.MarkupLine("[red]Gäst-ID måste vara ett heltal![/]");
@@ -193,7 +201,6 @@ namespace HotelBooking.UI
             string? newRoom = ui.AskWithEsc($"Nytt rum-ID (tomt = {booking.RoomId}):");
             if (newRoom == null) return null;
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(newRoom) && !int.TryParse(newRoom, out _))
             {
                 AnsiConsole.MarkupLine("[red]Rum-ID måste vara ett heltal![/]");
@@ -203,7 +210,6 @@ namespace HotelBooking.UI
             string? newFrom = ui.AskWithEsc($"Nytt från-datum (yyyy-MM-dd, tomt = {booking.FromDate:yyyy-MM-dd}):");
             if (newFrom == null) return null;
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(newFrom) && !DateTime.TryParse(newFrom, out _))
             {
                 AnsiConsole.MarkupLine("[red]Ogiltigt datumformat![/]");
@@ -213,7 +219,6 @@ namespace HotelBooking.UI
             string? newTo = ui.AskWithEsc($"Nytt till-datum (yyyy-MM-dd, tomt = {booking.ToDate:yyyy-MM-dd}):");
             if (newTo == null) return null;
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(newTo) && !DateTime.TryParse(newTo, out _))
             {
                 AnsiConsole.MarkupLine("[red]Ogiltigt datumformat![/]");
@@ -223,7 +228,6 @@ namespace HotelBooking.UI
             string? newGuests = ui.AskWithEsc($"Nytt antal gäster (tomt = {booking.NumberOfGuests}):");
             if (newGuests == null) return null;
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(newGuests) && (!int.TryParse(newGuests, out int g) || g <= 0))
             {
                 AnsiConsole.MarkupLine("[red]Antal gäster måste vara ett positivt heltal![/]");

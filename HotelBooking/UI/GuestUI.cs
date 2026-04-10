@@ -1,5 +1,4 @@
 ﻿using HotelBooking.Models;
-using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
@@ -28,7 +27,7 @@ namespace HotelBooking.UI
             {
                 table.AddRow(
                     g.Id.ToString(),
-                    g.FullName,
+                    $"{g.LastName}, {g.FirstName}",
                     g.PhoneNumber ?? "-",
                     g.Email ?? "-"
                 );
@@ -75,7 +74,7 @@ namespace HotelBooking.UI
 
             var panel = new Panel($@"
 [white]ID:[/] {guest.Id}
-[white]Namn:[/] {guest.FullName}
+[white]Namn:[/] {guest.LastName}, {guest.FirstName}
 [white]Telefon:[/] {guest.PhoneNumber ?? "-"}
 [white]Email:[/] {guest.Email ?? "-"}
 ")
@@ -93,28 +92,42 @@ namespace HotelBooking.UI
         {
             CurrentHeader = "SKAPA GÄST";
 
-            string? fullName;
-
+            // Förnamn
+            string firstName;
             while (true)
             {
-                fullName = AnsiConsole.Ask<string>("Ange [yellow]fullständigt namn[/]:");
+                firstName = AnsiConsole.Ask<string>("Ange [yellow]förnamn[/]:");
 
-                // VALIDATION
-                if (string.IsNullOrWhiteSpace(fullName))
+                if (string.IsNullOrWhiteSpace(firstName))
                 {
-                    AnsiConsole.MarkupLine("[red]Namn får inte vara tomt![/]");
+                    AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
                     continue;
                 }
 
                 break;
             }
 
+            // Efternamn
+            string lastName;
+            while (true)
+            {
+                lastName = AnsiConsole.Ask<string>("Ange [yellow]efternamn[/]:");
+
+                if (string.IsNullOrWhiteSpace(lastName))
+                {
+                    AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            // Telefon
             string? phone;
             while (true)
             {
                 phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
 
-                // VALIDATION
                 if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
                 {
                     AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
@@ -124,12 +137,12 @@ namespace HotelBooking.UI
                 break;
             }
 
+            // Email
             string? email;
             while (true)
             {
                 email = AnsiConsole.Ask<string>("Email (valfritt):");
 
-                // VALIDATION
                 if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
                 {
                     AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
@@ -139,13 +152,13 @@ namespace HotelBooking.UI
                 break;
             }
 
-            var guest = _service.CreateGuest(fullName, phone, email);
+            var guest = _service.CreateGuest(firstName, lastName, phone, email);
 
             AnsiConsole.MarkupLine($"[green]Gäst skapad![/] ID: {guest.Id}");
             WaitForEsc();
         }
 
-        // Updatera en gäst
+        // Uppdatera en gäst
         public void Update()
         {
             CurrentHeader = "UPPDATERA GÄST";
@@ -163,19 +176,15 @@ namespace HotelBooking.UI
                 return;
             }
 
-            string fullName = AnsiConsole.Ask<string>($"Nytt namn (tomt = behåll) [{guest.FullName}]:");
+            // Förnamn
+            string newFirst = AnsiConsole.Ask<string>($"Nytt förnamn (tomt = behåll) [{guest.FirstName}]:");
 
-            // VALIDATION
-            if (!string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(fullName.Trim()))
-            {
-                AnsiConsole.MarkupLine("[red]Namn får inte vara tomt![/]");
-                WaitForEsc();
-                return;
-            }
+            // Efternamn
+            string newLast = AnsiConsole.Ask<string>($"Nytt efternamn (tomt = behåll) [{guest.LastName}]:");
 
+            // Telefon
             string phone = AnsiConsole.Ask<string>($"Nytt telefonnummer (tomt = behåll) [{guest.PhoneNumber ?? "-"}]:");
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
             {
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
@@ -183,9 +192,9 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Email
             string email = AnsiConsole.Ask<string>($"Ny email (tomt = behåll) [{guest.Email ?? "-"}]:");
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
             {
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
@@ -195,7 +204,8 @@ namespace HotelBooking.UI
 
             bool success = _service.UpdateGuest(
                 id,
-                string.IsNullOrWhiteSpace(fullName) ? null : fullName,
+                string.IsNullOrWhiteSpace(newFirst) ? null : newFirst,
+                string.IsNullOrWhiteSpace(newLast) ? null : newLast,
                 string.IsNullOrWhiteSpace(phone) ? null : phone,
                 string.IsNullOrWhiteSpace(email) ? null : email
             );
@@ -207,7 +217,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Ta bort en gäst (soft delete)
+        // Ta bort en gäst
         public void SoftDelete()
         {
             CurrentHeader = "TA BORT GÄST";
@@ -225,7 +235,6 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // Kontrollera om gästen har bokningar
             if (_service.HasBookings(id))
             {
                 AnsiConsole.MarkupLine("[red]Gästen kan inte tas bort eftersom det finns bokningar kopplade till den.[/]");
@@ -241,6 +250,5 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
-
     }
 }

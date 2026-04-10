@@ -13,8 +13,13 @@ namespace HotelBooking.Models
         public string Username { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(150)]
-        public string FullName { get; set; } = string.Empty;
+        [MaxLength(50)]
+        public string FirstName { get; set; } = string.Empty; 
+
+        [Required]
+        [MaxLength(50)]
+        public string LastName { get; set; } = string.Empty; 
+
 
         [Required]
         public string PasswordHash { get; set; } = string.Empty;

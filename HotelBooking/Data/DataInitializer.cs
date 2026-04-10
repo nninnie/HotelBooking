@@ -36,10 +36,10 @@ namespace HotelBooking.Data
             if (!db.Guests.Any())
             {
                 db.Guests.AddRange(
-                    new Guest { FullName = "Anna Svensson", PhoneNumber = "0701234567", Email = "anna@example.com" },
-                    new Guest { FullName = "Markus Lindgren", PhoneNumber = "0709876543", Email = "markus@example.com" },
-                    new Guest { FullName = "Sara Ekström", PhoneNumber = "0735551122", Email = "sara@example.com" },
-                    new Guest { FullName = "David Holm", PhoneNumber = "0764442211", Email = "david@example.com" }
+                    new Guest { FirstName = "Anna", LastName = "Svensson", PhoneNumber = "0701234567", Email = "anna@example.com" },
+                    new Guest { FirstName = "Markus", LastName = "Lindgren", PhoneNumber = "0709876543", Email = "markus@example.com" },
+                    new Guest { FirstName = "Sara", LastName = "Ekström", PhoneNumber = "0735551122", Email = "sara@example.com" },
+                    new Guest { FirstName = "David", LastName = "Holm", PhoneNumber = "0764442211", Email = "david@example.com" }
                 );
             }
         }
@@ -73,28 +73,32 @@ namespace HotelBooking.Data
                     new Employee
                     {
                         Username = "ninnie",
-                        FullName = "Ninnie Dahlström",
-                        PasswordHash = Hash("0000"),
+                        FirstName = "Ninnie",     
+                        LastName = "Dahlström",   
+                        PasswordHash = Hash("1234"),
                         RoleId = manager.Id
                     },
                     new Employee
                     {
                         Username = "my",
-                        FullName = "My Jammeh",
+                        FirstName = "My",         
+                        LastName = "Jammeh",      
                         PasswordHash = Hash("1234"),
                         RoleId = receptionist.Id
                     },
                     new Employee
                     {
                         Username = "zoe",
-                        FullName = "Zoe Jammeh",
+                        FirstName = "Zoe",       
+                        LastName = "Jammeh",      
                         PasswordHash = Hash("1234"),
                         RoleId = receptionist.Id
                     },
                     new Employee
                     {
                         Username = "richard",
-                        FullName = "Richard Chalk",
+                        FirstName = "Richard",   
+                        LastName = "Chalk",      
                         PasswordHash = Hash("bajskorv"),
                         RoleId = master.Id
                     }

@@ -62,7 +62,6 @@ namespace HotelBooking.Services
         {
             var cutoff = DateTime.Now.AddDays(-10);
 
-            // Hitta alla obetalda fakturor äldre än 10 dagar
             var overdueInvoices = _db.Invoices
                 .Where(i => !i.IsPaid && i.CreatedDate < cutoff)
                 .ToList();
@@ -71,17 +70,15 @@ namespace HotelBooking.Services
 
             foreach (var invoice in overdueInvoices)
             {
-                // Hämta bokningen
                 var booking = _db.Bookings.FirstOrDefault(b => b.Id == invoice.BookingId);
 
-                if (booking != null)
+                if (booking != null && !booking.IsDeleted)
                 {
-                    _db.Bookings.Remove(booking);
+                    booking.IsDeleted = true;   // Soft delete
                     count++;
                 }
 
-                // Ta bort fakturan också
-                _db.Invoices.Remove(invoice);
+                _db.Invoices.Remove(invoice);   //  Fakturan tas bort
             }
 
             _db.SaveChanges();

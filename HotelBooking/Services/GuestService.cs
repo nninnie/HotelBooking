@@ -12,11 +12,12 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        // Hämta alla gäster sorterade efter namn
+        // Hämta alla gäster sorterade efter efternamn + förnamn
         public IEnumerable<Guest> GetAllGuests()
         {
             return _db.Guests
-                .OrderBy(g => g.FullName)
+                .OrderBy(g => g.LastName)   // sortera korrekt
+                .ThenBy(g => g.FirstName)
                 .ToList();
         }
 
@@ -27,11 +28,12 @@ namespace HotelBooking.Services
         }
 
         // Skapa en ny gäst
-        public Guest CreateGuest(string fullName, string? phone, string? email)
+        public Guest CreateGuest(string firstName, string lastName, string? phone, string? email)
         {
             var guest = new Guest
             {
-                FullName = fullName,
+                FirstName = firstName,   // ändrat
+                LastName = lastName,     // ändrat
                 PhoneNumber = phone,
                 Email = email
             };
@@ -42,13 +44,15 @@ namespace HotelBooking.Services
         }
 
         // Uppdatera en gästs information
-        public bool UpdateGuest(int id, string? fullName, string? phone, string? email)
+        public bool UpdateGuest(int id, string? firstName, string? lastName, string? phone, string? email)
         {
             var guest = GetGuest(id);
             if (guest == null)
                 return false;
 
-            if (!string.IsNullOrWhiteSpace(fullName)) guest.FullName = fullName;
+            // uppdatera endast om värden finns
+            if (!string.IsNullOrWhiteSpace(firstName)) guest.FirstName = firstName;
+            if (!string.IsNullOrWhiteSpace(lastName)) guest.LastName = lastName;
             if (!string.IsNullOrWhiteSpace(phone)) guest.PhoneNumber = phone;
             if (!string.IsNullOrWhiteSpace(email)) guest.Email = email;
 
@@ -59,7 +63,7 @@ namespace HotelBooking.Services
         // Kontrollera om gästen har bokningar
         public bool HasBookings(int guestId)
         {
-            return _db.Bookings.Any(b => b.GuestId == guestId);
+            return _db.Bookings.Any(b => b.GuestId == guestId && !b.IsDeleted);
         }
 
         // Ta bort en gäst

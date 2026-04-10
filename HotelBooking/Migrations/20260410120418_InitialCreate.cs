@@ -17,7 +17,8 @@ namespace HotelBooking.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
@@ -64,7 +65,8 @@ namespace HotelBooking.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false)
                 },
