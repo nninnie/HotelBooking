@@ -1,4 +1,4 @@
-﻿using HotelBooking.Core.Service;
+﻿using HotelBooking.Core;
 using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
@@ -31,32 +31,26 @@ namespace HotelBooking.Controllers
                 switch (choice)
                 {
                     case 1:
-                        // Hantera bokningar
                         _bookingController.RunCrudMenu();
                         break;
 
                     case 2:
-                        // Hantera rum
                         _roomController.RunCrudMenu();
                         break;
 
                     case 3:
-                        // Hantera gäster
                         _guestController.RunCrudMenu();
                         break;
 
                     case 4:
-                        // Hantera betalningar
                         _paymentController.RunCrudMenu();
                         break;
 
                     case 5:
-                        // Logga ut
                         LoginService.CurrentUserName = "Okänd";
                         return;
 
                     case 6:
-                        // Avsluta
                         Environment.Exit(0);
                         break;
                 }

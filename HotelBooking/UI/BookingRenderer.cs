@@ -43,7 +43,7 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
-        // ⭐ Visa detaljer för en bokning
+        // Visa detaljer för en bokning
         public static void ShowBookingDetails(Booking booking, Guest? guest, Room? room)
         {
             var panel = new Panel($@"
@@ -69,19 +69,19 @@ namespace HotelBooking.UI
             AnsiConsole.Write(panel);
         }
 
-        // ⭐ Visa felmeddelande
+        // Visa felmeddelande
         public static void ShowError(string message)
         {
             AnsiConsole.MarkupLine($"[red]{message}[/]");
         }
 
-        // ⭐ Visa lyckat meddelande
+        // Visa lyckat meddelande
         public static void ShowSuccess(string message)
         {
             AnsiConsole.MarkupLine($"[green]{message}[/]");
         }
 
-        // ⭐ Visa resultat (true/false)
+        // Visa resultat (true/false)
         public static void ShowResult(bool success, string successMessage, string failMessage)
         {
             if (success)

@@ -22,13 +22,12 @@ namespace HotelBooking.Services
         }
 
         // Skapa en betalning
-        public Payment CreatePayment(int invoiceId, decimal amount, string method)
+        public Payment CreatePayment(int invoiceId, decimal amount)
         {
             var payment = new Payment
             {
                 InvoiceId = invoiceId,
                 Amount = amount,
-                PaymentMethod = method,
                 PaymentDate = DateTime.Now,
                 IsSuccessful = true
             };

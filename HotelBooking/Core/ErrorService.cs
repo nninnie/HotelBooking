@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HotelBooking.Core.Service
+namespace HotelBooking.Core
 {
     public static class ErrorService
     {

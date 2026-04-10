@@ -6,17 +6,17 @@ class Program
 {
     static void Main(string[] args)
     {
-        // 1. Bygg Autofac-container
+        // Bygg Autofac-container
         var container = AutofacConfig.BuildContainer();
 
-        // 2. Skapa scope
+        // Skapa scope
         using var scope = container.BeginLifetimeScope();
 
-        // 3. Kör DB-migrering + seed
+        // Kör DB-migrering + seed
         var dbBuilder = scope.Resolve<BuildDB>();
         dbBuilder.Run();
 
-        // 4. Starta applikationen
+        // Starta applikationen
         var app = scope.Resolve<Application>();
         app.Run();
     }

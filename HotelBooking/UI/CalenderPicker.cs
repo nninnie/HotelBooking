@@ -86,7 +86,7 @@ public static class CalenderPicker
         AnsiConsole.Write(panel);
 
         Console.WriteLine();
-        AnsiConsole.MarkupLine("\nAnvänd piltangenter [blue]\u25C4 \u25B2 \u25BA \u25BC[/] för att navigera.");
+        AnsiConsole.MarkupLine("\nAnvänd piltangenter [blue]◄ ▲ ► ▼[/] för att navigera.");
         AnsiConsole.MarkupLine("Tryck [green]Enter[/] för att välja eller [red]ESC[/] för att avbryta.");
     }
 }

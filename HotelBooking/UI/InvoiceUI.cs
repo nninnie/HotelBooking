@@ -1,16 +1,17 @@
 ﻿using HotelBooking.Models;
 using HotelBooking.Services;
+using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
 namespace HotelBooking.UI
 {
     public class InvoiceUI : EscUI
     {
-        private readonly InvoiceService _invoiceService;
+        private readonly IInvoiceService _iinvoiceService;
 
-        public InvoiceUI(InvoiceService invoiceService)
+        public InvoiceUI(IInvoiceService iinvoiceService)
         {
-            _invoiceService = invoiceService;
+            _iinvoiceService = iinvoiceService;
         }
 
         // Gemensam tabellmetod
@@ -43,7 +44,7 @@ namespace HotelBooking.UI
         // Visa alla fakturor
         public void ShowAll()
         {
-            var invoices = _invoiceService.GetAllInvoices();
+            var invoices = _iinvoiceService.GetAllInvoices();
 
             if (!invoices.Any())
             {
@@ -59,11 +60,11 @@ namespace HotelBooking.UI
         // Visa detaljer för en faktura
         public void ShowDetails()
         {
-            var invoices = _invoiceService.GetAllInvoices();
+            var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
             int id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
-            var invoice = _invoiceService.GetInvoice(id);
+            var invoice = _iinvoiceService.GetInvoice(id);
 
             if (invoice == null)
             {
@@ -92,14 +93,14 @@ namespace HotelBooking.UI
         // Skapa faktura
         public void Create()
         {
-            var invoices = _invoiceService.GetAllInvoices();
+            var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
             int bookingId = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
             int guestId = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
             decimal amount = AnsiConsole.Ask<decimal>("Ange [yellow]totalbelopp[/] (kr):");
 
-            var invoice = _invoiceService.CreateInvoice(bookingId, guestId, amount);
+            var invoice = _iinvoiceService.CreateInvoice(bookingId, guestId, amount);
 
             AnsiConsole.MarkupLine($"[green]Faktura skapad![/] ID: {invoice.Id}");
             WaitForEsc();
@@ -108,16 +109,33 @@ namespace HotelBooking.UI
         // Markera faktura som betald
         public void MarkAsPaid()
         {
-            var invoices = _invoiceService.GetAllInvoices();
+            var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
             int id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att markera som betald:");
 
-            bool success = _invoiceService.MarkAsPaid(id);
+            bool success = _iinvoiceService.MarkAsPaid(id);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Fakturan markerades som betald![/]"
                 : "[red]Faktura hittades inte.[/]");
+
+            WaitForEsc();
+        }
+
+        // Annullera obetalda bokningar 
+        public void CancelUnpaid()
+        {
+            int cancelled = _iinvoiceService.CancelUnpaidBookings();
+
+            if (cancelled == 0)
+            {
+                AnsiConsole.MarkupLine("[yellow]Inga obetalda bokningar behövde annulleras.[/]");
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[red]{cancelled} bokningar annullerades pga obetalda fakturor.[/]");
+            }
 
             WaitForEsc();
         }

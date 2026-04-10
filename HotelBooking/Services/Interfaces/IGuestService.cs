@@ -8,5 +8,7 @@ namespace HotelBooking.Services.Interfaces
         Guest? GetGuest(int id);
         Guest CreateGuest(string fullName, string? phone, string? email);
         bool UpdateGuest(int id, string? fullName, string? phone, string? email);
+        bool DeleteGuest(int id);
+        bool HasBookings(int guestId);
     }
 }

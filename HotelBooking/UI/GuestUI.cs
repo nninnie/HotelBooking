@@ -1,6 +1,7 @@
-﻿using Spectre.Console;
+﻿using HotelBooking.Models;
+using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
-using HotelBooking.Models;
+using Spectre.Console;
 
 namespace HotelBooking.UI
 {
@@ -36,6 +37,7 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
+        // Visa alla gäster
         public void ShowAll()
         {
             var guests = _service.GetAllGuests();
@@ -51,6 +53,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
+        // Visa detaljer på en gäst
         public void ShowDetails()
         {
             var guests = _service.GetAllGuests();
@@ -81,6 +84,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
+        // Skapa en gäst
         public void Create()
         {
             string fullName = AnsiConsole.Ask<string>("Ange [yellow]fullständigt namn[/]:");
@@ -93,6 +97,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
+        // Updatera en gäst
         public void Update()
         {
             var guests = _service.GetAllGuests();
@@ -125,5 +130,39 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
+        // Ta bort en gäst (soft delete)
+        public void SoftDelete()
+        {
+            var guests = _service.GetAllGuests();
+            ShowGuestTable(guests);
+
+            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/] att ta bort:");
+            var guest = _service.GetGuest(id);
+
+            if (guest == null)
+            {
+                AnsiConsole.MarkupLine("[red]Gästen hittades inte.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            // Kontrollera om gästen har bokningar
+            if (_service.HasBookings(id))
+            {
+                AnsiConsole.MarkupLine("[red]Gästen kan inte tas bort eftersom det finns bokningar kopplade till den.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            bool success = _service.DeleteGuest(id);
+
+            AnsiConsole.MarkupLine(success
+                ? "[green]Gäst borttagen![/]"
+                : "[red]Misslyckades med att ta bort gäst.[/]");
+
+            WaitForEsc();
+        }
+
     }
 }

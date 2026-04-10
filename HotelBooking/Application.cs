@@ -33,14 +33,14 @@ namespace HotelBooking
                 // Skickar in db + flaggan som styr om login lyckades
                 LoginController.Login(_db, ref isLoggedIn);
 
-                // Om login misslyckas → börja om och visa login igen
+                // Om login misslyckas - börja om och visa login igen
                 if (!isLoggedIn)
                     continue;
 
                 // När login lyckas - starta huvudmenyn
                 _mainMenuController.Run();
 
-                // När användaren loggar ut → loopen fortsätter och login visas igen
+                // När användaren loggar ut - loopen fortsätter och login visas igen
             }
         }
     }

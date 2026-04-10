@@ -10,6 +10,7 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader($"Huvudmeny - Inloggad som {currentUser}");
 
+            // Meny
             var menu = new SelectionPrompt<string>()
                 .Title("[grey]Välj ett alternativ[/]")
                 .HighlightStyle(new Style(foreground: Color.Green))

@@ -15,7 +15,7 @@ namespace HotelBooking.Models
         [ForeignKey(nameof(InvoiceId))]
         public Invoice? Invoice { get; set; }
 
-        // Betalningsinformation
+
         [Required]
         [Range(0, 999999)]
         public decimal Amount { get; set; }
@@ -23,11 +23,6 @@ namespace HotelBooking.Models
         [Required]
         public DateTime PaymentDate { get; set; }
 
-        // Betalningsmetod (kan göras till enum om du vill)
-        [MaxLength(50)]
-        public string? PaymentMethod { get; set; }
-
-        // Status (valfritt)
         public bool IsSuccessful { get; set; }
     }
 }

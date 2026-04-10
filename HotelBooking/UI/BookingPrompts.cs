@@ -4,13 +4,16 @@ using Spectre.Console;
 
 namespace HotelBooking.UI
 {
-    // En hjälparklass som samlar alla frågor (prompts)
-    // som BookingUI behöver. Gör koden renare och mer SOLID.
+    // Den här klassen samlar alla frågor som BookingUI behöver.
+    // Det gör koden enklare och renare eftersom BookingUI slipper ha all input-logik själv.
+    // Detta följer SOLID: BookingUI fokuserar på flödet, och BookingPrompts hanterar alla frågor till användaren.
     public static class BookingPrompts
     {
-        // Fråga användaren om de vill skapa ny kund eller välja befintlig
+        // Välj kund (ny eller befintlig)
+
         public static int? SelectOrCreateGuest(EscUI ui, IGuestService guestService)
         {
+            // Visa tre val: ny kund, befintlig kund, avbryt
             var choice = ui.SelectWithEsc(
                 new List<string>
                 {
@@ -21,16 +24,19 @@ namespace HotelBooking.UI
                 s => s
             );
 
+            // Om användaren trycker ESC eller väljer Avbryt
             if (choice == null || choice == "Avbryt")
                 return null;
 
+            // Ny kund
             if (choice == "Skapa bokning med NY kund")
                 return CreateGuest(ui, guestService);
 
+            // Befintlig kund
             return SelectExistingGuest(ui, guestService);
         }
 
-        // Skapa en ny kund
+        //  Skapa ny kund
         public static int? CreateGuest(EscUI ui, IGuestService guestService)
         {
             string? fullName = ui.AskWithEsc("Fullständigt namn:");
@@ -42,11 +48,13 @@ namespace HotelBooking.UI
             string? email = ui.AskWithEsc("Email:");
             if (email == null) return null;
 
+            // Skapa kund i databasen
             var guest = guestService.CreateGuest(fullName, phone, email);
+
             return guest.Id;
         }
 
-        // Välj en befintlig kund
+        // Välj befintlig kund
         public static int? SelectExistingGuest(EscUI ui, IGuestService guestService)
         {
             var guests = guestService.GetAllGuests();
@@ -62,7 +70,7 @@ namespace HotelBooking.UI
             return selected?.Id;
         }
 
-        // Fråga efter antal gäster
+        // Antal gäster
         public static int? AskGuestCount(EscUI ui)
         {
             string? input = ui.AskWithEsc("Antal gäster:");
@@ -74,7 +82,7 @@ namespace HotelBooking.UI
             return count;
         }
 
-        // Välj rum från en lista
+        // Välj rum
         public static int? SelectRoom(EscUI ui, IEnumerable<Room> rooms)
         {
             var selected = ui.SelectWithEsc(
@@ -84,7 +92,6 @@ namespace HotelBooking.UI
 
             return selected?.Id;
         }
-
 
         // Fråga efter boknings-ID
         public static int? AskBookingId(EscUI ui)
@@ -98,7 +105,10 @@ namespace HotelBooking.UI
             return id;
         }
 
-        // Modell för uppdateringsvärden
+        // Modell för uppdatering av bokning
+        // En liten hjälpklass som bara används av UI:t när man uppdaterar en bokning.
+        // Den samlar alla ändringar i ett enda objekt så koden blir enklare och renare.
+        // Detta är INTE en databasmodell - bara en UI‑modell för att hålla användarens input.
         public class BookingUpdateModel
         {
             public int? GuestId { get; set; }
@@ -108,7 +118,7 @@ namespace HotelBooking.UI
             public int? NumberOfGuests { get; set; }
         }
 
-        // Fråga efter uppdateringar av en bokning
+        // Fråga efter uppdateringar
         public static BookingUpdateModel? AskBookingUpdates(EscUI ui, Booking booking)
         {
             AnsiConsole.MarkupLine("[green]Lämna tomt för att behålla nuvarande värde.[/]");

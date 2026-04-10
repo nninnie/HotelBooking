@@ -32,7 +32,6 @@ namespace HotelBooking.UI
                     p.InvoiceId.ToString(),
                     $"{p.Amount} kr",
                     p.PaymentDate.ToString("yyyy-MM-dd"),
-                    p.PaymentMethod ?? "Okänd",
                     p.IsSuccessful ? "[green]Genomförd[/]" : "[red]Misslyckad[/]"
                 );
             }
@@ -78,17 +77,15 @@ namespace HotelBooking.UI
 
         public void Create()
         {
-            // Visa alla betalningar först (hjälper användaren se faktura-ID:n)
             var payments = _service.GetAllPayments();
             ShowPaymentTable(payments);
 
             int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
             decimal amount = AnsiConsole.Ask<decimal>("Ange [yellow]belopp[/] (kr):");
-            string method = AnsiConsole.Ask<string>("Ange [yellow]betalningsmetod[/] (t.ex. Kort, Swish, Faktura):");
 
-            var payment = _service.CreatePayment(invoiceId, amount, method);
+            var payment = _service.CreatePayment(invoiceId, amount);
 
-            AnsiConsole.MarkupLine($"[green]Betalning skapad![/] ID: {payment.Id}");
+            AnsiConsole.MarkupLine($"[green]Betalning registrerad![/] ID: {payment.Id}");
             WaitForEsc();
         }
     }

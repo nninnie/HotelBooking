@@ -9,19 +9,14 @@ namespace HotelBooking.UI
         public static void ShowLogo()
         {
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
 
             string[] logoLines =
             {
-"▀██▀  ▀██▀           ▄           ▀██  ▀██     ▀██    ██▀ █▀▀▀▀▀██  ",
- "██    ██    ▄▄▄   ▄██▄    ▄▄▄▄   ██   ██      ███  ███      ▄█▀   ",
- "██▀▀▀▀██  ▄█  ▀█▄  ██   ▄█▄▄▄██  ██   ██      █▀█▄▄▀██     ██     ",
- "██    ██  ██   ██  ██   ██       ██   ██      █ ▀█▀ ██   ▄█▀      ",
-"▄██▄  ▄██▄  ▀█▄▄█▀  ▀█▄▀  ▀█▄▄▄▀ ▄██▄ ▄██▄    ▄█▄ █ ▄██▄ ██▄▄▄▄▄▄█ ",
-"                                                                   "
-                                                                   
-
-};
+                "╦ ╦┌─┐┌┬┐┌─┐┬  ┬    ╔╦╗╔═╗",
+                "╠═╣│ │ │ ├┤ │  │    ║║║╔═╝",
+                "╩ ╩└─┘ ┴ └─┘┴─┘┴─┘  ╩ ╩╚═╝"
+            };
 
             foreach (var line in logoLines)
                 PrintCentered(line);

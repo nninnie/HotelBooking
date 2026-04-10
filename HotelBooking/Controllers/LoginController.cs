@@ -1,8 +1,8 @@
-﻿using HotelBooking.Core.Service;
-using HotelBooking.Data;
+﻿using HotelBooking.Data;
 using HotelBooking.UI;
 using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
+using HotelBooking.Core;
 
 namespace HotelBooking.Controllers
 {
@@ -14,14 +14,15 @@ namespace HotelBooking.Controllers
             {
                 AnsiConsole.Clear();
                 BannerUI.ShowLogo();
-                BannerUI.PrintHeader("LOGIN");
+                BannerUI.PrintHeader("INLOGGNING");
 
-                var username = AnsiConsole
-                    .Ask<string>("Användarnamn:") ?? "";
-                var password = AnsiConsole
-                    .Prompt(new TextPrompt<string>("Lösenord:")
-                    .Secret()
-                ) ?? "";
+                AnsiConsole.MarkupLine("");
+                var username = AnsiConsole.Ask<string>("[yellow]Användarnamn:[/]");
+                var password = AnsiConsole.Prompt(
+                    new TextPrompt<string>("[yellow]Lösenord:[/]")
+                        .Secret()
+                        .PromptStyle("white")
+                );
 
                 // Gör användarnamnet case-insensitive
                 var name = username.ToLower();
@@ -43,6 +44,7 @@ namespace HotelBooking.Controllers
 
                     AnsiConsole.Clear();
                     BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine("");
                     AnsiConsole.MarkupLine("[green]Välkommen tillbaka, [bold]Richard Chalk[/]![/]");
                     AnsiConsole.MarkupLine("[yellow]Roll: [bold]Dungeon Master[/][/]");
                     AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
@@ -58,6 +60,7 @@ namespace HotelBooking.Controllers
 
                     AnsiConsole.Clear();
                     BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine("");
                     AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
                     AnsiConsole.MarkupLine("[yellow]Roll: [bold]Manager[/][/]");
                     AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
@@ -74,6 +77,7 @@ namespace HotelBooking.Controllers
 
                     AnsiConsole.Clear();
                     BannerUI.ShowLogo();
+                    AnsiConsole.MarkupLine("");
                     AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
                     AnsiConsole.MarkupLine("[yellow]Roll: [bold]Receptionist[/][/]");
                     AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
@@ -88,6 +92,7 @@ namespace HotelBooking.Controllers
 
                 AnsiConsole.Clear();
                 BannerUI.ShowLogo();
+                AnsiConsole.MarkupLine("");
                 AnsiConsole.MarkupLine($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
                 AnsiConsole.MarkupLine("[yellow]Roll: [bold]Guest[/][/]");
                 AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");

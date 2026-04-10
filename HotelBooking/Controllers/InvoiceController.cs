@@ -32,6 +32,9 @@ namespace HotelBooking.Controllers
                         _invoiceUI.MarkAsPaid();
                         break;
                     case 5:
+                        _invoiceUI.CancelUnpaid();  
+                        break;
+                    case 6:
                         return; 
                 }
             }
