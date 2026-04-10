@@ -41,6 +41,8 @@ namespace HotelBooking.UI
 
         public void Show()
         {
+            CurrentHeader = "BETALNINGAR PER FAKTURA";
+
             // Visa alla betalningar först
             var allPayments = _service.GetAllPayments();
             ShowPaymentTable(allPayments);
@@ -62,6 +64,8 @@ namespace HotelBooking.UI
 
         public void ShowAll()
         {
+            CurrentHeader = "ALLA BETALNINGAR";
+
             var payments = _service.GetAllPayments();
 
             if (!payments.Any())
@@ -77,6 +81,8 @@ namespace HotelBooking.UI
 
         public void Create()
         {
+            CurrentHeader = "REGISTRERA BETALNING";
+
             var payments = _service.GetAllPayments();
             ShowPaymentTable(payments);
 

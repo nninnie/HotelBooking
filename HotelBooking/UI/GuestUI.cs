@@ -40,6 +40,8 @@ namespace HotelBooking.UI
         // Visa alla gäster
         public void ShowAll()
         {
+            CurrentHeader = "VISA ALLA GÄSTER";
+
             var guests = _service.GetAllGuests();
 
             if (!guests.Any())
@@ -56,6 +58,8 @@ namespace HotelBooking.UI
         // Visa detaljer på en gäst
         public void ShowDetails()
         {
+            CurrentHeader = "GÄSTDETALJER";
+
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 
@@ -87,6 +91,8 @@ namespace HotelBooking.UI
         // Skapa en gäst
         public void Create()
         {
+            CurrentHeader = "SKAPA GÄST";
+
             string fullName = AnsiConsole.Ask<string>("Ange [yellow]fullständigt namn[/]:");
             string? phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
             string? email = AnsiConsole.Ask<string>("Email (valfritt):");
@@ -100,6 +106,8 @@ namespace HotelBooking.UI
         // Updatera en gäst
         public void Update()
         {
+            CurrentHeader = "UPPDATERA GÄST";
+
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 
@@ -134,6 +142,8 @@ namespace HotelBooking.UI
         // Ta bort en gäst (soft delete)
         public void SoftDelete()
         {
+            CurrentHeader = "TA BORT GÄST";
+
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 

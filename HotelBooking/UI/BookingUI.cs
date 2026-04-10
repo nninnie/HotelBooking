@@ -79,6 +79,8 @@ namespace HotelBooking.UI
         // VISA ALLA
         public void ShowAll()
         {
+            CurrentHeader = "ALLA BOKNINGAR";
+
             var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
@@ -100,6 +102,8 @@ namespace HotelBooking.UI
         // VISA DETALJER
         public void ShowDetails()
         {
+            CurrentHeader = "BOKNINGSDETALJER";
+
             var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
@@ -136,6 +140,8 @@ namespace HotelBooking.UI
         // SOFT DELETE
         public void SoftDelete()
         {
+            CurrentHeader = "RADERA BOKNING";
+
             var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
@@ -168,6 +174,8 @@ namespace HotelBooking.UI
         // RESTORE
         public void Restore()
         {
+            CurrentHeader = "ÅTERSTÄLL BOKNING";
+
             var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
@@ -200,6 +208,8 @@ namespace HotelBooking.UI
         // UPDATE
         public void Update()
         {
+            CurrentHeader = "UPPDATERA BOKNING";
+
             var bookings = _bookingService.GetAll();
 
             BookingRenderer.ShowBookingTable(

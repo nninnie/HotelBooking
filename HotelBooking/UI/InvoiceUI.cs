@@ -44,6 +44,8 @@ namespace HotelBooking.UI
         // Visa alla fakturor
         public void ShowAll()
         {
+            CurrentHeader = "ALLA FAKTUROR";
+
             var invoices = _iinvoiceService.GetAllInvoices();
 
             if (!invoices.Any())
@@ -60,6 +62,8 @@ namespace HotelBooking.UI
         // Visa detaljer för en faktura
         public void ShowDetails()
         {
+            CurrentHeader = "FAKTURADETALJER";
+
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
@@ -93,6 +97,8 @@ namespace HotelBooking.UI
         // Skapa faktura
         public void Create()
         {
+            CurrentHeader = "SKAPA FAKTURA";
+
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
@@ -109,6 +115,8 @@ namespace HotelBooking.UI
         // Markera faktura som betald
         public void MarkAsPaid()
         {
+            CurrentHeader = "MARKERA FAKTURA SOM BETALD";
+
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
@@ -126,6 +134,8 @@ namespace HotelBooking.UI
         // Annullera obetalda bokningar 
         public void CancelUnpaid()
         {
+            CurrentHeader = "ANNULLERA OBETALDA BOKNINGAR";
+
             int cancelled = _iinvoiceService.CancelUnpaidBookings();
 
             if (cancelled == 0)

@@ -45,6 +45,8 @@ namespace HotelBooking.UI
 
         public void ShowAll()
         {
+            CurrentHeader = "VISA ALLA RUM";
+
             var rooms = _roomService.GetAllRooms();
 
             if (!rooms.Any())
@@ -60,6 +62,8 @@ namespace HotelBooking.UI
 
         public void ShowDetails()
         {
+            CurrentHeader = "RUMSDETALJER";
+
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
@@ -94,6 +98,8 @@ namespace HotelBooking.UI
 
         public void Create()
         {
+            CurrentHeader = "SKAPA RUM";
+
             string number = AnsiConsole.Ask<string>("Ange [yellow]rumsnummer[/]:");
             string type = AnsiConsole.Ask<string>("Ange [yellow]rumstyp[/] (Enkelrum/Dubbelrum/Svit):");
             int capacity = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
@@ -109,6 +115,8 @@ namespace HotelBooking.UI
 
         public void Update()
         {
+            CurrentHeader = "UPPDATERA RUM";
+
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
@@ -140,6 +148,8 @@ namespace HotelBooking.UI
 
         public void SoftDelete()
         {
+            CurrentHeader = "MARKERA RUM SOM UR FUNKTION";
+
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
@@ -155,6 +165,8 @@ namespace HotelBooking.UI
 
         public void Restore()
         {
+            CurrentHeader = "ÅTERSTÄLL RUM";
+
             var deletedRooms = _roomService.GetDeletedRooms();
 
             if (!deletedRooms.Any())
