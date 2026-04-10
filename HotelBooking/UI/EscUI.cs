@@ -5,6 +5,8 @@ namespace HotelBooking.UI
     // Bas-klass för all UI som ska stödja ESC
     public abstract class EscUI
     {
+        public string? CurrentHeader { get; set; }
+
         // Väntar på att användaren trycker ESC för att gå tillbaka
         public void WaitForEsc()
         {
@@ -30,24 +32,20 @@ namespace HotelBooking.UI
             {
                 key = Console.ReadKey(true);
 
-                // ESC = avbryt
                 if (key.Key == ConsoleKey.Escape)
                     return null;
 
-                // ENTER = klart
                 if (key.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
                     return input;
                 }
 
-                // Backspace
                 if (key.Key == ConsoleKey.Backspace && input.Length > 0)
                 {
                     input = input[..^1];
                     Console.Write("\b \b");
                 }
-                // Vanliga tecken
                 else if (!char.IsControl(key.KeyChar))
                 {
                     input += key.KeyChar;
@@ -57,16 +55,23 @@ namespace HotelBooking.UI
         }
 
         // Lista med piltangenter + ESC för att avbryta
-        public T? SelectWithEsc<T>(List<T> items, Func<T, string> converter)
+        public T? SelectWithEsc<T>(List<T> items, Func<T, string> converter, string? header = null)
         {
             int index = 0;
 
             while (true)
             {
-                Console.Clear();
+                AnsiConsole.Clear();
+
+                BannerUI.ShowLogo();
+
+                // ANVÄND HEADER-PARAMETER ELLER CurrentHeader
+                string? h = header ?? CurrentHeader;
+                if (!string.IsNullOrWhiteSpace(h))
+                    BannerUI.PrintHeader(h);
+
                 AnsiConsole.MarkupLine("[green]Välj (ESC för att gå tillbaka):[/]");
 
-                // Visa alla val
                 for (int i = 0; i < items.Count; i++)
                 {
                     if (i == index)

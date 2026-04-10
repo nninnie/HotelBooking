@@ -20,7 +20,9 @@ namespace HotelBooking.UI
         // SKAPA NY BOKNING
         public void Create()
         {
-            // 1. Välj eller skapa kund
+            CurrentHeader = "SKAPA BOKNING";
+
+            // Välj eller skapa kund
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
 
