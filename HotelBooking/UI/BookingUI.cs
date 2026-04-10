@@ -26,27 +26,57 @@ namespace HotelBooking.UI
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
 
-            // 2. Datum
+            // Datum
             AnsiConsole.MarkupLine("[green]Välj incheckningsdatum:[/]");
-            var checkIn = CalenderPicker.SelectDate();
-            if (checkIn == null) return;
+            DateTime? checkIn = null;
+
+            while (true)
+            {
+                AnsiConsole.MarkupLine("[green]Välj incheckningsdatum:[/]");
+                checkIn = CalenderPicker.SelectDate();
+
+                if (checkIn == null)
+                    return;
+
+                // VALIDATION
+                if (checkIn.Value.Date < DateTime.Today)
+                {
+                    BookingRenderer.ShowError("Incheckningsdatum kan inte vara bakåt i tiden.");
+                    continue;
+                }
+
+                break;
+            }
 
             AnsiConsole.MarkupLine("[green]Välj utcheckningsdatum:[/]");
-            var checkOut = CalenderPicker.SelectDate();
-            if (checkOut == null) return;
+            DateTime? checkOut = null;
 
-            if (checkOut <= checkIn)
+            while (true)
             {
-                AnsiConsole.MarkupLine("[red]Utcheckningsdatum måste vara efter incheckningsdatum![/]");
+                checkOut = CalenderPicker.SelectDate();
+                if (checkOut == null) return;
+
+                if (checkOut > checkIn)
+                    break;
+
+                BookingRenderer.ShowError("Utcheckningsdatum måste vara efter incheckningsdatum!");
+                AnsiConsole.MarkupLine("[grey]Tryck valfri tangent för att fortsätta...[/]");
+                Console.ReadKey(true);
+            }
+
+            // Antal gäster
+            var guestsCount = BookingPrompts.AskGuestCount(this);
+            if (guestsCount == null) return;
+
+            // VALIDATION
+            if (guestsCount <= 0)
+            {
+                BookingRenderer.ShowError("Antal gäster måste vara minst 1.");
                 WaitForEsc();
                 return;
             }
 
-            // 3. Antal gäster
-            var guestsCount = BookingPrompts.AskGuestCount(this);
-            if (guestsCount == null) return;
-
-            // 4. Lediga rum
+            // Lediga rum
             var availableRooms = _bookingService.GetAvailableRooms(
                 checkIn.Value,
                 checkOut.Value,
@@ -63,7 +93,7 @@ namespace HotelBooking.UI
             var roomId = BookingPrompts.SelectRoom(this, availableRooms);
             if (roomId == null) return;
 
-            // 5. Skapa bokning
+            // Skapa bokning
             var booking = _bookingService.CreateBooking(
                 guestId.Value,
                 roomId.Value,
@@ -122,6 +152,14 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
+            // VALIDATION
+            if (bookingId <= 0)
+            {
+                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                WaitForEsc();
+                return;
+            }
+
             var booking = _bookingService.GetBooking(bookingId.Value);
             if (booking == null)
             {
@@ -160,6 +198,14 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
+            // VALIDATION
+            if (bookingId <= 0)
+            {
+                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                WaitForEsc();
+                return;
+            }
+
             bool success = _bookingService.SoftDelete(bookingId.Value);
 
             BookingRenderer.ShowResult(
@@ -194,6 +240,14 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
+            // VALIDATION
+            if (bookingId <= 0)
+            {
+                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                WaitForEsc();
+                return;
+            }
+
             bool success = _bookingService.Restore(bookingId.Value);
 
             BookingRenderer.ShowResult(
@@ -221,6 +275,14 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
+            // VALIDATION
+            if (bookingId <= 0)
+            {
+                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                WaitForEsc();
+                return;
+            }
+
             var booking = _bookingService.GetBooking(bookingId.Value);
             if (booking == null)
             {
@@ -231,6 +293,21 @@ namespace HotelBooking.UI
 
             var updates = BookingPrompts.AskBookingUpdates(this, booking);
             if (updates == null) return;
+
+            // VALIDATION
+            if (updates.FromDate >= updates.ToDate)
+            {
+                BookingRenderer.ShowError("Utcheckningsdatum måste vara efter incheckningsdatum.");
+                WaitForEsc();
+                return;
+            }
+
+            if (updates.NumberOfGuests <= 0)
+            {
+                BookingRenderer.ShowError("Antal gäster måste vara minst 1.");
+                WaitForEsc();
+                return;
+            }
 
             bool success = _bookingService.UpdateBooking(
                 booking.Id,

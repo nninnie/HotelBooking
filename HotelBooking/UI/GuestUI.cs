@@ -93,9 +93,51 @@ namespace HotelBooking.UI
         {
             CurrentHeader = "SKAPA GÄST";
 
-            string fullName = AnsiConsole.Ask<string>("Ange [yellow]fullständigt namn[/]:");
-            string? phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
-            string? email = AnsiConsole.Ask<string>("Email (valfritt):");
+            string? fullName;
+
+            while (true)
+            {
+                fullName = AnsiConsole.Ask<string>("Ange [yellow]fullständigt namn[/]:");
+
+                // VALIDATION
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    AnsiConsole.MarkupLine("[red]Namn får inte vara tomt![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            string? phone;
+            while (true)
+            {
+                phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
+
+                // VALIDATION
+                if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
+                {
+                    AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            string? email;
+            while (true)
+            {
+                email = AnsiConsole.Ask<string>("Email (valfritt):");
+
+                // VALIDATION
+                if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+                {
+                    AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
+                    continue;
+                }
+
+                break;
+            }
 
             var guest = _service.CreateGuest(fullName, phone, email);
 
@@ -122,8 +164,34 @@ namespace HotelBooking.UI
             }
 
             string fullName = AnsiConsole.Ask<string>($"Nytt namn (tomt = behåll) [{guest.FullName}]:");
+
+            // VALIDATION
+            if (!string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(fullName.Trim()))
+            {
+                AnsiConsole.MarkupLine("[red]Namn får inte vara tomt![/]");
+                WaitForEsc();
+                return;
+            }
+
             string phone = AnsiConsole.Ask<string>($"Nytt telefonnummer (tomt = behåll) [{guest.PhoneNumber ?? "-"}]:");
+
+            // VALIDATION
+            if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
+            {
+                AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
+                WaitForEsc();
+                return;
+            }
+
             string email = AnsiConsole.Ask<string>($"Ny email (tomt = behåll) [{guest.Email ?? "-"}]:");
+
+            // VALIDATION
+            if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
+            {
+                AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
+                WaitForEsc();
+                return;
+            }
 
             bool success = _service.UpdateGuest(
                 id,

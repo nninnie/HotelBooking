@@ -6,6 +6,7 @@ public static class CalenderPicker
     public static DateTime? SelectDate()
     {
         DateTime today = DateTime.Today;
+        DateTime maxDate = today.AddYears(2); // Ska inte kunna bläddra flera år framåt i kalendern
         DateTime selectedDate = today; // Starta alltid på dagens datum
 
         while (true)
@@ -40,9 +41,18 @@ public static class CalenderPicker
                     return null;
             }
 
-            // STOPPA användaren från att gå bakåt i tiden
+            // Stoppa användaren från att gå bakåt i tiden
             if (selectedDate < today)
                 selectedDate = today;
+
+            // Stoppa användaren från att gå för långt fram
+            if (selectedDate > maxDate)
+                selectedDate = maxDate;
+
+            // Fix för dagar som inte finns i månaden
+            int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
+            if (selectedDate.Day > daysInMonth)
+                selectedDate = new DateTime(selectedDate.Year, selectedDate.Month, daysInMonth);
         }
     }
 

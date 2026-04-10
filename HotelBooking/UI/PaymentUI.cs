@@ -47,7 +47,20 @@ namespace HotelBooking.UI
             var allPayments = _service.GetAllPayments();
             ShowPaymentTable(allPayments);
 
-            int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att filtrera på:");
+            int invoiceId;
+            while (true)
+            {
+                invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att filtrera på:");
+
+                // VALIDATION
+                if (invoiceId <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                    continue;
+                }
+
+                break;
+            }
 
             var payments = _service.GetPaymentsForInvoice(invoiceId);
 
@@ -86,8 +99,35 @@ namespace HotelBooking.UI
             var payments = _service.GetAllPayments();
             ShowPaymentTable(payments);
 
-            int invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
-            decimal amount = AnsiConsole.Ask<decimal>("Ange [yellow]belopp[/] (kr):");
+            int invoiceId;
+            while (true)
+            {
+                invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
+
+                // VALIDATION
+                if (invoiceId <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            decimal amount;
+            while (true)
+            {
+                amount = AnsiConsole.Ask<decimal>("Ange [yellow]belopp[/] (kr):");
+
+                // VALIDATION
+                if (amount <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");
+                    continue;
+                }
+
+                break;
+            }
 
             var payment = _service.CreatePayment(invoiceId, amount);
 

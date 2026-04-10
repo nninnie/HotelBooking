@@ -102,9 +102,50 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int bookingId = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
-            int guestId = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
-            decimal amount = AnsiConsole.Ask<decimal>("Ange [yellow]totalbelopp[/] (kr):");
+            int bookingId;
+            while (true)
+            {
+                bookingId = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
+
+                // VALIDATION
+                if (bookingId <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Boknings-ID måste vara ett positivt tal![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            int guestId;
+            while (true)
+            {
+                guestId = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
+
+                // VALIDATION
+                if (guestId <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Gäst-ID måste vara ett positivt tal![/]");
+                    continue;
+                }
+
+                break;
+            }
+
+            decimal amount;
+            while (true)
+            {
+                amount = AnsiConsole.Ask<decimal>("Ange [yellow]totalbelopp[/] (kr):");
+
+                // VALIDATION
+                if (amount <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");
+                    continue;
+                }
+
+                break;
+            }
 
             var invoice = _iinvoiceService.CreateInvoice(bookingId, guestId, amount);
 
@@ -120,7 +161,20 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att markera som betald:");
+            int id;
+            while (true)
+            {
+                id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att markera som betald:");
+
+                // VALIDATION
+                if (id <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                    continue;
+                }
+
+                break;
+            }
 
             bool success = _iinvoiceService.MarkAsPaid(id);
 

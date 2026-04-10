@@ -70,8 +70,6 @@ namespace HotelBooking.UI
                 if (!string.IsNullOrWhiteSpace(h))
                     BannerUI.PrintHeader(h);
 
-                AnsiConsole.MarkupLine("[green]Välj (ESC för att gå tillbaka):[/]");
-
                 for (int i = 0; i < items.Count; i++)
                 {
                     if (i == index)
