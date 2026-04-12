@@ -20,15 +20,8 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
             table.AddColumn("[yellow]Typ[/]");
-            table.AddColumn("[yellow]Kapacitet[/]");
             table.AddColumn("[yellow]Extra bäddar[/]");
-            table.AddColumn("[yellow]Max gäster[/]");
             table.AddColumn("[yellow]Pris/natt[/]");
-            table.AddColumn("[yellow]Havsutsikt[/]");
-            table.AddColumn("[yellow]Minibar[/]");
-            table.AddColumn("[yellow]Husdjur[/]");
-            table.AddColumn("[yellow]Balkong[/]");
-            table.AddColumn("[yellow]Badkar[/]");
             table.AddColumn("[yellow]Status[/]");
 
             foreach (var r in rooms)
@@ -37,20 +30,14 @@ namespace HotelBooking.UI
                     r.Id.ToString(),
                     r.RoomNumber,
                     r.RoomType,
-                    r.Capacity.ToString(),
                     r.ExtraBeds.ToString(),
-                    r.MaxGuests.ToString(),
                     $"{r.PricePerNight} kr",
-                    r.HasSeaView ? "[green]Ja[/]" : "[red]Nej[/]",
-                    r.HasMinibar ? "[green]Ja[/]" : "[red]Nej[/]",
-                    r.IsPetFriendly ? "[green]Ja[/]" : "[red]Nej[/]",
-                    r.HasBalcony ? "[green]Ja[/]" : "[red]Nej[/]",
-                    r.HasBathtub ? "[green]Ja[/]" : "[red]Nej[/]",
                     r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]"
                 );
             }
 
             AnsiConsole.Write(table);
+            WaitForEsc();
         }
 
         // VISA ALLA RUM
