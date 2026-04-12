@@ -39,7 +39,7 @@ namespace HotelBooking.UI
             Console.WriteLine();
         }
 
-        private static void PrintCentered(string text)
+        public static void PrintCentered(string text)
         {
             int padding = (BannerWidth - text.Length) / 2;
             if (padding < 0) padding = 0;

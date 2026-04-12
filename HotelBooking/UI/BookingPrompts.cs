@@ -9,12 +9,23 @@ namespace HotelBooking.UI
         // Välj kund (ny eller befintlig)
         public static int? SelectOrCreateGuest(EscUI ui, IGuestService guestService)
         {
+            AnsiConsole.Clear();
+
+            // RITA HEADER MED SPECTRE 
+            var panel = new Panel("[bold white]HANTERA BOKNINGAR[/]\n[grey]Välj kundtyp[/]");
+            panel.Border = BoxBorder.Rounded;
+            panel.Expand = false;
+            AnsiConsole.Write(panel);
+
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             var choice = ui.SelectWithEsc(
                 new List<string>
                 {
-                    "Skapa bokning med NY kund",
-                    "Skapa bokning med BEFINTLIG kund",
-                    "Avbryt"
+            "Skapa bokning med NY kund",
+            "Skapa bokning med BEFINTLIG kund",
+            "Avbryt"
                 },
                 s => s
             );
@@ -23,22 +34,21 @@ namespace HotelBooking.UI
                 return null;
 
             if (choice == "Skapa bokning med NY kund")
-                return CreateGuest(ui, guestService);
+                return CreateGuest(ui, guestService, "Ny kund");
 
-            return SelectExistingGuest(ui, guestService);
+            return SelectExistingGuest(ui, guestService, "Välj kund");
         }
 
         // Skapa ny kund
-        public static int? CreateGuest(EscUI ui, IGuestService guestService)
+        public static int? CreateGuest(EscUI ui, IGuestService guestService, string subtitle)
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
-
-            if (!string.IsNullOrWhiteSpace(ui.CurrentHeader))
-                BannerUI.PrintHeader(ui.CurrentHeader);
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
 
             AnsiConsole.MarkupLine("");
-            AnsiConsole.MarkupLine("[green]Ange information för den nya kunden. Tryck ESC för att avbryta.[/]");
+            AnsiConsole.MarkupLine("[darkgreen]Ange information för den nya kunden. ");
+            AnsiConsole.MarkupLine("[grey]Tryck ESC för att avbryta.[/]");
 
             // Förnamn
             string? firstName;
@@ -112,14 +122,17 @@ namespace HotelBooking.UI
                 break;
             }
 
-            // Skapa gäst
             var guest = guestService.CreateGuest(firstName, lastName, phone, email);
             return guest.Id;
         }
 
         // Välj befintlig kund
-        public static int? SelectExistingGuest(EscUI ui, IGuestService guestService)
+        public static int? SelectExistingGuest(EscUI ui, IGuestService guestService, string subtitle)
         {
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             var guests = guestService.GetAllGuests();
 
             if (!guests.Any())
@@ -136,6 +149,10 @@ namespace HotelBooking.UI
         // Antal gäster
         public static int? AskGuestCount(EscUI ui)
         {
+            BannerUI.PrintHeader("Hantera bokningar", "Antal gäster");
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             string? input = ui.AskWithEsc("Antal gäster:");
             if (input == null) return null;
 
@@ -157,6 +174,10 @@ namespace HotelBooking.UI
         // Välj rum
         public static int? SelectRoom(EscUI ui, IEnumerable<Room> rooms)
         {
+            BannerUI.PrintHeader("Hantera bokningar", "Välj rum");
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             var selected = ui.SelectWithEsc(
                 rooms.ToList(),
                 r => $"{r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt (Max {r.MaxGuests})"
@@ -168,6 +189,10 @@ namespace HotelBooking.UI
         // Fråga efter boknings-ID
         public static int? AskBookingId(EscUI ui)
         {
+            BannerUI.PrintHeader("Hantera bokningar", "Ange boknings-ID");
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             string? input = ui.AskWithEsc("Ange boknings-ID:");
             if (input == null) return null;
 
@@ -199,6 +224,10 @@ namespace HotelBooking.UI
         // Fråga efter uppdateringar
         public static BookingUpdateModel? AskBookingUpdates(EscUI ui, Booking booking)
         {
+            BannerUI.PrintHeader("Hantera bokningar", "Uppdatera bokning");
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+
             AnsiConsole.MarkupLine("[green]Lämna tomt för att behålla nuvarande värde.[/]");
 
             string? newGuest = ui.AskWithEsc($"Ny gäst-ID (tomt = {booking.GuestId}):");

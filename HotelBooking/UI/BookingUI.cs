@@ -20,7 +20,11 @@ namespace HotelBooking.UI
         // SKAPA NY BOKNING
         public void Create(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            // HEADER
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Skapa ny bokning");
+            AnsiConsole.WriteLine();
 
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
@@ -100,7 +104,10 @@ namespace HotelBooking.UI
         // VISA ALLA
         public void ShowAll(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Visa alla");
+            AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
 
@@ -123,7 +130,10 @@ namespace HotelBooking.UI
         // VISA DETALJER
         public void ShowDetails(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Visa detaljer");
+            AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
 
@@ -168,7 +178,10 @@ namespace HotelBooking.UI
         // SOFT DELETE
         public void SoftDelete(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Avboka (soft delete)");
+            AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
 
@@ -209,7 +222,10 @@ namespace HotelBooking.UI
         // RESTORE
         public void Restore(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Återställ bokning");
+            AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
 
@@ -250,7 +266,10 @@ namespace HotelBooking.UI
         // UPDATE
         public void Update(string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Uppdatera bokning");
+            AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
 
