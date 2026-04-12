@@ -224,7 +224,22 @@ namespace HotelBooking.Migrations
                     b.Property<int>("ExtraBeds")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HasBalcony")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasBathtub")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasMinibar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasSeaView")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsOutOfService")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPetFriendly")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("PricePerNight")

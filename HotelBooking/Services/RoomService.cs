@@ -36,7 +36,19 @@ namespace HotelBooking.Services
             return _db.Rooms.FirstOrDefault(r => r.Id == id);
         }
 
-        public Room CreateRoom(string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
+        // SKAPA RUM – nu med alla nya features
+        public Room CreateRoom(
+            string number,
+            string type,
+            int capacity,
+            int extraBeds,
+            decimal price,
+            bool outOfService,
+            bool hasSeaView,
+            bool hasMinibar,
+            bool isPetFriendly,
+            bool hasBalcony,
+            bool hasBathtub)
         {
             var room = new Room
             {
@@ -45,7 +57,14 @@ namespace HotelBooking.Services
                 Capacity = capacity,
                 ExtraBeds = extraBeds,
                 PricePerNight = price,
-                IsOutOfService = outOfService
+                IsOutOfService = outOfService,
+
+                // Nya features
+                HasSeaView = hasSeaView,
+                HasMinibar = hasMinibar,
+                IsPetFriendly = isPetFriendly,
+                HasBalcony = hasBalcony,
+                HasBathtub = hasBathtub
             };
 
             _db.Rooms.Add(room);
@@ -53,7 +72,20 @@ namespace HotelBooking.Services
             return room;
         }
 
-        public bool UpdateRoom(int id, string number, string type, int capacity, int extraBeds, decimal price, bool outOfService)
+        // UPPDATERA RUM – nu med alla nya features
+        public bool UpdateRoom(
+            int id,
+            string number,
+            string type,
+            int capacity,
+            int extraBeds,
+            decimal price,
+            bool outOfService,
+            bool hasSeaView,
+            bool hasMinibar,
+            bool isPetFriendly,
+            bool hasBalcony,
+            bool hasBathtub)
         {
             var room = GetRoom(id);
             if (room == null) return false;
@@ -64,6 +96,13 @@ namespace HotelBooking.Services
             room.ExtraBeds = extraBeds;
             room.PricePerNight = price;
             room.IsOutOfService = outOfService;
+
+            // Nya features
+            room.HasSeaView = hasSeaView;
+            room.HasMinibar = hasMinibar;
+            room.IsPetFriendly = isPetFriendly;
+            room.HasBalcony = hasBalcony;
+            room.HasBathtub = hasBathtub;
 
             _db.SaveChanges();
             return true;

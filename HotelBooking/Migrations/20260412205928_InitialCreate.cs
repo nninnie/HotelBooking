@@ -51,7 +51,12 @@ namespace HotelBooking.Migrations
                     Capacity = table.Column<int>(type: "int", nullable: false),
                     ExtraBeds = table.Column<int>(type: "int", nullable: false),
                     PricePerNight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsOutOfService = table.Column<bool>(type: "bit", nullable: false)
+                    IsOutOfService = table.Column<bool>(type: "bit", nullable: false),
+                    HasSeaView = table.Column<bool>(type: "bit", nullable: false),
+                    HasMinibar = table.Column<bool>(type: "bit", nullable: false),
+                    IsPetFriendly = table.Column<bool>(type: "bit", nullable: false),
+                    HasBalcony = table.Column<bool>(type: "bit", nullable: false),
+                    HasBathtub = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

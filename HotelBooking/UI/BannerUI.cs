@@ -1,50 +1,23 @@
-﻿using System;
+﻿using Spectre.Console;
 
-namespace HotelBooking.UI
+public static class BannerUI
 {
-    public static class BannerUI
+    public static void ShowLogo()
     {
-        private const int BannerWidth = 70;
+        AnsiConsole.WriteLine();
+        SpectreCenter.Center("[blue]╦ ╦┌─┐┌┬┐┌─┐┬  ┬    ╔╦╗╔═╗[/]");
+        SpectreCenter.Center("[blue]╠═╣│ │ │ ├┤ │  │    ║║║╔═╝[/]");
+        SpectreCenter.Center("[blue]╩ ╩└─┘ ┴ └─┘┴─┘┴─┘  ╩ ╩╚═╝[/]");
+        AnsiConsole.WriteLine();
+    }
 
-        public static void ShowLogo()
-        {
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
+    public static void PrintHeader(string title, string? subtitle = null)
+    {
+        SpectreCenter.Center($"[white]{title.ToUpper()}[/]");
 
-            string[] logoLines =
-            {
-                "╦ ╦┌─┐┌┬┐┌─┐┬  ┬    ╔╦╗╔═╗",
-                "╠═╣│ │ │ ├┤ │  │    ║║║╔═╝",
-                "╩ ╩└─┘ ┴ └─┘┴─┘┴─┘  ╩ ╩╚═╝"
-            };
+        if (!string.IsNullOrWhiteSpace(subtitle))
+            SpectreCenter.Center($"[grey]{subtitle}[/]");
 
-            foreach (var line in logoLines)
-                PrintCentered(line);
-
-            Console.ResetColor();
-        }
-
-        public static void PrintHeader(string title, string? subtitle = null)
-        {
-            Console.WriteLine();
-            PrintCentered(title.ToUpper());
-
-            if (!string.IsNullOrWhiteSpace(subtitle))
-            {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                PrintCentered(subtitle);
-                Console.ResetColor();
-            }
-
-            Console.WriteLine();
-        }
-
-        public static void PrintCentered(string text)
-        {
-            int padding = (BannerWidth - text.Length) / 2;
-            if (padding < 0) padding = 0;
-
-            Console.WriteLine(new string(' ', padding) + text);
-        }
+        AnsiConsole.WriteLine();
     }
 }

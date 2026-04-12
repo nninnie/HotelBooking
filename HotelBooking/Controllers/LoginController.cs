@@ -80,9 +80,6 @@ namespace HotelBooking.Controllers
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
-
-            AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
 
             CenteredMarkup($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");

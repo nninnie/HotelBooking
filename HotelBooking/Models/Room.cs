@@ -30,5 +30,12 @@ namespace HotelBooking.Models
         public bool IsOutOfService { get; set; } = false;
 
         public List<Booking> Bookings { get; set; } = new();
+        public bool HasSeaView { get; set; }
+        public bool HasMinibar { get; set; }
+        public bool IsPetFriendly { get; set; }
+
+        public bool HasBalcony { get; set; }
+        public bool HasBathtub { get; set; }
+
     }
 }

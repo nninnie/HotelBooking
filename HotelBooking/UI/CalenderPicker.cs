@@ -1,17 +1,18 @@
 ﻿using Spectre.Console;
 using System.Globalization;
+using System.Text;
 
-public static class CalenderPicker
+public static class CalendarPicker
 {
     public static DateTime? SelectDate()
     {
         DateTime today = DateTime.Today;
-        DateTime maxDate = today.AddYears(2); // Ska inte kunna bläddra flera år framåt i kalendern
-        DateTime selectedDate = today; // Starta alltid på dagens datum
+        DateTime maxDate = today.AddYears(2);
+        DateTime selectedDate = today;
 
         while (true)
         {
-            Console.Clear();
+            AnsiConsole.Clear();
             RenderCalendar(selectedDate);
 
             var key = Console.ReadKey(true).Key;
@@ -41,15 +42,12 @@ public static class CalenderPicker
                     return null;
             }
 
-            // Stoppa användaren från att gå bakåt i tiden
             if (selectedDate < today)
                 selectedDate = today;
 
-            // Stoppa användaren från att gå för långt fram
             if (selectedDate > maxDate)
                 selectedDate = maxDate;
 
-            // Fix för dagar som inte finns i månaden
             int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
             if (selectedDate.Day > daysInMonth)
                 selectedDate = new DateTime(selectedDate.Year, selectedDate.Month, daysInMonth);
@@ -58,36 +56,36 @@ public static class CalenderPicker
 
     private static void RenderCalendar(DateTime selectedDate)
     {
-        var calendarContent = new StringWriter();
+        var sb = new StringBuilder();
 
-        // Månadstitel
-        calendarContent.WriteLine($"[red]{selectedDate:MMMM}[/]".ToUpper());
-        calendarContent.WriteLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
-        calendarContent.WriteLine("─────────────────────────────────");
+        // Titel
+        sb.AppendLine($"[red]{selectedDate:MMMM yyyy}[/]".ToUpper());
+        sb.AppendLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
+        sb.AppendLine("─────────────────────────────────");
 
-        DateTime firstDayOfMonth = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+        DateTime firstDay = new DateTime(selectedDate.Year, selectedDate.Month, 1);
         int daysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
-        int startDay = (int)firstDayOfMonth.DayOfWeek;
-        startDay = (startDay == 0) ? 6 : startDay - 1; // Gör måndag till första dagen
 
-        // Tomma rutor innan månadens första dag
+        int startDay = (int)firstDay.DayOfWeek;
+        startDay = (startDay == 0) ? 6 : startDay - 1;
+
+        // Tomma rutor
         for (int i = 0; i < startDay; i++)
-            calendarContent.Write("     ");
+            sb.Append("     ");
 
         // Dagar
         for (int day = 1; day <= daysInMonth; day++)
         {
             if (day == selectedDate.Day)
-                calendarContent.Write($"[green]{day,2}[/]   "); // Markera vald dag
+                sb.Append($"[green]{day,2}[/]   ");
             else
-                calendarContent.Write($"{day,2}   ");
+                sb.Append($"{day,2}   ");
 
             if ((startDay + day) % 7 == 0)
-                calendarContent.WriteLine();
+                sb.AppendLine();
         }
 
-        // Panel runt kalendern
-        var panel = new Panel(calendarContent.ToString())
+        var panel = new Panel(sb.ToString())
         {
             Border = BoxBorder.Double,
             Header = new PanelHeader($"[red]{selectedDate:yyyy}[/]", Justify.Center)
@@ -95,8 +93,8 @@ public static class CalenderPicker
 
         AnsiConsole.Write(panel);
 
-        Console.WriteLine();
-        AnsiConsole.MarkupLine("\nAnvänd piltangenter [blue]◄ ▲ ► ▼[/] för att navigera.");
-        AnsiConsole.MarkupLine("Tryck [green]Enter[/] för att välja eller [red]ESC[/] för att avbryta.");
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[grey]Använd piltangenter för att navigera.[/]");
+        AnsiConsole.MarkupLine("[grey]Enter = välj, ESC = avbryt[/]");
     }
 }

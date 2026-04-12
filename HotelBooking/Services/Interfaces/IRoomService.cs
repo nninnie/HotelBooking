@@ -10,9 +10,34 @@ namespace HotelBooking.Services.Interfaces
 
         Room? GetRoom(int id);
 
-        Room CreateRoom(string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService);
+        Room CreateRoom(
+            string number,
+            string type,
+            int baseGuests,
+            int extraBeds,
+            decimal price,
+            bool outOfService,
+            bool hasSeaView,
+            bool hasMinibar,
+            bool isPetFriendly,
+            bool hasBalcony,
+            bool hasBathtub
+        );
 
-        bool UpdateRoom(int id, string number, string type, int baseGuests, int extraBeds, decimal price, bool outOfService);
+        bool UpdateRoom(
+            int id,
+            string number,
+            string type,
+            int baseGuests,
+            int extraBeds,
+            decimal price,
+            bool outOfService,
+            bool hasSeaView,
+            bool hasMinibar,
+            bool isPetFriendly,
+            bool hasBalcony,
+            bool hasBathtub
+        );
 
         bool SoftDelete(int id);
         bool Restore(int id);

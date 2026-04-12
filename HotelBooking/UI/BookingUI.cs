@@ -34,7 +34,7 @@ namespace HotelBooking.UI
             while (true)
             {
                 AnsiConsole.MarkupLine("[green]Välj incheckningsdatum:[/]");
-                checkIn = CalenderPicker.SelectDate();
+                checkIn = CalendarPicker.SelectDate();
 
                 if (checkIn == null)
                     return;
@@ -53,7 +53,7 @@ namespace HotelBooking.UI
             while (true)
             {
                 AnsiConsole.MarkupLine("[green]Välj utcheckningsdatum:[/]");
-                checkOut = CalenderPicker.SelectDate();
+                checkOut = CalendarPicker.SelectDate();
                 if (checkOut == null) return;
 
                 if (checkOut > checkIn)
@@ -97,7 +97,25 @@ namespace HotelBooking.UI
                 guestsCount.Value
             );
 
-            BookingRenderer.ShowSuccess($"Bokning skapad! ID: {booking.Id}");
+            // Hämta rummet för pris och info
+            var room = _roomService.GetRoom(roomId.Value);
+
+            // Räkna ut totalpris
+            int nights = (checkOut.Value - checkIn.Value).Days;
+            decimal totalPrice = nights * (room?.PricePerNight ?? 0);
+
+            // Visa sammanfattning
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("[green]Bokningen är klar![/]");
+            AnsiConsole.MarkupLine($"Rum: [yellow]{room.RoomNumber}[/] ({room.RoomType})");
+            AnsiConsole.MarkupLine($"Antal nätter: [yellow]{nights}[/]");
+            AnsiConsole.MarkupLine($"Pris per natt: [yellow]{room.PricePerNight} kr[/]");
+            AnsiConsole.MarkupLine($"Totalpris: [bold yellow]{totalPrice} kr[/]");
+            AnsiConsole.WriteLine();
+
+            // Lämna över nyckelkort
+            AnsiConsole.MarkupLine("[blue]Nyckelkort skapas...[/]");
+            AnsiConsole.MarkupLine($"[green]✔ Nyckelkort till rum {room.RoomNumber} överlämnat till kunden.[/]");
             WaitForEsc();
         }
 
@@ -118,7 +136,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowBookingTable(
+            BookingRenderer.ShowSmallBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -144,7 +162,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowBookingTable(
+            BookingRenderer.ShowSmallBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -192,7 +210,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowBookingTable(
+            BookingRenderer.ShowSmallBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -236,7 +254,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowBookingTable(
+            BookingRenderer.ShowSmallBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -273,7 +291,7 @@ namespace HotelBooking.UI
 
             var bookings = _bookingService.GetAll();
 
-            BookingRenderer.ShowBookingTable(
+            BookingRenderer.ShowSmallBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)

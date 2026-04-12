@@ -46,8 +46,8 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera bokningar", subtitle);
 
-            AnsiConsole.MarkupLine("");
-            AnsiConsole.MarkupLine("[darkgreen]Ange information för den nya kunden. ");
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("[green]Ange information för den nya kunden.[/]");
             AnsiConsole.MarkupLine("[grey]Tryck ESC för att avbryta.[/]");
 
             // Förnamn
@@ -129,8 +129,7 @@ namespace HotelBooking.UI
         // Välj befintlig kund
         public static int? SelectExistingGuest(EscUI ui, IGuestService guestService, string subtitle)
         {
-            BannerUI.PrintHeader("Hantera bokningar", subtitle);
-            AnsiConsole.WriteLine();
+
             AnsiConsole.WriteLine();
 
             var guests = guestService.GetAllGuests();
@@ -149,8 +148,6 @@ namespace HotelBooking.UI
         // Antal gäster
         public static int? AskGuestCount(EscUI ui)
         {
-            BannerUI.PrintHeader("Hantera bokningar", "Antal gäster");
-            AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
 
             string? input = ui.AskWithEsc("Antal gäster:");
@@ -174,8 +171,6 @@ namespace HotelBooking.UI
         // Välj rum
         public static int? SelectRoom(EscUI ui, IEnumerable<Room> rooms)
         {
-            BannerUI.PrintHeader("Hantera bokningar", "Välj rum");
-            AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
 
             var selected = ui.SelectWithEsc(
@@ -189,8 +184,6 @@ namespace HotelBooking.UI
         // Fråga efter boknings-ID
         public static int? AskBookingId(EscUI ui)
         {
-            BannerUI.PrintHeader("Hantera bokningar", "Ange boknings-ID");
-            AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
 
             string? input = ui.AskWithEsc("Ange boknings-ID:");

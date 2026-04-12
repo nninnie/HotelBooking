@@ -86,5 +86,39 @@ namespace HotelBooking.UI
             else
                 ShowError(failMessage);
         }
+
+        public static void ShowSmallBookingTable(
+    IEnumerable<Booking> bookings,
+    Func<int, Guest?> getGuest,
+    Func<int, Room?> getRoom)
+        {
+            var table = new Table().RoundedBorder();
+
+            table.AddColumn("[yellow]ID[/]");
+            table.AddColumn("[yellow]Gäst[/]");
+            table.AddColumn("[yellow]Rum[/]");
+            table.AddColumn("[yellow]Datum[/]");
+            table.AddColumn("[yellow]Totalpris[/]");
+            table.AddColumn("[yellow]Status[/]");
+
+            foreach (var b in bookings)
+            {
+                var guest = getGuest(b.GuestId);
+                var room = getRoom(b.RoomId);
+
+                table.AddRow(
+                    b.Id.ToString(),
+                    guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd",
+                    room != null ? room.RoomNumber.ToString() : "-",
+                    $"{b.FromDate:MM/dd} - {b.ToDate:MM/dd}",
+                    room != null ? $"{room.PricePerNight * (b.ToDate - b.FromDate).Days} kr" : "-",
+                    b.IsDeleted ? "[red]Avbokad[/]" : "[green]Aktiv[/]"
+                );
+            }
+
+            AnsiConsole.Write(table);
+        }
+
+
     }
 }

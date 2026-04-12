@@ -18,9 +18,8 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                var rooms = _roomService.GetAllRooms();
-
-                string choice = CrudMenuUI.Show("Hantera rum", rooms);
+                // Ingen lista skickas längre – menyn ska vara ren
+                string choice = CrudMenuUI.Show("Hantera rum");
 
                 switch (choice)
                 {
