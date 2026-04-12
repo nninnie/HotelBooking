@@ -39,11 +39,11 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
-        public void Show()
+        // VISA BETALNINGAR PER FAKTURA
+        public void Show(string subtitle)
         {
-            CurrentHeader = "BETALNINGAR PER FAKTURA";
+            BannerUI.PrintHeader("Hantera betalning", subtitle);
 
-            // Visa alla betalningar först
             var allPayments = _service.GetAllPayments();
             ShowPaymentTable(allPayments);
 
@@ -52,7 +52,6 @@ namespace HotelBooking.UI
             {
                 invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att filtrera på:");
 
-                // VALIDATION
                 if (invoiceId <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
@@ -75,9 +74,10 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void ShowAll()
+        // VISA ALLA BETALNINGAR
+        public void ShowAll(string subtitle)
         {
-            CurrentHeader = "ALLA BETALNINGAR";
+            BannerUI.PrintHeader("Hantera betalning", subtitle);
 
             var payments = _service.GetAllPayments();
 
@@ -92,9 +92,10 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void Create()
+        // SKAPA NY BETALNING
+        public void Create(string subtitle)
         {
-            CurrentHeader = "REGISTRERA BETALNING";
+            BannerUI.PrintHeader("Hantera betalning", subtitle);
 
             var payments = _service.GetAllPayments();
             ShowPaymentTable(payments);
@@ -104,7 +105,6 @@ namespace HotelBooking.UI
             {
                 invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
 
-                // VALIDATION
                 if (invoiceId <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
@@ -119,7 +119,6 @@ namespace HotelBooking.UI
             {
                 amount = AnsiConsole.Ask<decimal>("Ange [yellow]belopp[/] (kr):");
 
-                // VALIDATION
                 if (amount <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");

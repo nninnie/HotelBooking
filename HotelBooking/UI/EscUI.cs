@@ -10,7 +10,7 @@ namespace HotelBooking.UI
         // Väntar på att användaren trycker ESC för att gå tillbaka
         public void WaitForEsc()
         {
-            AnsiConsole.MarkupLine("[grey]Tryck ESC för att gå tillbaka[/]");
+            AnsiConsole.MarkupLine("\n[grey]Tryck ESC för att gå tillbaka[/]");
 
             while (true)
             {

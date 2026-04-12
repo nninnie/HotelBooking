@@ -1,5 +1,4 @@
-﻿using Autofac.Core;
-using HotelBooking.UI;
+﻿using HotelBooking.UI;
 using Spectre.Console;
 
 namespace HotelBooking.Controllers
@@ -17,21 +16,25 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                int choice = CrudMenuUI.Show("Hantera betalning");
+                // CrudMenuUI returnerar nu TEXT
+                string choice = CrudMenuUI.Show("Hantera betalning");
 
                 switch (choice)
                 {
-                    case 1:
-                        _paymentUI.Create();    
+                    case "Skapa ny":
+                        _paymentUI.Create(choice);
                         break;
-                    case 2:
-                        _paymentUI.Show();      
+
+                    case "Visa alla":
+                        _paymentUI.ShowAll(choice);
                         break;
-                    case 3:
-                        _paymentUI.ShowAll();   
+
+                    case "Visa detaljer":
+                        _paymentUI.Show(choice);
                         break;
-                    case 4:
-                        return;                 
+
+                    case "Tillbaka":
+                        return;
                 }
             }
         }

@@ -7,7 +7,7 @@ namespace HotelBooking.UI
 {
     public static class CrudMenuUI
     {
-        public static int Show(string title, IEnumerable<Room>? rooms = null)
+        public static string Show(string title, IEnumerable<Room>? rooms = null)
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
@@ -32,19 +32,8 @@ namespace HotelBooking.UI
                     "Tillbaka"
                 );
 
-            var choice = AnsiConsole.Prompt(menu);
-
-            return choice switch
-            {
-                "Skapa ny" => 1,
-                "Visa alla" => 2,
-                "Visa detaljer" => 3,
-                "Uppdatera" => 4,
-                "Ta bort" => 5,
-                "Återställ" => 6,
-                "Tillbaka" => 7,
-                _ => 0
-            };
+            // Returnera VALTEXTEN direkt
+            return AnsiConsole.Prompt(menu);
         }
 
         private static void ShowRoomTable(IEnumerable<Room> rooms)

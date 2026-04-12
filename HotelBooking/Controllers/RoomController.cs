@@ -19,30 +19,37 @@ namespace HotelBooking.Controllers
             while (true)
             {
                 var rooms = _roomService.GetAllRooms();
-                int choice = CrudMenuUI.Show("Hantera rum", rooms);
+
+                string choice = CrudMenuUI.Show("Hantera rum", rooms);
 
                 switch (choice)
                 {
-                    case 1:
-                        _roomUI.Create();
+                    case "Skapa ny":
+                        _roomUI.Create(choice);
                         break;
-                    case 2:
-                        _roomUI.ShowAll();
+
+                    case "Visa alla":
+                        _roomUI.ShowAll(choice);
                         break;
-                    case 3:
-                        _roomUI.ShowDetails();
+
+                    case "Visa detaljer":
+                        _roomUI.ShowDetails(choice);
                         break;
-                    case 4:
-                        _roomUI.Update();
+
+                    case "Uppdatera":
+                        _roomUI.Update(choice);
                         break;
-                    case 5:
-                        _roomUI.SoftDelete();
+
+                    case "Ta bort":
+                        _roomUI.SoftDelete(choice);
                         break;
-                    case 6:
-                        _roomUI.Restore();
+
+                    case "Återställ":
+                        _roomUI.Restore(choice);
                         break;
-                    case 7:
-                        return; 
+
+                    case "Tillbaka":
+                        return;
                 }
             }
         }

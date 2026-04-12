@@ -15,27 +15,33 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                int choice = CrudMenuUI.Show("Hantera faktura");
+                // CrudMenuUI returnerar TEXT
+                string choice = CrudMenuUI.Show("Hantera faktura");
 
                 switch (choice)
                 {
-                    case 1:
-                        _invoiceUI.Create();
+                    case "Skapa ny":
+                        _invoiceUI.Create(choice);
                         break;
-                    case 2:
-                        _invoiceUI.ShowAll();
+
+                    case "Visa alla":
+                        _invoiceUI.ShowAll(choice);
                         break;
-                    case 3:
-                        _invoiceUI.ShowDetails();
+
+                    case "Visa detaljer":
+                        _invoiceUI.ShowDetails(choice);
                         break;
-                    case 4:
-                        _invoiceUI.MarkAsPaid();
+
+                    case "Uppdatera":
+                        _invoiceUI.MarkAsPaid(choice);
                         break;
-                    case 5:
-                        _invoiceUI.CancelUnpaid();  
+
+                    case "Ta bort":
+                        _invoiceUI.CancelUnpaid(choice);
                         break;
-                    case 6:
-                        return; 
+
+                    case "Tillbaka":
+                        return;
                 }
             }
         }

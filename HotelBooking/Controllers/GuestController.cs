@@ -1,8 +1,4 @@
-﻿using HotelBooking.Services;
-using HotelBooking.UI;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using HotelBooking.UI;
 
 namespace HotelBooking.Controllers
 {
@@ -19,24 +15,28 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                int choice = UI.CrudMenuUI.Show("Hantera gäster");
+                string choice = CrudMenuUI.Show("Hantera gäster");
 
                 switch (choice)
                 {
-                    case 1:
-                        _guestUI.Create();
+                    case "Skapa ny":
+                        _guestUI.Create(choice);
                         break;
-                    case 2:
-                        _guestUI.ShowAll();
+
+                    case "Visa alla":
+                        _guestUI.ShowAll(choice);
                         break;
-                    case 3:
-                        _guestUI.ShowDetails();
+
+                    case "Visa detaljer":
+                        _guestUI.ShowDetails(choice);
                         break;
-                    case 4:
-                        _guestUI.Update();
+
+                    case "Uppdatera":
+                        _guestUI.Update(choice);
                         break;
-                    case 5:
-                        return; 
+
+                    case "Tillbaka":
+                        return;
                 }
             }
         }

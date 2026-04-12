@@ -24,12 +24,19 @@ namespace HotelBooking.UI
             Console.ResetColor();
         }
 
-        public static void PrintHeader(string title)
+        public static void PrintHeader(string title, string? subtitle = null)
         {
             Console.WriteLine();
             PrintCentered(title.ToUpper());
+
+            if (!string.IsNullOrWhiteSpace(subtitle))
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                PrintCentered(subtitle);
+                Console.ResetColor();
+            }
+
             Console.WriteLine();
-            Console.ResetColor();
         }
 
         private static void PrintCentered(string text)

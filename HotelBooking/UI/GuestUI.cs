@@ -13,7 +13,6 @@ namespace HotelBooking.UI
             _service = service;
         }
 
-        // Gemensam metod för att visa gäster i tabellform
         private void ShowGuestTable(IEnumerable<Guest> guests)
         {
             var table = new Table().RoundedBorder();
@@ -36,10 +35,10 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
-        // Visa alla gäster
-        public void ShowAll()
+        // VISA ALLA GÄSTER
+        public void ShowAll(string subtitle)
         {
-            CurrentHeader = "VISA ALLA GÄSTER";
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
 
             var guests = _service.GetAllGuests();
 
@@ -54,10 +53,10 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Visa detaljer på en gäst
-        public void ShowDetails()
+        // VISA DETALJER
+        public void ShowDetails(string subtitle)
         {
-            CurrentHeader = "GÄSTDETALJER";
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
 
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
@@ -87,69 +86,41 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Skapa en gäst
-        public void Create()
+        // SKAPA GÄST
+        public void Create(string subtitle)
         {
-            CurrentHeader = "SKAPA GÄST";
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            // Förnamn
             string firstName;
             while (true)
             {
                 firstName = AnsiConsole.Ask<string>("Ange [yellow]förnamn[/]:");
-
-                if (string.IsNullOrWhiteSpace(firstName))
-                {
-                    AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
-                    continue;
-                }
-
-                break;
+                if (!string.IsNullOrWhiteSpace(firstName)) break;
+                AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
             }
 
-            // Efternamn
             string lastName;
             while (true)
             {
                 lastName = AnsiConsole.Ask<string>("Ange [yellow]efternamn[/]:");
-
-                if (string.IsNullOrWhiteSpace(lastName))
-                {
-                    AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
-                    continue;
-                }
-
-                break;
+                if (!string.IsNullOrWhiteSpace(lastName)) break;
+                AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
             }
 
-            // Telefon
             string? phone;
             while (true)
             {
                 phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
-
-                if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
-                {
-                    AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
-                    continue;
-                }
-
-                break;
+                if (string.IsNullOrWhiteSpace(phone) || phone.All(char.IsDigit)) break;
+                AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
             }
 
-            // Email
             string? email;
             while (true)
             {
                 email = AnsiConsole.Ask<string>("Email (valfritt):");
-
-                if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
-                {
-                    AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
-                    continue;
-                }
-
-                break;
+                if (string.IsNullOrWhiteSpace(email) || email.Contains("@")) break;
+                AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
             }
 
             var guest = _service.CreateGuest(firstName, lastName, phone, email);
@@ -158,10 +129,10 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Uppdatera en gäst
-        public void Update()
+        // UPPDATERA GÄST
+        public void Update(string subtitle)
         {
-            CurrentHeader = "UPPDATERA GÄST";
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
 
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
@@ -176,15 +147,10 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // Förnamn
             string newFirst = AnsiConsole.Ask<string>($"Nytt förnamn (tomt = behåll) [{guest.FirstName}]:");
-
-            // Efternamn
             string newLast = AnsiConsole.Ask<string>($"Nytt efternamn (tomt = behåll) [{guest.LastName}]:");
 
-            // Telefon
             string phone = AnsiConsole.Ask<string>($"Nytt telefonnummer (tomt = behåll) [{guest.PhoneNumber ?? "-"}]:");
-
             if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
             {
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
@@ -192,9 +158,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // Email
             string email = AnsiConsole.Ask<string>($"Ny email (tomt = behåll) [{guest.Email ?? "-"}]:");
-
             if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
             {
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
@@ -217,10 +181,10 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Ta bort en gäst
-        public void SoftDelete()
+        // TA BORT GÄST
+        public void SoftDelete(string subtitle)
         {
-            CurrentHeader = "TA BORT GÄST";
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
 
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);

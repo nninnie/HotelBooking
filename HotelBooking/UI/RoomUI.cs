@@ -13,7 +13,6 @@ namespace HotelBooking.UI
             _roomService = roomService;
         }
 
-        // Visar en tabell med rum – används i alla metoder där användaren ska välja ID.
         private void ShowRoomTable(IEnumerable<Room> rooms)
         {
             var table = new Table().RoundedBorder();
@@ -43,9 +42,9 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
-        public void ShowAll()
+        public void ShowAll(string subtitle)
         {
-            CurrentHeader = "VISA ALLA RUM";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var rooms = _roomService.GetAllRooms();
 
@@ -60,9 +59,9 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void ShowDetails()
+        public void ShowDetails(string subtitle)
         {
-            CurrentHeader = "RUMSDETALJER";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
@@ -72,7 +71,6 @@ namespace HotelBooking.UI
             {
                 id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/]:");
 
-                // VALIDATION
                 if (id <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Rums-ID måste vara ett positivt tal![/]");
@@ -110,16 +108,15 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void Create()
+        public void Create(string subtitle)
         {
-            CurrentHeader = "SKAPA RUM";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             string number;
             while (true)
             {
                 number = AnsiConsole.Ask<string>("Ange [yellow]rumsnummer[/]:");
 
-                // VALIDATION
                 if (string.IsNullOrWhiteSpace(number))
                 {
                     AnsiConsole.MarkupLine("[red]Rumsnummer får inte vara tomt![/]");
@@ -134,7 +131,6 @@ namespace HotelBooking.UI
             {
                 type = AnsiConsole.Ask<string>("Ange [yellow]rumstyp[/] (Enkelrum/Dubbelrum/Svit):");
 
-                // VALIDATION
                 if (string.IsNullOrWhiteSpace(type))
                 {
                     AnsiConsole.MarkupLine("[red]Rumstyp får inte vara tomt![/]");
@@ -149,7 +145,6 @@ namespace HotelBooking.UI
             {
                 capacity = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
 
-                // VALIDATION
                 if (capacity <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Kapacitet måste vara större än 0![/]");
@@ -164,7 +159,6 @@ namespace HotelBooking.UI
             {
                 extraBeds = AnsiConsole.Ask<int>("Ange [yellow]extrabäddar[/] (0–2):");
 
-                // VALIDATION
                 if (extraBeds < 0 || extraBeds > 2)
                 {
                     AnsiConsole.MarkupLine("[red]Extrabäddar måste vara mellan 0 och 2![/]");
@@ -179,7 +173,6 @@ namespace HotelBooking.UI
             {
                 price = AnsiConsole.Ask<decimal>("Ange [yellow]pris per natt[/] (kr):");
 
-                // VALIDATION
                 if (price <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Pris måste vara större än 0![/]");
@@ -197,9 +190,9 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void Update()
+        public void Update(string subtitle)
         {
-            CurrentHeader = "UPPDATERA RUM";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
@@ -209,7 +202,6 @@ namespace HotelBooking.UI
             {
                 id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att uppdatera:");
 
-                // VALIDATION
                 if (id <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Rums-ID måste vara ett positivt tal![/]");
@@ -230,7 +222,6 @@ namespace HotelBooking.UI
 
             string number = AnsiConsole.Ask<string>($"Rumsnummer ({existing.RoomNumber}):");
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(number) && string.IsNullOrWhiteSpace(number.Trim()))
             {
                 AnsiConsole.MarkupLine("[red]Rumsnummer får inte vara tomt![/]");
@@ -240,7 +231,6 @@ namespace HotelBooking.UI
 
             string type = AnsiConsole.Ask<string>($"Rumstyp ({existing.RoomType}):");
 
-            // VALIDATION
             if (!string.IsNullOrWhiteSpace(type) && string.IsNullOrWhiteSpace(type.Trim()))
             {
                 AnsiConsole.MarkupLine("[red]Rumstyp får inte vara tomt![/]");
@@ -250,7 +240,6 @@ namespace HotelBooking.UI
 
             int capacity = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.Capacity}):");
 
-            // VALIDATION
             if (capacity <= 0)
             {
                 AnsiConsole.MarkupLine("[red]Kapacitet måste vara större än 0![/]");
@@ -260,7 +249,6 @@ namespace HotelBooking.UI
 
             int extraBeds = AnsiConsole.Ask<int>($"Extrabäddar ({existing.ExtraBeds}):");
 
-            // VALIDATION
             if (extraBeds < 0 || extraBeds > 2)
             {
                 AnsiConsole.MarkupLine("[red]Extrabäddar måste vara mellan 0 och 2![/]");
@@ -270,7 +258,6 @@ namespace HotelBooking.UI
 
             decimal price = AnsiConsole.Ask<decimal>($"Pris per natt ({existing.PricePerNight}):");
 
-            // VALIDATION
             if (price <= 0)
             {
                 AnsiConsole.MarkupLine("[red]Pris måste vara större än 0![/]");
@@ -289,9 +276,9 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void SoftDelete()
+        public void SoftDelete(string subtitle)
         {
-            CurrentHeader = "MARKERA RUM SOM UR FUNKTION";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
@@ -301,7 +288,6 @@ namespace HotelBooking.UI
             {
                 id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att markera som ur funktion:");
 
-                // VALIDATION
                 if (id <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Rums-ID måste vara ett positivt tal![/]");
@@ -320,9 +306,9 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        public void Restore()
+        public void Restore(string subtitle)
         {
-            CurrentHeader = "ÅTERSTÄLL RUM";
+            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var deletedRooms = _roomService.GetDeletedRooms();
 
@@ -340,7 +326,6 @@ namespace HotelBooking.UI
             {
                 id = AnsiConsole.Ask<int>("Ange [yellow]rums-ID[/] att återställa:");
 
-                // VALIDATION
                 if (id <= 0)
                 {
                     AnsiConsole.MarkupLine("[red]Rums-ID måste vara ett positivt tal![/]");
