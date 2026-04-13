@@ -9,12 +9,14 @@ namespace HotelBooking.UI
         private readonly IBookingService _bookingService;
         private readonly IGuestService _guestService;
         private readonly IRoomService _roomService;
+        private readonly InvoiceUI _invoiceUI;
 
-        public BookingUI(IBookingService bookingService, IGuestService guestService, IRoomService roomService)
+        public BookingUI(IBookingService bookingService, IGuestService guestService, IRoomService roomService, InvoiceUI invoiceUI)
         {
             _bookingService = bookingService;
             _guestService = guestService;
             _roomService = roomService;
+            _invoiceUI = invoiceUI;
         }
 
         // SKAPA NY BOKNING
@@ -114,7 +116,8 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader("Hantera bokningar", "Visa alla");
             AnsiConsole.WriteLine();
 
-            var bookings = _bookingService.GetAll();
+            var bookings = _bookingService
+                .GetAll();
 
             if (!bookings.Any())
             {

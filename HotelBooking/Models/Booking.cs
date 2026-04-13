@@ -62,5 +62,5 @@ public class Booking
     }
 
     // Relation till Invoice
-    public List<Invoice> Invoices { get; set; } = new();
+    public Invoice? Invoice { get; set; }
 }

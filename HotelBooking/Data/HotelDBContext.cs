@@ -38,12 +38,11 @@ namespace HotelBooking
                 .HasForeignKey(i => i.GuestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Booking - Invoice (en bokning kan ha flera fakturor)
-            modelBuilder.Entity<Invoice>()
-                .HasOne(i => i.Booking)
-                .WithMany(b => b.Invoices)
-                .HasForeignKey(i => i.BookingId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Booking - Invoice (en bokning kan ha EN faktura)
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Invoice)
+                .WithOne(i => i.Booking)
+                .HasForeignKey<Invoice>(i => i.BookingId);
 
             // Room - Booking (ett rum kan ha många bokningar)
             modelBuilder.Entity<Booking>()

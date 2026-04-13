@@ -99,20 +99,27 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]Rum[/]");
             table.AddColumn("[yellow]Datum[/]");
             table.AddColumn("[yellow]Totalpris[/]");
-            table.AddColumn("[yellow]Status[/]");
+            table.AddColumn("[yellow]Betald[/]");
 
             foreach (var b in bookings)
             {
                 var guest = getGuest(b.GuestId);
                 var room = getRoom(b.RoomId);
 
+                var paid = b.Invoice?.IsPaid == true
+                    ? "[green]✔[/]"
+                    : "[red]✘[/]";
+
                 table.AddRow(
                     b.Id.ToString(),
                     guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd",
-                    room != null ? room.RoomNumber.ToString() : "-",
-                    $"{b.FromDate:MM/dd} - {b.ToDate:MM/dd}",
-                    room != null ? $"{room.PricePerNight * (b.ToDate - b.FromDate).Days} kr" : "-",
-                    b.IsDeleted ? "[red]Avbokad[/]" : "[green]Aktiv[/]"
+                    $"{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}",
+                    room != null ? $"{room.RoomNumber} ({room.RoomType})" : b.RoomId.ToString(),
+                    b.FromDate.ToString("yyyy-MM-dd"),
+                    b.ToDate.ToString("yyyy-MM-dd"),
+                    b.NumberOfGuests.ToString(),
+                    b.BookingDate.ToString("yyyy-MM-dd"),
+                    paid
                 );
             }
 

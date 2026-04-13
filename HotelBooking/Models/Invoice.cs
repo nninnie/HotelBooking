@@ -33,7 +33,7 @@ namespace HotelBooking.Models
 
         public bool IsPaid { get; set; }
 
-        // Navigation till Payments (saknades)
+        // Navigation till Payments 
         public List<Payment> Payments { get; set; } = new();
     }
 }
