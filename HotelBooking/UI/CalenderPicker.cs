@@ -138,5 +138,8 @@ public static class CalendarPicker
 
         if (checkIn != null && !selectingCheckIn)
             AnsiConsole.MarkupLine($"\n[green]Incheckning vald:[/] [yellow]{checkIn:yyyy-MM-dd}[/]");
+
+        if (checkOut != null && !selectingCheckIn)
+            AnsiConsole.MarkupLine($"\n[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
     }
 }
