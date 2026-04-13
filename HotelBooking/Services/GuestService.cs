@@ -16,7 +16,7 @@ namespace HotelBooking.Services
         public IEnumerable<Guest> GetAllGuests()
         {
             return _db.Guests
-                .OrderBy(g => g.LastName)   // sortera korrekt
+                .OrderBy(g => g.LastName)   
                 .ThenBy(g => g.FirstName)
                 .ToList();
         }
@@ -24,7 +24,8 @@ namespace HotelBooking.Services
         // Hämta en gäst baserat på ID
         public Guest? GetGuest(int id)
         {
-            return _db.Guests.FirstOrDefault(g => g.Id == id);
+            return _db.Guests
+                .FirstOrDefault(g => g.Id == id);
         }
 
         // Skapa en ny gäst
@@ -32,8 +33,8 @@ namespace HotelBooking.Services
         {
             var guest = new Guest
             {
-                FirstName = firstName,   // ändrat
-                LastName = lastName,     // ändrat
+                FirstName = firstName,   
+                LastName = lastName,     
                 PhoneNumber = phone,
                 Email = email
             };
@@ -69,7 +70,8 @@ namespace HotelBooking.Services
         // Ta bort en gäst
         public bool DeleteGuest(int id)
         {
-            var guest = _db.Guests.FirstOrDefault(g => g.Id == id);
+            var guest = _db.Guests
+                .FirstOrDefault(g => g.Id == id);
             if (guest == null)
                 return false;
 

@@ -19,14 +19,150 @@ namespace HotelBooking.Data
             if (!db.Rooms.Any())
             {
                 db.Rooms.AddRange(
-                    new Room { RoomNumber = "101", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m },
-                    new Room { RoomNumber = "102", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 1, PricePerNight = 1050m },
-                    new Room { RoomNumber = "103", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 0, PricePerNight = 900m },
-                    new Room { RoomNumber = "104", RoomType = "Enkelrum", Capacity = 1, ExtraBeds = 1, PricePerNight = 1050m },
-                    new Room { RoomNumber = "201", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
-                    new Room { RoomNumber = "202", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 1, PricePerNight = 1200m },
-                    new Room { RoomNumber = "203", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m },
-                    new Room { RoomNumber = "204", RoomType = "Dubbelrum", Capacity = 2, ExtraBeds = 2, PricePerNight = 1400m }
+     // --- Enkelrum (billigare, få features) ---
+     new Room
+     {
+         RoomNumber = "101",
+         RoomType = "Enkelrum",
+         Capacity = 1,
+         ExtraBeds = 0,
+         PricePerNight = 850m,
+         HasSeaView = false,
+         HasMinibar = false,
+         IsPetFriendly = false,
+         HasBalcony = false,
+         HasBathtub = false
+     },
+
+     new Room
+     {
+         RoomNumber = "102",
+         RoomType = "Enkelrum",
+         Capacity = 1,
+         ExtraBeds = 1,
+         PricePerNight = 950m,
+         HasSeaView = false,
+         HasMinibar = true,
+         IsPetFriendly = false,
+         HasBalcony = false,
+         HasBathtub = false
+     },
+
+     new Room
+     {
+         RoomNumber = "103",
+         RoomType = "Enkelrum",
+         Capacity = 1,
+         ExtraBeds = 0,
+         PricePerNight = 900m,
+         HasSeaView = true,
+         HasMinibar = false,
+         IsPetFriendly = false,
+         HasBalcony = true,
+         HasBathtub = false
+     },
+
+     // --- Dubbelrum (standard) ---
+     new Room
+     {
+         RoomNumber = "201",
+         RoomType = "Dubbelrum",
+         Capacity = 2,
+         ExtraBeds = 1,
+         PricePerNight = 1200m,
+         HasSeaView = false,
+         HasMinibar = true,
+         IsPetFriendly = true,
+         HasBalcony = false,
+         HasBathtub = false
+     },
+
+     new Room
+     {
+         RoomNumber = "202",
+         RoomType = "Dubbelrum",
+         Capacity = 2,
+         ExtraBeds = 1,
+         PricePerNight = 1300m,
+         HasSeaView = true,
+         HasMinibar = true,
+         IsPetFriendly = false,
+         HasBalcony = true,
+         HasBathtub = false
+     },
+
+     new Room
+     {
+         RoomNumber = "203",
+         RoomType = "Dubbelrum",
+         Capacity = 2,
+         ExtraBeds = 2,
+         PricePerNight = 1450m,
+         HasSeaView = true,
+         HasMinibar = true,
+         IsPetFriendly = true,
+         HasBalcony = true,
+         HasBathtub = true
+     },
+
+     // --- Premiumrum / Familjerum ---
+     new Room
+     {
+         RoomNumber = "301",
+         RoomType = "Familjerum",
+         Capacity = 3,
+         ExtraBeds = 2,
+         PricePerNight = 1800m,
+         HasSeaView = false,
+         HasMinibar = true,
+         IsPetFriendly = true,
+         HasBalcony = false,
+         HasBathtub = true
+     },
+
+     new Room
+     {
+         RoomNumber = "302",
+         RoomType = "Familjerum",
+         Capacity = 4,
+         ExtraBeds = 2,
+         PricePerNight = 1950m,
+         HasSeaView = true,
+         HasMinibar = true,
+         IsPetFriendly = false,
+         HasBalcony = true,
+         HasBathtub = true
+     },
+
+     // --- Lyxrum / Suite ---
+     new Room
+     {
+         RoomNumber = "401",
+         RoomType = "Svit",
+         Capacity = 2,
+         ExtraBeds = 1,
+         PricePerNight = 2600m,
+         HasSeaView = true,
+         HasMinibar = true,
+         IsPetFriendly = false,
+         HasBalcony = true,
+         HasBathtub = true
+     },
+
+     new Room
+     {
+         RoomNumber = "402",
+         RoomType = "Svit",
+         Capacity = 2,
+         ExtraBeds = 0,
+         PricePerNight = 2800m,
+         HasSeaView = true,
+         HasMinibar = true,
+         IsPetFriendly = true,
+         HasBalcony = true,
+         HasBathtub = true
+     }
+ 
                 );
             }
         }

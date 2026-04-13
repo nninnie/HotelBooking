@@ -1,6 +1,7 @@
 ﻿using HotelBooking.Data;
 using HotelBooking.Models;
 using HotelBooking.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services
 {
@@ -16,24 +17,31 @@ namespace HotelBooking.Services
         // Hämtar alla rum (både aktiva och ur funktion)
         public IEnumerable<Room> GetAllRooms()
         {
-            return _db.Rooms.ToList();
+            return _db.Rooms
+                .OrderBy(r => r.RoomNumber)
+                .ToList();
         }
 
         // Hämtar endast aktiva rum
         public IEnumerable<Room> GetActiveRooms()
         {
-            return _db.Rooms.Where(r => !r.IsOutOfService).ToList();
+            return _db.Rooms
+                .Where(r => !r.IsOutOfService)
+                .ToList();
         }
 
         // Hämtar endast rum som är markerade som ur funktion (soft deleted)
         public IEnumerable<Room> GetDeletedRooms()
         {
-            return _db.Rooms.Where(r => r.IsOutOfService).ToList();
+            return _db.Rooms
+                .Where(r => r.IsOutOfService)
+                .ToList();
         }
 
         public Room? GetRoom(int id)
         {
-            return _db.Rooms.FirstOrDefault(r => r.Id == id);
+            return _db.Rooms
+                .FirstOrDefault(r => r.Id == id);
         }
 
         // SKAPA RUM – nu med alla nya features
@@ -96,8 +104,6 @@ namespace HotelBooking.Services
             room.ExtraBeds = extraBeds;
             room.PricePerNight = price;
             room.IsOutOfService = outOfService;
-
-            // Nya features
             room.HasSeaView = hasSeaView;
             room.HasMinibar = hasMinibar;
             room.IsPetFriendly = isPetFriendly;
