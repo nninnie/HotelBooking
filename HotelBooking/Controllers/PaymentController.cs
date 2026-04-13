@@ -16,8 +16,17 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                // CrudMenuUI returnerar nu TEXT
-                string choice = CrudMenuUI.Show("Hantera betalning", "Välj ett alternativ");
+                string? choice = CrudMenuUI.Show(
+                    "Hantera betalningar",
+                    "Välj ett alternativ",
+                    "Skapa ny",
+                    "Visa alla",
+                    "Visa detaljer",
+                    "Tillbaka"
+                );
+
+                if (choice == null)
+                    return; 
 
                 switch (choice)
                 {

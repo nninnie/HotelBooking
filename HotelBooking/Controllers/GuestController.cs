@@ -15,7 +15,19 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                string choice = CrudMenuUI.Show("Hantera gäster", "Välj ett alternativ");
+                string? choice = CrudMenuUI.Show(
+                    "Hantera gäster",
+                    "Välj ett alternativ",
+                    "Skapa ny",
+                    "Visa alla",
+                    "Visa detaljer",
+                    "Uppdatera",
+                    "Ta bort",
+                    "Tillbaka"
+                );
+
+                if (choice == null)
+                    return; 
 
                 switch (choice)
                 {
@@ -33,6 +45,10 @@ namespace HotelBooking.Controllers
 
                     case "Uppdatera":
                         _guestUI.Update(choice);
+                        break;
+
+                    case "Ta bort":
+                        _guestUI.SoftDelete(choice);
                         break;
 
                     case "Tillbaka":

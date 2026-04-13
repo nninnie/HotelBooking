@@ -15,8 +15,19 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                // CrudMenuUI returnerar TEXT
-                string choice = CrudMenuUI.Show("Hantera faktura", "Välj ett alternativ");
+                string? choice = CrudMenuUI.Show(
+                    "Hantera fakturor",
+                    "Välj ett alternativ",
+                    "Skapa ny",
+                    "Visa alla",
+                    "Visa detaljer",
+                    "Markera som betald",
+                    "Annullera obetalda",
+                    "Tillbaka"
+                );
+
+                if (choice == null)
+                    return; 
 
                 switch (choice)
                 {
@@ -32,11 +43,11 @@ namespace HotelBooking.Controllers
                         _invoiceUI.ShowDetails(choice);
                         break;
 
-                    case "Uppdatera":
+                    case "Markera som betald":
                         _invoiceUI.MarkAsPaid(choice);
                         break;
 
-                    case "Ta bort":
+                    case "Annullera obetalda":
                         _invoiceUI.CancelUnpaid(choice);
                         break;
 

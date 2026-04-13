@@ -93,18 +93,20 @@ namespace HotelBooking.UI
         {
             BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            string firstName;
+            string? firstName;
             while (true)
             {
-                firstName = AnsiConsole.Ask<string>("Ange [yellow]förnamn[/]:");
+                firstName = AskWithEsc("Ange förnamn:");
+                if (firstName == null) return; 
                 if (!string.IsNullOrWhiteSpace(firstName)) break;
                 AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
             }
 
-            string lastName;
+            string? lastName;
             while (true)
             {
-                lastName = AnsiConsole.Ask<string>("Ange [yellow]efternamn[/]:");
+                lastName = AskWithEsc("Ange efternamn:");
+                if (lastName == null) return; 
                 if (!string.IsNullOrWhiteSpace(lastName)) break;
                 AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
             }
@@ -112,7 +114,8 @@ namespace HotelBooking.UI
             string? phone;
             while (true)
             {
-                phone = AnsiConsole.Ask<string>("Telefonnummer (valfritt):");
+                phone = AskWithEsc("Telefonnummer (valfritt):");
+                if (phone == null) return; 
                 if (string.IsNullOrWhiteSpace(phone) || phone.All(char.IsDigit)) break;
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
             }
@@ -120,7 +123,8 @@ namespace HotelBooking.UI
             string? email;
             while (true)
             {
-                email = AnsiConsole.Ask<string>("Email (valfritt):");
+                email = AskWithEsc("Email (valfritt):");
+                if (email == null) return; 
                 if (string.IsNullOrWhiteSpace(email) || email.Contains("@")) break;
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
             }

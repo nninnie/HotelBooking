@@ -12,19 +12,22 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                // LOGIN-SKÄRM 
+                // LOGIN-SKÄRM
                 AnsiConsole.Clear();
                 BannerUI.ShowLogo();
                 BannerUI.PrintHeader("INLOGGNING", "Ange dina uppgifter");
 
                 AnsiConsole.WriteLine();
 
-                var username = AnsiConsole.Ask<string>("[yellow]Användarnamn:[/]");
-                var password = AnsiConsole.Prompt(
-                    new TextPrompt<string>("[yellow]Lösenord:[/]")
-                        .Secret()
-                        .PromptStyle("white")
-                );
+                var esc = new TempEsc();
+
+                string? username = esc.AskWithEsc("Användarnamn:");
+                if (username == null)
+                    return;
+
+                string? password = esc.AskPasswordOrEsc("Lösenord:");
+                if (password == null)
+                    return;
 
                 var name = username.ToLower();
 
@@ -37,6 +40,7 @@ namespace HotelBooking.Controllers
                         AnsiConsole.MarkupLine("[yellow]Det rätta lösenordet är: [bold]bajskorv[/][/]");
                         AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
                         Console.ReadKey();
+                        continue;
                     }
 
                     LoginService.CurrentUserName = "Dungeon Master Richard Chalk";
@@ -94,7 +98,7 @@ namespace HotelBooking.Controllers
 
         private static void CenteredMarkup(string markup)
         {
-            int width = 70; 
+            int width = 70;
             int textLength = markup
                 .Replace("[green]", "")
                 .Replace("[yellow]", "")
@@ -108,5 +112,7 @@ namespace HotelBooking.Controllers
 
             AnsiConsole.MarkupLine(new string(' ', padding) + markup);
         }
+
+        private class TempEsc : EscUI { }
     }
 }

@@ -114,6 +114,9 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
 
+            var rooms = _roomService.GetAllRooms();
+            ShowRoomTable(rooms);
+
             string? number = AskWithEsc("Ange rumsnummer:");
             if (number == null) return;
 
@@ -227,7 +230,8 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
 
-            var deletedRooms = _roomService.GetDeletedRooms();
+            var deletedRooms = _roomService
+                .GetDeletedRooms();
 
             if (!deletedRooms.Any())
             {

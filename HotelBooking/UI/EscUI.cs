@@ -184,5 +184,44 @@ namespace HotelBooking.UI
                 }
             }
         }
+        // Lösenordsinput som kan avbrytas med ESC
+        public string? AskPasswordOrEsc(string question)
+        {
+            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+
+            string input = "";
+            ConsoleKeyInfo key;
+
+            while (true)
+            {
+                key = Console.ReadKey(true);
+
+                // ESC → avbryt
+                if (key.Key == ConsoleKey.Escape)
+                    return null;
+
+                // ENTER → returnera lösenordet
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input;
+                }
+
+                // BACKSPACE
+                if (key.Key == ConsoleKey.Backspace && input.Length > 0)
+                {
+                    input = input[..^1];
+                    Console.Write("\b \b");
+                    continue;
+                }
+
+                // Maskera lösenordet
+                if (!char.IsControl(key.KeyChar))
+                {
+                    input += key.KeyChar;
+                    Console.Write("*");
+                }
+            }
+        }
     }
 }

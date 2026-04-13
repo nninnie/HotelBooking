@@ -16,17 +16,30 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                // CrudMenuUI returnerar nu TEXT, inte int
-                string choice = CrudMenuUI.Show("Hantera bokningar", "Välj ett alternativ");
+                // CrudMenuUI 
+                string? choice = CrudMenuUI.Show(
+     "Hantera bokningar",
+     "Välj ett alternativ",
+     "Skapa ny",
+     "Visa alla",
+     "Visa detaljer",
+     "Uppdatera",
+     "Ta bort",
+     "Återställ",
+     "Tillbaka"
+ );
+
+                if (choice == null)
+                    return; 
 
                 switch (choice)
                 {
                     case "Skapa ny":
-                        _bookingUI.Create(choice);   // choice = "Skapa ny"
+                        _bookingUI.Create(choice);  
                         break;
 
                     case "Visa alla":
-                        _bookingUI.ShowAll(choice);  // choice = "Visa alla"
+                        _bookingUI.ShowAll(choice);  
                         break;
 
                     case "Visa detaljer":
