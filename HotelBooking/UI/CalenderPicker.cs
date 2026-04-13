@@ -71,7 +71,8 @@ public static class CalendarPicker
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"[red]{cursor:MMMM yyyy}[/]".ToUpper());
+        // Titel
+        sb.AppendLine($"[bold red]{cursor:MMMM yyyy}[/]".ToUpper());
         sb.AppendLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
         sb.AppendLine("───────────────────────────────");
 
@@ -81,14 +82,16 @@ public static class CalendarPicker
         int startDay = (int)firstDay.DayOfWeek;
         startDay = (startDay == 0) ? 6 : startDay - 1;
 
+        // Tomma rutor innan månadens start
         for (int i = 0; i < startDay; i++)
             sb.Append("     ");
 
+        // Dagar
         for (int day = 1; day <= daysInMonth; day++)
         {
             DateTime current = new DateTime(cursor.Year, cursor.Month, day);
 
-            bool isCursor = day == cursor.Day;
+            bool isCursor = current == cursor;
             bool isCheckIn = checkIn != null && current == checkIn.Value;
             bool isCheckOut = checkOut != null && current == checkOut.Value;
             bool isRange =
@@ -97,21 +100,30 @@ public static class CalendarPicker
                 current > checkIn.Value &&
                 current < checkOut.Value;
 
+            string text;
+
             if (isCheckIn)
-                sb.Append($"[bold green]{day,2}[/]  ");
+                text = $"[bold green]{day,2}[/]";
             else if (isCheckOut)
-                sb.Append($"[bold red]{day,2}[/]  ");
+                text = $"[bold red]{day,2}[/]";
             else if (isRange)
-                sb.Append($"[yellow]{day,2}[/]  ");
+                text = $"[yellow]{day,2}[/]";
             else if (isCursor)
-                sb.Append($"[cyan]{day,2}[/]  ");
+                text = $"[cyan]{day,2}[/]";
             else
-                sb.Append($"{day,2}  ");
+                text = $"{day,2}";
+
+            sb.Append($"{text}  ");
+
+            // Radbyte efter söndag
+            if ((startDay + day) % 7 == 0)
+                sb.AppendLine();
         }
 
+        // Panel
         var panel = new Panel(sb.ToString())
         {
-            Border = BoxBorder.Rounded,
+            Border = BoxBorder.Double,
             Header = new PanelHeader(
                 selectingCheckIn ? "[green]Välj incheckning[/]" : "[red]Välj utcheckning[/]",
                 Justify.Center)
@@ -119,14 +131,12 @@ public static class CalendarPicker
 
         AnsiConsole.Write(panel);
 
-        AnsiConsole.WriteLine();
+        // Instruktioner
         AnsiConsole.MarkupLine("[grey]Piltangenter = navigera[/]");
         AnsiConsole.MarkupLine("[grey]Enter = välj datum[/]");
         AnsiConsole.MarkupLine("[grey]ESC = avbryt[/]");
 
-        if (checkIn != null && selectingCheckIn == false)
-        {
-            AnsiConsole.MarkupLine($"[green]Incheckning:[/] [yellow]{checkIn:yyyy-MM-dd}[/]");
-        }
+        if (checkIn != null && !selectingCheckIn)
+            AnsiConsole.MarkupLine($"\n[green]Incheckning vald:[/] [yellow]{checkIn:yyyy-MM-dd}[/]");
     }
 }

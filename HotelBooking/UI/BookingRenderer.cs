@@ -88,9 +88,9 @@ namespace HotelBooking.UI
         }
 
         public static void ShowSmallBookingTable(
-    IEnumerable<Booking> bookings,
-    Func<int, Guest?> getGuest,
-    Func<int, Room?> getRoom)
+     IEnumerable<Booking> bookings,
+     Func<int, Guest?> getGuest,
+     Func<int, Room?> getRoom)
         {
             var table = new Table().RoundedBorder();
 
@@ -110,22 +110,26 @@ namespace HotelBooking.UI
                     ? "[green]✔[/]"
                     : "[red]✘[/]";
 
+                decimal total = 0;
+                if (room != null)
+                {
+                    int nights = (b.ToDate - b.FromDate).Days;
+                    if (nights < 1) nights = 1;
+                    total = nights * room.PricePerNight;
+                }
+
                 table.AddRow(
                     b.Id.ToString(),
                     guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd",
-                    $"{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}",
-                    room != null ? $"{room.RoomNumber} ({room.RoomType})" : b.RoomId.ToString(),
-                    b.FromDate.ToString("yyyy-MM-dd"),
-                    b.ToDate.ToString("yyyy-MM-dd"),
-                    b.NumberOfGuests.ToString(),
-                    b.BookingDate.ToString("yyyy-MM-dd"),
+                    room != null ? room.RoomNumber.ToString() : "-",
+                    $"{b.FromDate:yyyy-MM-dd} → {b.ToDate:yyyy-MM-dd}",
+                    $"{total} kr",
                     paid
                 );
             }
 
             AnsiConsole.Write(table);
         }
-
 
     }
 }
