@@ -220,7 +220,7 @@ namespace HotelBooking.Data
                         FirstName = "My",         
                         LastName = "Jammeh",      
                         PasswordHash = Hash("1234"),
-                        RoleId = receptionist.Id
+                        RoleId = master.Id
                     },
                     new Employee
                     {
@@ -228,7 +228,7 @@ namespace HotelBooking.Data
                         FirstName = "Zoe",       
                         LastName = "Jammeh",      
                         PasswordHash = Hash("1234"),
-                        RoleId = receptionist.Id
+                        RoleId = master.Id
                     },
                     new Employee
                     {
@@ -237,6 +237,14 @@ namespace HotelBooking.Data
                         LastName = "Chalk",      
                         PasswordHash = Hash("bajskorv"),
                         RoleId = master.Id
+                    },
+                    new Employee
+                    {
+                        Username = "TestUser",
+                        FirstName = "Test",
+                        LastName = "User",
+                        PasswordHash = "",
+                        RoleId = receptionist.Id 
                     }
                 );
             }

@@ -1,13 +1,11 @@
 ﻿using HotelBooking.Models;
-using System;
+using HotelBooking.Data;
 
 namespace HotelBooking.Core
 {
     public static class LoginService
     {
         public static Employee? CurrentEmployee { get; private set; }
-
-        public static bool IsLoggedIn => CurrentEmployee != null;
 
         public static void Login(Employee employee)
         {
@@ -19,14 +17,10 @@ namespace HotelBooking.Core
             CurrentEmployee = null;
         }
 
-        public static Employee FallbackEmployee => new Employee
+        // Hämta fallback från databasen
+        public static Employee GetFallbackEmployee(HotelDBContext db)
         {
-            Id = 999,
-            Username = "TestUser",
-            FirstName = "Test",
-            LastName = "User",
-            PasswordHash = "",
-            RoleId = 1
-        };
+            return db.Employees.First(e => e.Username == "TestUser");
+        }
     }
 }

@@ -66,7 +66,8 @@ namespace HotelBooking.Services
                 NumberOfGuests = guests,
                 BookingDate = DateTime.Now,
                 IsDeleted = false,
-                CreatedByEmployeeId = LoginService.CurrentEmployee!.Id
+                CreatedByEmployeeId = LoginService.CurrentEmployee?
+                .Id ?? LoginService.GetFallbackEmployee(_db).Id
             };
 
             _db.Bookings.Add(booking);

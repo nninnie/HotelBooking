@@ -5,45 +5,6 @@ namespace HotelBooking.UI
 {
     public static class BookingRenderer
     {
-        public static void ShowBookingTable(
-            IEnumerable<Booking> bookings,
-            Func<int, Guest?> getGuest,
-            Func<int, Room?> getRoom)
-        {
-            var table = new Table().RoundedBorder();
-
-            table.AddColumn("[yellow]ID[/]");
-            table.AddColumn("[yellow]Gäst[/]");
-            table.AddColumn("[yellow]Kontakt[/]");
-            table.AddColumn("[yellow]Rum[/]");
-            table.AddColumn("[yellow]Från[/]");
-            table.AddColumn("[yellow]Till[/]");
-            table.AddColumn("[yellow]Gäster[/]");
-            table.AddColumn("[yellow]Bokad[/]");
-            table.AddColumn("[yellow]Status[/]");
-
-            foreach (var b in bookings)
-            {
-                var guest = getGuest(b.GuestId);
-                var room = getRoom(b.RoomId);
-
-                table.AddRow(
-                    b.Id.ToString(),
-                    guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd", // ändrat
-                    $"{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}",
-                    room != null ? $"{room.RoomNumber} ({room.RoomType})" : b.RoomId.ToString(),
-                    b.FromDate.ToString("yyyy-MM-dd"),
-                    b.ToDate.ToString("yyyy-MM-dd"),
-                    b.NumberOfGuests.ToString(),
-                    b.BookingDate.ToString("yyyy-MM-dd"),
-                    b.IsDeleted ? "[red]Raderad[/]" : "[green]Aktiv[/]"
-                );
-            }
-
-            AnsiConsole.Write(table);
-        }
-
-        // Visa detaljer för en bokning
         public static void ShowBookingDetails(Booking booking, Guest? guest, Room? room)
         {
             var panel = new Panel($@"
@@ -87,10 +48,10 @@ namespace HotelBooking.UI
                 ShowError(failMessage);
         }
 
-        public static void ShowSmallBookingTable(
-     IEnumerable<Booking> bookings,
-     Func<int, Guest?> getGuest,
-     Func<int, Room?> getRoom)
+        public static void ShowBookingTable(
+            IEnumerable<Booking> bookings,
+            Func<int, Guest?> getGuest,
+            Func<int, Room?> getRoom)
         {
             var table = new Table().RoundedBorder();
 
@@ -106,10 +67,12 @@ namespace HotelBooking.UI
                 var guest = getGuest(b.GuestId);
                 var room = getRoom(b.RoomId);
 
+                // Korrekt IsPaid-logik
                 var paid = b.Invoice?.IsPaid == true
                     ? "[green]✔[/]"
                     : "[red]✘[/]";
 
+                // Totalpris
                 decimal total = 0;
                 if (room != null)
                 {
@@ -130,6 +93,5 @@ namespace HotelBooking.UI
 
             AnsiConsole.Write(table);
         }
-
     }
 }

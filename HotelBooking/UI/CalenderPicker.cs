@@ -49,6 +49,10 @@ public static class CalendarPicker
                         else
                         {
                             checkOut = cursor;
+
+                            AnsiConsole.MarkupLine($"\n[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
+                            Thread.Sleep(1200);
+
                             return (checkIn, checkOut);
                         }
                     }
@@ -140,6 +144,9 @@ public static class CalendarPicker
             AnsiConsole.MarkupLine($"\n[green]Incheckning vald:[/] [yellow]{checkIn:yyyy-MM-dd}[/]");
 
         if (checkOut != null && !selectingCheckIn)
-            AnsiConsole.MarkupLine($"\n[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
+            AnsiConsole.MarkupLine($"[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
+
+
+
     }
 }

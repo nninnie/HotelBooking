@@ -126,7 +126,8 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowSmallBookingTable(
+            BookingRenderer.
+                ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -152,7 +153,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowSmallBookingTable(
+            BookingRenderer.ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -200,7 +201,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowSmallBookingTable(
+            BookingRenderer.ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -247,7 +248,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            BookingRenderer.ShowSmallBookingTable(
+            BookingRenderer.ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
@@ -293,7 +294,7 @@ namespace HotelBooking.UI
 
             var bookings = _bookingService.GetAll();
 
-            BookingRenderer.ShowSmallBookingTable(
+            BookingRenderer.ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
