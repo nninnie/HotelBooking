@@ -29,44 +29,28 @@ namespace HotelBooking.UI
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
 
-            DateTime? checkIn = null;
+            // NYTT: välj båda datumen i ett steg
+            var (checkIn, checkOut) = CalendarPicker.SelectDateRange();
 
-            while (true)
+            if (checkIn == null || checkOut == null)
+                return;
+
+            if (checkIn.Value.Date < DateTime.Today)
             {
-                AnsiConsole.MarkupLine("[green]Välj incheckningsdatum:[/]");
-                checkIn = CalendarPicker.SelectDate();
-
-                if (checkIn == null)
-                    return;
-
-                if (checkIn.Value.Date < DateTime.Today)
-                {
-                    BookingRenderer.ShowError("Incheckningsdatum kan inte vara bakåt i tiden.");
-                    continue;
-                }
-
-                break;
+                BookingRenderer.ShowError("Incheckningsdatum kan inte vara bakåt i tiden.");
+                WaitForEsc();
+                return;
             }
 
-            DateTime? checkOut = null;
-
-            while (true)
+            if (checkOut.Value <= checkIn.Value)
             {
-                AnsiConsole.MarkupLine("[green]Välj utcheckningsdatum:[/]");
-                checkOut = CalendarPicker.SelectDate();
-                if (checkOut == null) return;
-
-                if (checkOut > checkIn)
-                    break;
-
                 BookingRenderer.ShowError("Utcheckningsdatum måste vara efter incheckningsdatum!");
-                Console.ReadKey(true);
+                WaitForEsc();
+                return;
             }
 
             var guestsCount = BookingPrompts.AskGuestCount(this);
-            if (guestsCount == null) return;
-
-            if (guestsCount <= 0)
+            if (guestsCount == null || guestsCount <= 0)
             {
                 BookingRenderer.ShowError("Antal gäster måste vara minst 1.");
                 WaitForEsc();
@@ -97,14 +81,18 @@ namespace HotelBooking.UI
                 guestsCount.Value
             );
 
-            // Hämta rummet för pris och info
             var room = _roomService.GetRoom(roomId.Value);
 
-            // Räkna ut totalpris
-            int nights = (checkOut.Value - checkIn.Value).Days;
-            decimal totalPrice = nights * (room?.PricePerNight ?? 0);
+            if (room == null)
+            {
+                BookingRenderer.ShowError("Kunde inte hämta rumsinformation.");
+                WaitForEsc();
+                return;
+            }
 
-            // Visa sammanfattning
+            int nights = (checkOut.Value - checkIn.Value).Days;
+            decimal totalPrice = nights * room.PricePerNight;  
+
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine("[green]Bokningen är klar![/]");
             AnsiConsole.MarkupLine($"Rum: [yellow]{room.RoomNumber}[/] ({room.RoomType})");
@@ -113,7 +101,6 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine($"Totalpris: [bold yellow]{totalPrice} kr[/]");
             AnsiConsole.WriteLine();
 
-            // Lämna över nyckelkort
             AnsiConsole.MarkupLine("[blue]Nyckelkort skapas...[/]");
             AnsiConsole.MarkupLine($"[green]✔ Nyckelkort till rum {room.RoomNumber} överlämnat till kunden.[/]");
             WaitForEsc();
@@ -245,7 +232,10 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader("Hantera bokningar", "Återställ bokning");
             AnsiConsole.WriteLine();
 
-            var bookings = _bookingService.GetAll();
+            var bookings = _bookingService
+                .GetAll()
+                .Where(b => b.IsDeleted)
+                .ToList();
 
             if (!bookings.Any())
             {

@@ -10,15 +10,8 @@ namespace HotelBooking.UI
         public static int? SelectOrCreateGuest(EscUI ui, IGuestService guestService)
         {
             AnsiConsole.Clear();
-
-            // RITA HEADER MED SPECTRE 
-            var panel = new Panel("[bold white]HANTERA BOKNINGAR[/]\n[grey]Välj kundtyp[/]");
-            panel.Border = BoxBorder.Rounded;
-            panel.Expand = false;
-            AnsiConsole.Write(panel);
-
-            AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", "Välj kundtyp");
 
             var choice = ui.SelectWithEsc(
                 new List<string>
@@ -129,20 +122,104 @@ namespace HotelBooking.UI
         // Välj befintlig kund
         public static int? SelectExistingGuest(EscUI ui, IGuestService guestService, string subtitle)
         {
-
-            AnsiConsole.WriteLine();
-
-            var guests = guestService.GetAllGuests();
+            var guests = guestService.GetAllGuests().ToList();
 
             if (!guests.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
+                ui.WaitForEsc();
                 return null;
+            }
 
-            var selected = ui.SelectWithEsc(
-                guests.ToList(),
-                g => $"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}"
-            );
+            int pageSize = 10;
+            int page = 0;
+            int index = 0;
 
-            return selected?.Id;
+            while (true)
+            {
+                AnsiConsole.Clear();
+                BannerUI.ShowLogo();
+                BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+                int totalPages = (int)Math.Ceiling(guests.Count / (double)pageSize);
+
+                var pageItems = guests
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                if (index >= pageItems.Count)
+                    index = pageItems.Count - 1;
+                if (index < 0)
+                    index = 0;
+
+                AnsiConsole.MarkupLine($"[grey]Sida {page + 1} / {totalPages}[/]");
+                AnsiConsole.WriteLine();
+
+                for (int i = 0; i < pageItems.Count; i++)
+                {
+                    var g = pageItems[i];
+                    string text = $"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}";
+
+                    if (i == index)
+                        AnsiConsole.MarkupLine($"[yellow]> {text}[/]");
+                    else
+                        AnsiConsole.MarkupLine($"  {text}");
+                }
+
+                var key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        index--;
+                        if (index < 0)
+                        {
+                            if (page > 0)
+                            {
+                                page--;
+                                index = pageSize - 1;
+                            }
+                            else index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        index++;
+                        if (index >= pageItems.Count)
+                        {
+                            if (page < totalPages - 1)
+                            {
+                                page++;
+                                index = 0;
+                            }
+                            else index = pageItems.Count - 1;
+                        }
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        if (page > 0)
+                        {
+                            page--;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (page < totalPages - 1)
+                        {
+                            page++;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        return pageItems[index].Id;
+
+                    case ConsoleKey.Escape:
+                        return null;
+                }
+            }
         }
 
         // Antal gäster

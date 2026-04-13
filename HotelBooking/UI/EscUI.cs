@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using HotelBooking.Services.Interfaces;
+using Spectre.Console;
 
 namespace HotelBooking.UI
 {
@@ -101,13 +102,10 @@ namespace HotelBooking.UI
             while (true)
             {
                 AnsiConsole.Clear();
-
                 BannerUI.ShowLogo();
+                BannerUI.PrintHeader("Hantera bokningar", "Skapa ny bokning");
 
-                // ANVÄND HEADER-PARAMETER ELLER CurrentHeader
-                string? h = header ?? CurrentHeader;
-                if (!string.IsNullOrWhiteSpace(h))
-                    BannerUI.PrintHeader(h);
+                AnsiConsole.WriteLine();
 
                 for (int i = 0; i < items.Count; i++)
                 {
@@ -138,6 +136,106 @@ namespace HotelBooking.UI
             }
         }
 
+        
+        public static int? SelectExistingGuest(EscUI ui, IGuestService guestService, string subtitle)
+        {
+            var guests = guestService.GetAllGuests();
+
+            if (!guests.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
+                ui.WaitForEsc();
+                return null;
+            }
+
+            int pageSize = 10;
+            int page = 0;
+            int index = 0;
+
+            while (true)
+            {
+                AnsiConsole.Clear();
+                BannerUI.ShowLogo();
+                BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+                int totalPages = (int)Math.Ceiling(guests.Count() / (double)pageSize);
+
+                var pageItems = guests
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                if (index >= pageItems.Count)
+                    index = pageItems.Count - 1;
+
+                AnsiConsole.MarkupLine($"[grey]Sida {page + 1} / {totalPages}[/]");
+                AnsiConsole.WriteLine();
+
+                for (int i = 0; i < pageItems.Count; i++)
+                {
+                    var g = pageItems[i];
+                    string text = $"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}";
+
+                    if (i == index)
+                        AnsiConsole.MarkupLine($"[yellow]> {text}[/]");
+                    else
+                        AnsiConsole.MarkupLine($"  {text}");
+                }
+
+                var key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        index--;
+                        if (index < 0)
+                        {
+                            if (page > 0)
+                            {
+                                page--;
+                                index = pageSize - 1;
+                            }
+                            else index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        index++;
+                        if (index >= pageItems.Count)
+                        {
+                            if (page < totalPages - 1)
+                            {
+                                page++;
+                                index = 0;
+                            }
+                            else index = pageItems.Count - 1;
+                        }
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        if (page > 0)
+                        {
+                            page--;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (page < totalPages - 1)
+                        {
+                            page++;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        return pageItems[index].Id;
+
+                    case ConsoleKey.Escape:
+                        return null;
+                }
+            }
+        }
         // Decimalinput som kan avbrytas med ESC
         public decimal? AskDecimalOrEsc(string question)
         {
