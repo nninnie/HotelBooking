@@ -61,8 +61,10 @@ namespace HotelBooking.UI
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 
-            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
-            var guest = _service.GetGuest(id);
+            int? id = AskIntOrEsc("Ange gäst-ID");
+            if (id == null) return;
+
+            var guest = _service.GetGuest(id.Value);
 
             if (guest == null)
             {
@@ -137,8 +139,10 @@ namespace HotelBooking.UI
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 
-            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/] att uppdatera:");
-            var guest = _service.GetGuest(id);
+            int? id = AskIntOrEsc("Ange gäst-ID att uppdatera");
+            if (id == null) return;
+
+            var guest = _service.GetGuest(id.Value);
 
             if (guest == null)
             {
@@ -167,7 +171,7 @@ namespace HotelBooking.UI
             }
 
             bool success = _service.UpdateGuest(
-                id,
+                id.Value,
                 string.IsNullOrWhiteSpace(newFirst) ? null : newFirst,
                 string.IsNullOrWhiteSpace(newLast) ? null : newLast,
                 string.IsNullOrWhiteSpace(phone) ? null : phone,
@@ -189,8 +193,10 @@ namespace HotelBooking.UI
             var guests = _service.GetAllGuests();
             ShowGuestTable(guests);
 
-            int id = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/] att ta bort:");
-            var guest = _service.GetGuest(id);
+            int? id = AskIntOrEsc("Ange gäst-ID att ta bort");
+            if (id == null) return;
+
+            var guest = _service.GetGuest(id.Value);
 
             if (guest == null)
             {
@@ -199,14 +205,14 @@ namespace HotelBooking.UI
                 return;
             }
 
-            if (_service.HasBookings(id))
+            if (_service.HasBookings(id.Value))
             {
                 AnsiConsole.MarkupLine("[red]Gästen kan inte tas bort eftersom det finns bokningar kopplade till den.[/]");
                 WaitForEsc();
                 return;
             }
 
-            bool success = _service.DeleteGuest(id);
+            bool success = _service.DeleteGuest(id.Value);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Gäst borttagen![/]"

@@ -53,6 +53,7 @@ namespace HotelBooking.UI
                 }
             }
         }
+        // Numerisk input som kan avbrytas med ESC
         public int? AskIntOrEsc(string question)
         {
             AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
@@ -133,6 +134,53 @@ namespace HotelBooking.UI
 
                     case ConsoleKey.Escape:
                         return default;
+                }
+            }
+        }
+
+        // Decimalinput som kan avbrytas med ESC
+        public decimal? AskDecimalOrEsc(string question)
+        {
+            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+
+            string input = "";
+            ConsoleKeyInfo key;
+
+            while (true)
+            {
+                key = Console.ReadKey(true);
+
+                // ESC - avbryt
+                if (key.Key == ConsoleKey.Escape)
+                    return null;
+
+                // ENTER - validera
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+
+                    if (decimal.TryParse(input, out decimal value))
+                        return value;
+
+                    AnsiConsole.MarkupLine("[red]Ogiltigt belopp. Försök igen.[/]");
+                    input = "";
+                    AnsiConsole.Markup($"{question}: ");
+                    continue;
+                }
+
+                // BACKSPACE
+                if (key.Key == ConsoleKey.Backspace && input.Length > 0)
+                {
+                    input = input[..^1];
+                    Console.Write("\b \b");
+                    continue;
+                }
+
+                // Tillåt endast siffror och komma
+                if (char.IsDigit(key.KeyChar) || key.KeyChar == ',' || key.KeyChar == '.')
+                {
+                    input += key.KeyChar;
+                    Console.Write(key.KeyChar);
                 }
             }
         }

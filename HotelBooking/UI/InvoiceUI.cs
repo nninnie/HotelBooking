@@ -65,8 +65,10 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
-            var invoice = _iinvoiceService.GetInvoice(id);
+            int? id = AskIntOrEsc("Ange faktura-ID");
+            if (id == null) return;
+
+            var invoice = _iinvoiceService.GetInvoice(id.Value);
 
             if (invoice == null)
             {
@@ -100,20 +102,22 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int bookingId;
-            while (true)
+            int? bookingId = AskIntOrEsc("Ange boknings-ID");
+            if (bookingId == null) return;
+            if (bookingId <= 0)
             {
-                bookingId = AnsiConsole.Ask<int>("Ange [yellow]boknings-ID[/]:");
-                if (bookingId > 0) break;
                 AnsiConsole.MarkupLine("[red]Boknings-ID måste vara ett positivt tal![/]");
+                WaitForEsc();
+                return;
             }
 
-            int guestId;
-            while (true)
+            int? guestId = AskIntOrEsc("Ange gäst-ID");
+            if (guestId == null) return;
+            if (guestId <= 0)
             {
-                guestId = AnsiConsole.Ask<int>("Ange [yellow]gäst-ID[/]:");
-                if (guestId > 0) break;
                 AnsiConsole.MarkupLine("[red]Gäst-ID måste vara ett positivt tal![/]");
+                WaitForEsc();
+                return;
             }
 
             decimal amount;
@@ -124,7 +128,7 @@ namespace HotelBooking.UI
                 AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");
             }
 
-            var invoice = _iinvoiceService.CreateInvoice(bookingId, guestId, amount);
+            var invoice = _iinvoiceService.CreateInvoice(bookingId.Value, guestId.Value, amount);
 
             AnsiConsole.MarkupLine($"[green]Faktura skapad![/] ID: {invoice.Id}");
             WaitForEsc();
@@ -138,15 +142,16 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int id;
-            while (true)
+            int? id = AskIntOrEsc("Ange faktura-ID att markera som betald");
+            if (id == null) return;
+            if (id <= 0)
             {
-                id = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att markera som betald:");
-                if (id > 0) break;
                 AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                WaitForEsc();
+                return;
             }
 
-            bool success = _iinvoiceService.MarkAsPaid(id);
+            bool success = _iinvoiceService.MarkAsPaid(id.Value);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Fakturan markerades som betald![/]"

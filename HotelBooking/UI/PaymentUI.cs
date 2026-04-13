@@ -47,21 +47,17 @@ namespace HotelBooking.UI
             var allPayments = _service.GetAllPayments();
             ShowPaymentTable(allPayments);
 
-            int invoiceId;
-            while (true)
+            int? invoiceId = AskIntOrEsc("Ange faktura-ID att filtrera på");
+            if (invoiceId == null) return;
+
+            if (invoiceId <= 0)
             {
-                invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/] att filtrera på:");
-
-                if (invoiceId <= 0)
-                {
-                    AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
-                    continue;
-                }
-
-                break;
+                AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                WaitForEsc();
+                return;
             }
 
-            var payments = _service.GetPaymentsForInvoice(invoiceId);
+            var payments = _service.GetPaymentsForInvoice(invoiceId.Value);
 
             if (!payments.Any())
             {
@@ -100,18 +96,14 @@ namespace HotelBooking.UI
             var payments = _service.GetAllPayments();
             ShowPaymentTable(payments);
 
-            int invoiceId;
-            while (true)
+            int? invoiceId = AskIntOrEsc("Ange faktura-ID");
+            if (invoiceId == null) return;
+
+            if (invoiceId <= 0)
             {
-                invoiceId = AnsiConsole.Ask<int>("Ange [yellow]faktura-ID[/]:");
-
-                if (invoiceId <= 0)
-                {
-                    AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
-                    continue;
-                }
-
-                break;
+                AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                WaitForEsc();
+                return;
             }
 
             decimal amount;
@@ -128,7 +120,7 @@ namespace HotelBooking.UI
                 break;
             }
 
-            var payment = _service.CreatePayment(invoiceId, amount);
+            var payment = _service.CreatePayment(invoiceId.Value, amount);
 
             AnsiConsole.MarkupLine($"[green]Betalning registrerad![/] ID: {payment.Id}");
             WaitForEsc();

@@ -13,7 +13,7 @@ namespace HotelBooking.UI
             _roomService = roomService;
         }
 
-        // RUMSTABELL – ENDA VERSIONEN (alla features)
+        // RUMSTABELL 
         private void ShowRoomTable(IEnumerable<Room> rooms)
         {
             var table = new Table().RoundedBorder();
@@ -114,13 +114,22 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
 
-            string number = AnsiConsole.Ask<string>("Ange [yellow]rumsnummer[/]:");
-            string type = AnsiConsole.Ask<string>("Ange [yellow]rumstyp[/]:");
-            int capacity = AnsiConsole.Ask<int>("Ange [yellow]grundkapacitet[/]:");
-            int extraBeds = AnsiConsole.Ask<int>("Ange [yellow]extrabäddar[/] (0–2):");
-            decimal price = AnsiConsole.Ask<decimal>("Ange [yellow]pris per natt[/] (kr):");
-            bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
+            string? number = AskWithEsc("Ange rumsnummer:");
+            if (number == null) return;
 
+            string? type = AskWithEsc("Ange rumstyp:");
+            if (type == null) return;
+
+            int? capacity = AskIntOrEsc("Ange grundkapacitet:");
+            if (capacity == null) return;
+
+            int? extraBeds = AskIntOrEsc("Ange extrabäddar (0–2):");
+            if (extraBeds == null) return;
+
+            decimal? price = AskDecimalOrEsc("Ange pris per natt (kr):");
+            if (price == null) return;
+
+            bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
             bool hasSeaView = AnsiConsole.Confirm("Har rummet havsutsikt?");
             bool hasMinibar = AnsiConsole.Confirm("Har rummet minibar?");
             bool isPetFriendly = AnsiConsole.Confirm("Är rummet husdjursvänligt?");
@@ -128,7 +137,7 @@ namespace HotelBooking.UI
             bool hasBathtub = AnsiConsole.Confirm("Har rummet badkar?");
 
             var room = _roomService.CreateRoom(
-                number, type, capacity, extraBeds, price,
+                number, type, capacity.Value, extraBeds.Value, price.Value,
                 outOfService, hasSeaView, hasMinibar,
                 isPetFriendly, hasBalcony, hasBathtub
             );
