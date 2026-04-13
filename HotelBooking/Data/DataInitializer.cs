@@ -19,7 +19,7 @@ namespace HotelBooking.Data
             if (!db.Rooms.Any())
             {
                 db.Rooms.AddRange(
-     // --- Enkelrum (billigare, få features) ---
+     // Enkelrum 
      new Room
      {
          RoomNumber = "101",
@@ -62,7 +62,7 @@ namespace HotelBooking.Data
          HasBathtub = false
      },
 
-     // --- Dubbelrum (standard) ---
+     //  Dubbelrum 
      new Room
      {
          RoomNumber = "201",
@@ -105,7 +105,7 @@ namespace HotelBooking.Data
          HasBathtub = true
      },
 
-     // --- Premiumrum / Familjerum ---
+     // Familjerum
      new Room
      {
          RoomNumber = "301",
@@ -134,7 +134,7 @@ namespace HotelBooking.Data
          HasBathtub = true
      },
 
-     // --- Lyxrum / Suite ---
+     // Suite
      new Room
      {
          RoomNumber = "401",
