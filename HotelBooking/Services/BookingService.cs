@@ -120,12 +120,22 @@ namespace HotelBooking.Services
         // Återställ en soft-deleted bokning
         public bool Restore(int id)
         {
-            var booking = GetBooking(id);
-            if (booking == null || !booking.IsDeleted) return false;
+            var booking = _db.Bookings
+                .FirstOrDefault(b => b
+                .Id == id && b
+                .IsDeleted);
+            if (booking == null) return false;
 
             booking.IsDeleted = false;
             _db.SaveChanges();
             return true;
+        }
+        // 
+        public IEnumerable<Booking> GetDeleted()
+        {
+            return _db.Bookings
+                .Where(b => b.IsDeleted)
+                .ToList();
         }
 
         // Uppdatera valfria delar av en bokning

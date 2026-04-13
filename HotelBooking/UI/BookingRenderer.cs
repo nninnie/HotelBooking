@@ -7,6 +7,29 @@ namespace HotelBooking.UI
     {
         public static void ShowBookingDetails(Booking booking, Guest? guest, Room? room)
         {
+            // Prisberäkning
+            int nights = (booking.ToDate - booking.FromDate).Days;
+            if (nights < 1) nights = 1;
+
+            decimal pricePerNight = room?.PricePerNight ?? 0;
+            decimal totalPrice = nights * pricePerNight;
+
+            // Betald-status
+            string paid = booking.Invoice?.IsPaid == true
+                ? "[green]✔[/]"
+                : "[red]✘[/]";
+
+            // Rumsegenskaper
+            string features = room == null
+                ? "-"
+                : $@"Kapacitet: {room.Capacity}
+Extrabäddar: {room.ExtraBeds}
+Havsutsikt: {(room.HasSeaView ? "Ja" : "Nej")}
+Minibar: {(room.HasMinibar ? "Ja" : "Nej")}
+Husdjur tillåtet: {(room.IsPetFriendly ? "Ja" : "Nej")}
+Balkong: {(room.HasBalcony ? "Ja" : "Nej")}
+Badkar: {(room.HasBathtub ? "Ja" : "Nej")}";
+
             var panel = new Panel($@"
 [white]ID:[/] {booking.Id}
 
@@ -17,10 +40,15 @@ namespace HotelBooking.UI
 
 [white]Från:[/] {booking.FromDate:yyyy-MM-dd}
 [white]Till:[/] {booking.ToDate:yyyy-MM-dd}
+[white]Antal nätter:[/] {nights}
 [white]Antal gäster:[/] {booking.NumberOfGuests}
 
-[white]Bokad:[/] {booking.BookingDate:yyyy-MM-dd}
-[white]Status:[/] {(booking.IsDeleted ? "[red]Raderad[/]" : "[green]Aktiv[/]")}
+[white]Pris per natt:[/] {pricePerNight} kr
+[white]Totalpris:[/] {totalPrice} kr
+[white]Betald:[/] {paid}
+
+[grey]Rumsdetaljer[/]
+{features}
 ")
             {
                 Header = new PanelHeader("[green]Bokningsinformation[/]"),

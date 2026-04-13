@@ -17,5 +17,6 @@ namespace HotelBooking.Services.Interfaces
         int GetHistoryBookingCount(int guestId);
         decimal GetTotalSpentByGuest(int guestId);
         List<Booking> GetBookingsByGuestId(int guestId);
+        IEnumerable<Booking> GetDeleted();
     }
 }

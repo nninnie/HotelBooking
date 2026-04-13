@@ -236,10 +236,7 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader("Hantera bokningar", "Återställ bokning");
             AnsiConsole.WriteLine();
 
-            var bookings = _bookingService
-                .GetAll()
-                .Where(b => b.IsDeleted)
-                .ToList();
+            var bookings = _bookingService.GetDeleted().ToList();
 
             if (!bookings.Any())
             {
@@ -264,7 +261,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            bool confirm = BookingPrompts.Confirm("Är du säker att du vill avboka denna bokning?");
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa denna bokning?");
             if (!confirm)
             {
                 BookingRenderer.ShowError("Avbokning avbröts.");

@@ -359,7 +359,13 @@ namespace HotelBooking.UI
 
         public static bool Confirm(string message)
         {
-            return AnsiConsole.Confirm($"[yellow]{message}[/]");
+            var input = AnsiConsole.Prompt(
+                new TextPrompt<string>($"{message} (j/n): ")
+                    .AddChoice("j")
+                    .AddChoice("n")
+            );
+
+            return input == "j";
         }
     }
 }
