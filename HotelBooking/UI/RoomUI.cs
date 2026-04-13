@@ -32,7 +32,7 @@ namespace HotelBooking.UI
                     r.RoomType,
 
                     // visar ordinarie + extra sängar i en kolumn
-                    $"{r.Capacity} + {r.ExtraBeds}",
+                    $"{r.Capacity} ({r.ExtraBeds})",
 
                     $"{r.PricePerNight} kr",
                     r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]"
