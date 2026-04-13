@@ -217,6 +217,8 @@ namespace HotelBooking.UI
         // Fråga efter uppdateringar
         public static BookingUpdateModel? AskBookingUpdates(EscUI ui, Booking booking)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera bokningar", "Uppdatera bokning");
             AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();

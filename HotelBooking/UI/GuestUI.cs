@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Models;
+using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
@@ -6,11 +7,13 @@ namespace HotelBooking.UI
 {
     public class GuestUI : EscUI
     {
-        private readonly IGuestService _service;
+        private readonly IGuestService _guestService;
+        private readonly IBookingService _bookingService;
 
-        public GuestUI(IGuestService service)
+        public GuestUI(IGuestService service, IBookingService bookingService)
         {
-            _service = service;
+            _guestService = service;
+            _bookingService = bookingService;   
         }
 
         private void ShowGuestTable(IEnumerable<Guest> guests)
@@ -21,14 +24,21 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]Namn[/]");
             table.AddColumn("[yellow]Telefon[/]");
             table.AddColumn("[yellow]Email[/]");
+            table.AddColumn("[yellow]Aktiv bokning[/]");
+
+            var sortedGuests = guests
+                .OrderBy(g => g.Id);
 
             foreach (var g in guests)
             {
+                bool hasActiveBooking = g.Bookings?.Any(b => b.IsActive) == true;
+
                 table.AddRow(
                     g.Id.ToString(),
                     $"{g.LastName}, {g.FirstName}",
                     g.PhoneNumber ?? "-",
-                    g.Email ?? "-"
+                    g.Email ?? "-",
+                    hasActiveBooking ? "[green]Ja[/]" : "[red]Nej[/]"
                 );
             }
 
@@ -38,9 +48,12 @@ namespace HotelBooking.UI
         // VISA ALLA GÄSTER
         public void ShowAll(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            var guests = _service.GetAllGuests();
+            var guests = _guestService.GetAllGuests();
+            ShowGuestTable(guests);
 
             if (!guests.Any())
             {
@@ -49,23 +62,31 @@ namespace HotelBooking.UI
                 return;
             }
 
-            ShowGuestTable(guests);
             WaitForEsc();
         }
 
         // VISA DETALJER
         public void ShowDetails(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            var guests = _service.GetAllGuests();
+            var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
-            int? id = AskIntOrEsc("Ange gäst-ID");
+            if (!guests.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga gäster hittades.[/]");
+                WaitForEsc();
+                return;
+            }
+
+            int? id = AskIntOrEsc("Ange gäst-ID att visa");
             if (id == null) return;
 
-            var guest = _service.GetGuest(id.Value);
-
+            var guest = _guestService
+                .GetGuest(id.Value);
             if (guest == null)
             {
                 AnsiConsole.MarkupLine("[red]Gäst hittades inte.[/]");
@@ -73,11 +94,42 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Hämta bokningar via service
+            var bookings = _bookingService
+                .GetBookingsByGuestId(guest.Id);
+
+            int active = bookings
+                .Count(b => b.IsActive);
+            int history = bookings
+                .Count(b => !b.IsActive);
+            decimal totalSpent = bookings
+                .Sum(b => b.TotalPrice);
+
+            var lastBooking = bookings
+                .OrderByDescending(b => b.FromDate)
+                .FirstOrDefault();
+
+            string lastBookingText = lastBooking == null
+                ? "[grey]Ingen bokningshistorik[/]"
+                : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:MM-dd} – {lastBooking.ToDate:MM-dd})";
+
             var panel = new Panel($@"
-[white]ID:[/] {guest.Id}
-[white]Namn:[/] {guest.LastName}, {guest.FirstName}
-[white]Telefon:[/] {guest.PhoneNumber ?? "-"}
-[white]Email:[/] {guest.Email ?? "-"}
+[white]Gäst-ID:[/] {guest.Id}
+
+[white]Förnamn:[/] {guest.FirstName}
+[white]Efternamn:[/] {guest.LastName}
+
+[white]Telefon:[/] {(string.IsNullOrWhiteSpace(guest.PhoneNumber) ? "[red]Saknas[/]" : guest.PhoneNumber)}
+[white]Email:[/] {(string.IsNullOrWhiteSpace(guest.Email) ? "[red]Saknas[/]" : guest.Email)}
+
+[white]Antal bokningar:[/] {bookings.Count}
+[white]Aktiva bokningar:[/] {active}
+[white]Historiska bokningar:[/] {history}
+
+[white]Totalt spenderat:[/] {totalSpent} kr
+
+[white]Senaste bokning:[/]
+{lastBookingText}
 ")
             {
                 Header = new PanelHeader("[green]Gästinformation[/]"),
@@ -91,7 +143,12 @@ namespace HotelBooking.UI
         // SKAPA GÄST
         public void Create(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera gäster", subtitle);
+
+            var guests = _guestService.GetAllGuests();
+            ShowGuestTable(guests);
 
             string? firstName;
             while (true)
@@ -129,7 +186,7 @@ namespace HotelBooking.UI
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
             }
 
-            var guest = _service.CreateGuest(firstName, lastName, phone, email);
+            var guest = _guestService.CreateGuest(firstName, lastName, phone, email);
 
             AnsiConsole.MarkupLine($"[green]Gäst skapad![/] ID: {guest.Id}");
             WaitForEsc();
@@ -138,15 +195,17 @@ namespace HotelBooking.UI
         // UPPDATERA GÄST
         public void Update(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            var guests = _service.GetAllGuests();
+            var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
             int? id = AskIntOrEsc("Ange gäst-ID att uppdatera");
             if (id == null) return;
 
-            var guest = _service.GetGuest(id.Value);
+            var guest = _guestService.GetGuest(id.Value);
 
             if (guest == null)
             {
@@ -174,7 +233,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            bool success = _service.UpdateGuest(
+            bool success = _guestService.UpdateGuest(
                 id.Value,
                 string.IsNullOrWhiteSpace(newFirst) ? null : newFirst,
                 string.IsNullOrWhiteSpace(newLast) ? null : newLast,
@@ -192,15 +251,17 @@ namespace HotelBooking.UI
         // TA BORT GÄST
         public void SoftDelete(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera gäster", subtitle);
 
-            var guests = _service.GetAllGuests();
+            var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
             int? id = AskIntOrEsc("Ange gäst-ID att ta bort");
             if (id == null) return;
 
-            var guest = _service.GetGuest(id.Value);
+            var guest = _guestService.GetGuest(id.Value);
 
             if (guest == null)
             {
@@ -209,14 +270,14 @@ namespace HotelBooking.UI
                 return;
             }
 
-            if (_service.HasBookings(id.Value))
+            if (_guestService.HasBookings(id.Value))
             {
                 AnsiConsole.MarkupLine("[red]Gästen kan inte tas bort eftersom det finns bokningar kopplade till den.[/]");
                 WaitForEsc();
                 return;
             }
 
-            bool success = _service.DeleteGuest(id.Value);
+            bool success = _guestService.DeleteGuest(id.Value);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Gäst borttagen![/]"

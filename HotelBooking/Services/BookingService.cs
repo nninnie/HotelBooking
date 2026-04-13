@@ -159,5 +159,38 @@ namespace HotelBooking.Services
             _db.SaveChanges();
             return true;
         }
+
+        // Hämta antal aktiva bokningar för en gäst
+        public int GetActiveBookingCount(int guestId)
+        {
+            return _db.Bookings
+                .Where(b => b.GuestId == guestId && !b.IsDeleted)
+                .Count(b => b.IsActive);
+        }
+        // Hämta antal historiska (icke-aktiva) bokningar för en gäst
+        public int GetHistoryBookingCount(int guestId)
+        {
+            return _db.Bookings
+                .Where(b => b.GuestId == guestId && !b.IsDeleted)
+                .Count(b => !b.IsActive);
+        }
+        // Hämta total spenderat belopp för en gäst (baserat på alla icke-raderade bokningar)
+        public decimal GetTotalSpentByGuest(int guestId)
+        {
+            return _db.Bookings
+                .Where(b => b.GuestId == guestId && !b.IsDeleted)
+                .Sum(b => b.TotalPrice);
+        }
+
+        // Hämtar alla bokningar för en specifik gäst och sorterar dem efter startdatum
+        public List<Booking> GetBookingsByGuestId(int guestId)
+        {
+            return _db.Bookings
+                .Where(b => b.GuestId == guestId && !b.IsDeleted)
+                .Include(b => b.Room)
+                .Include(b => b.Guest)
+                .OrderBy(b => b.FromDate)
+                .ToList();
+        }
     }
 }

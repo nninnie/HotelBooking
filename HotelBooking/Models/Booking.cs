@@ -35,6 +35,32 @@ public class Booking
     
     public bool IsDeleted { get; set; } = false;
 
+    // Beräknad egenskap för att avgöra om bokningen är aktiv (inte raderad och inom datumintervallet)
+    // [NotMapped] betyder att denna egenskap inte kommer att skapas som en kolumn i databasen
+    [NotMapped]
+    public bool IsActive
+    {
+        get
+        {
+            var today = DateTime.Today;
+            return !IsDeleted && today >= FromDate && today <= ToDate;
+        }
+    }
+
+    [NotMapped]
+    public decimal TotalPrice
+    {
+        get
+        {
+            if (Room == null) return 0;
+
+            int nights = (ToDate - FromDate).Days;
+            if (nights < 1) nights = 1; // säkerhet om datumen är samma
+
+            return nights * Room.PricePerNight;
+        }
+    }
+
     // Relation till Invoice
     public List<Invoice> Invoices { get; set; } = new();
 }

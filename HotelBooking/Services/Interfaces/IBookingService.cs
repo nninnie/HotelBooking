@@ -13,5 +13,9 @@ namespace HotelBooking.Services.Interfaces
         bool Restore(int id);
         bool UpdateBooking(int id, int? guestId, DateTime? from, DateTime? to, int? guests);
         bool UpgradeBooking(int id);
+        int GetActiveBookingCount(int guestId);
+        int GetHistoryBookingCount(int guestId);
+        decimal GetTotalSpentByGuest(int guestId);
+        List<Booking> GetBookingsByGuestId(int guestId);
     }
 }

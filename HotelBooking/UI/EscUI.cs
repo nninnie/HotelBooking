@@ -187,7 +187,7 @@ namespace HotelBooking.UI
         // Lösenordsinput som kan avbrytas med ESC
         public string? AskPasswordOrEsc(string question)
         {
-            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+            AnsiConsole.Markup($"{question} ");
 
             string input = "";
             ConsoleKeyInfo key;
@@ -221,6 +221,28 @@ namespace HotelBooking.UI
                     input += key.KeyChar;
                     Console.Write("*");
                 }
+            }
+        }
+
+        public bool? AskBoolOrEsc(string question, bool defaultValue)
+        {
+            AnsiConsole.Markup($"{question} (j/n, ENTER = {defaultValue}, ESC för att avbryta): ");
+
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Escape)
+                    return null;
+
+                if (key.Key == ConsoleKey.J)
+                    return true;
+
+                if (key.Key == ConsoleKey.N)
+                    return false;
+
+                if (key.Key == ConsoleKey.Enter)
+                    return defaultValue;
             }
         }
     }

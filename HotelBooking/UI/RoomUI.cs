@@ -20,7 +20,7 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
             table.AddColumn("[yellow]Typ[/]");
-            table.AddColumn("[yellow]Extra bäddar[/]");
+            table.AddColumn("[yellow]Antal gäster[/]"); 
             table.AddColumn("[yellow]Pris/natt[/]");
             table.AddColumn("[yellow]Status[/]");
 
@@ -30,7 +30,10 @@ namespace HotelBooking.UI
                     r.Id.ToString(),
                     r.RoomNumber,
                     r.RoomType,
-                    r.ExtraBeds.ToString(),
+
+                    // visar ordinarie + extra sängar i en kolumn
+                    $"{r.Capacity} + {r.ExtraBeds}",
+
                     $"{r.PricePerNight} kr",
                     r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]"
                 );
@@ -62,6 +65,10 @@ namespace HotelBooking.UI
         // VISA DETALJER
         public void ShowDetails(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera rum", subtitle);
+
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
@@ -85,18 +92,15 @@ namespace HotelBooking.UI
 [white]Rums-ID:[/] {room.Id}
 [white]Nummer:[/] {room.RoomNumber}
 [white]Typ:[/] {room.RoomType}
-[white]Grundkapacitet:[/] {room.Capacity}
+[white]Ordinarie platser:[/] {room.Capacity}
 [white]Extrabäddar:[/] {room.ExtraBeds}
-[white]Max gäster:[/] {room.MaxGuests}
 [white]Pris per natt:[/] {room.PricePerNight} kr
-
 [white]Havsutsikt:[/] {(room.HasSeaView ? "[green]Ja[/]" : "[red]Nej[/]")}
 [white]Minibar:[/] {(room.HasMinibar ? "[green]Ja[/]" : "[red]Nej[/]")}
 [white]Husdjur tillåtet:[/] {(room.IsPetFriendly ? "[green]Ja[/]" : "[red]Nej[/]")}
 [white]Balkong:[/] {(room.HasBalcony ? "[green]Ja[/]" : "[red]Nej[/]")}
 [white]Badkar:[/] {(room.HasBathtub ? "[green]Ja[/]" : "[red]Nej[/]")}
-
-[white]Status:[/] {(room.IsOutOfService ? "Ur funktion" : "Tillgänglig")}
+[white]Status:[/] {(room.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]")}
 ")
             {
                 Header = new PanelHeader("[green]Rumsinformation[/]"),
@@ -123,7 +127,7 @@ namespace HotelBooking.UI
             string? type = AskWithEsc("Ange rumstyp:");
             if (type == null) return;
 
-            int? capacity = AskIntOrEsc("Ange grundkapacitet:");
+            int? capacity = AskIntOrEsc("Ange antal ordinarie gäster:");
             if (capacity == null) return;
 
             int? extraBeds = AskIntOrEsc("Ange extrabäddar (0–2):");
@@ -171,28 +175,56 @@ namespace HotelBooking.UI
                 return;
             }
 
-            string number = AnsiConsole.Ask<string>($"Rumsnummer ({existing.RoomNumber}):", existing.RoomNumber);
-            string type = AnsiConsole.Ask<string>($"Rumstyp ({existing.RoomType}):", existing.RoomType);
-            int capacity = AnsiConsole.Ask<int>($"Grundkapacitet ({existing.Capacity}):", existing.Capacity);
-            int extraBeds = AnsiConsole.Ask<int>($"Extrabäddar ({existing.ExtraBeds}):", existing.ExtraBeds);
-            decimal price = AnsiConsole.Ask<decimal>($"Pris per natt ({existing.PricePerNight}):", existing.PricePerNight);
-            bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?", existing.IsOutOfService);
+            string? number = AskWithEsc($"Rumsnummer ({existing.RoomNumber}):");
+            if (number == null) return;
+            if (number == "") number = existing.RoomNumber;
 
-            bool hasSeaView = AnsiConsole.Confirm("Har rummet havsutsikt?", existing.HasSeaView);
-            bool hasMinibar = AnsiConsole.Confirm("Har rummet minibar?", existing.HasMinibar);
-            bool isPetFriendly = AnsiConsole.Confirm("Är rummet husdjursvänligt?", existing.IsPetFriendly);
-            bool hasBalcony = AnsiConsole.Confirm("Har rummet balkong?", existing.HasBalcony);
-            bool hasBathtub = AnsiConsole.Confirm("Har rummet badkar?", existing.HasBathtub);
+            string? type = AskWithEsc($"Rumstyp ({existing.RoomType}):");
+            if (type == null) return;
+            if (type == "") type = existing.RoomType;
+
+            int? capacity = AskIntOrEsc($"Antal ordinarie gäster ({existing.Capacity}):");
+            if (capacity == null) return;
+
+
+            int? extraBeds = AskIntOrEsc($"Extrabäddar ({existing.ExtraBeds}):");
+            if (extraBeds == null) return;
+
+            decimal? price = AskDecimalOrEsc($"Pris per natt ({existing.PricePerNight}):");
+            if (price == null) return;
+
+            bool? outOfService = AskBoolOrEsc("Är rummet ur funktion?", existing.IsOutOfService);
+            if (outOfService == null) return;
+
+            bool? hasSeaView = AskBoolOrEsc("Har rummet havsutsikt?", existing.HasSeaView);
+            if (hasSeaView == null) return;
+
+            bool? hasMinibar = AskBoolOrEsc("Har rummet minibar?", existing.HasMinibar);
+            if (hasMinibar == null) return;
+
+            bool? isPetFriendly = AskBoolOrEsc("Är rummet husdjursvänligt?", existing.IsPetFriendly);
+            if (isPetFriendly == null) return;
+
+            bool? hasBalcony = AskBoolOrEsc("Har rummet balkong?", existing.HasBalcony);
+            if (hasBalcony == null) return;
+
+            bool? hasBathtub = AskBoolOrEsc("Har rummet badkar?", existing.HasBathtub);
+            if (hasBathtub == null) return;
 
             bool success = _roomService.UpdateRoom(
-                id.Value, number, type, capacity, extraBeds, price,
-                outOfService, hasSeaView, hasMinibar,
-                isPetFriendly, hasBalcony, hasBathtub
+                id.Value,
+                number,
+                type,
+                capacity.Value,
+                extraBeds.Value,
+                price.Value,
+                outOfService.Value,
+                hasSeaView.Value,
+                hasMinibar.Value,
+                isPetFriendly.Value,
+                hasBalcony.Value,
+                hasBathtub.Value
             );
-
-            AnsiConsole.Clear();
-            BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera rum", subtitle);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Rummet uppdaterades![/]"
