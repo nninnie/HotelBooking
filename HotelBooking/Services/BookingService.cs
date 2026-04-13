@@ -1,11 +1,12 @@
-﻿using HotelBooking.Data;
+﻿using HotelBooking.Core;
+using HotelBooking.Data;
 using HotelBooking.Models;
 using HotelBooking.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services
 {
-    // BookingService implementerar IBookingService (SOLID: DIP)
+    // BookingService implementerar IBookingService
     public class BookingService : IBookingService
     {
         private readonly HotelDBContext _db;
@@ -26,12 +27,14 @@ namespace HotelBooking.Services
                 throw new Exception("Utcheckningsdatum måste vara efter incheckningsdatum.");
 
             // Filtrera rum:
-            // 1. Rummet måste klara antal gäster
-            // 2. Rummet får inte vara ur bruk
-            // 3. Rummet får inte ha en aktiv bokning som överlappar datumintervallet
+            //  Rummet måste klara antal gäster
+            //  Rummet får inte vara ur bruk
+            //  Rummet får inte ha en aktiv bokning som överlappar datumintervallet
             return _db.Rooms
-                .Where(r => (r.Capacity + r.ExtraBeds) >= guests && !r.IsOutOfService)
-                .Where(r => !r.Bookings.Any(b =>
+                .Where(r => (r.Capacity + r.ExtraBeds) >= guests && !r
+                .IsOutOfService)
+                .Where(r => !r.Bookings
+                .Any(b =>
                     !b.IsDeleted &&
                     (
                         (checkIn >= b.FromDate && checkIn < b.ToDate) ||
@@ -62,7 +65,8 @@ namespace HotelBooking.Services
                 ToDate = checkOut,
                 NumberOfGuests = guests,
                 BookingDate = DateTime.Now,
-                IsDeleted = false
+                IsDeleted = false,
+                CreatedByEmployeeId = LoginService.CurrentEmployee!.Id
             };
 
             _db.Bookings.Add(booking);

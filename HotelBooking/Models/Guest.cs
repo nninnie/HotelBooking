@@ -21,6 +21,7 @@ namespace HotelBooking.Models
 
         [MaxLength(100)]
         public string? Email { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         // En gäst kan ha flera bokningar
         public List<Booking> Bookings { get; set; } = new();

@@ -43,7 +43,7 @@ namespace HotelBooking.Controllers
                         continue;
                     }
 
-                    LoginService.CurrentUserName = "Dungeon Master Richard Chalk";
+                    LoginService.CurrentEmployee?.Username = "Dungeon Master Richard Chalk";
                     isLoggedIn = true;
 
                     ShowWelcomeScreen("Richard Chalk", "Dungeon Master");
@@ -53,7 +53,7 @@ namespace HotelBooking.Controllers
                 // NINNIE
                 if (name == "ninnie")
                 {
-                    LoginService.CurrentUserName = $"Manager {username}";
+                    LoginService.CurrentEmployee?.Username = $"Manager {username}";
                     isLoggedIn = true;
 
                     ShowWelcomeScreen(username, "Manager");
@@ -63,7 +63,7 @@ namespace HotelBooking.Controllers
                 // MY & ZOE
                 if (name == "my" || name == "zoe")
                 {
-                    LoginService.CurrentUserName = $"Receptionist {username}";
+                    LoginService.CurrentEmployee?.Username = $"Receptionist {username}";
                     isLoggedIn = true;
 
                     ShowWelcomeScreen(username, "Receptionist");
@@ -71,7 +71,7 @@ namespace HotelBooking.Controllers
                 }
 
                 // DEFAULT (Guest)
-                LoginService.CurrentUserName = $"Guest {username}";
+                LoginService.CurrentEmployee?.Username = $"Guest {username}";
                 isLoggedIn = true;
 
                 ShowWelcomeScreen(username, "Guest");

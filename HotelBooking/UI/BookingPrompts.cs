@@ -356,5 +356,10 @@ namespace HotelBooking.UI
                 NumberOfGuests = string.IsNullOrWhiteSpace(newGuests) ? null : int.Parse(newGuests)
             };
         }
+
+        public static bool Confirm(string message)
+        {
+            return AnsiConsole.Confirm($"[yellow]{message}[/]");
+        }
     }
 }

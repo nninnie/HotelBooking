@@ -188,7 +188,7 @@ namespace HotelBooking.UI
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera bokningar", "Avboka (soft delete)");
+            BannerUI.PrintHeader("Hantera bokningar", "Avboka");
             AnsiConsole.WriteLine();
 
             var bookings = _bookingService.GetAll();
@@ -262,6 +262,15 @@ namespace HotelBooking.UI
                 WaitForEsc();
                 return;
             }
+
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill avboka denna bokning?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Avbokning avbröts.");
+                WaitForEsc();
+                return;
+            }
+
 
             bool success = _bookingService.Restore(bookingId.Value);
 

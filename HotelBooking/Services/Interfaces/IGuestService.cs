@@ -10,5 +10,9 @@ namespace HotelBooking.Services.Interfaces
         bool UpdateGuest(int id, string? firstName, string? lastName, string? phone, string? email);
         bool DeleteGuest(int id);
         bool HasBookings(int guestId);
+        IEnumerable<Guest> GetDeletedGuests();
+        bool SoftDelete(int id);
+        bool Restore(int id);
+
     }
 }

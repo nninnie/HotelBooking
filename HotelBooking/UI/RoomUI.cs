@@ -232,25 +232,43 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
-
-        // SOFT DELETE
+        // SOFT DELETE (MARKERA SOM UR FUNKTION)    
         public void SoftDelete(string subtitle)
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
+            AnsiConsole.WriteLine();
 
             var rooms = _roomService.GetAllRooms();
+
+            if (!rooms.Any())
+            {
+                BookingRenderer.ShowError("Inga rum hittades.");
+                WaitForEsc();
+                return;
+            }
+
             ShowRoomTable(rooms);
 
             int? id = AskIntOrEsc("Ange rums-ID att markera som ur funktion");
             if (id == null) return;
 
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera detta rum som ur funktion?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Åtgärden avbröts.");
+                WaitForEsc();
+                return;
+            }
+
             bool success = _roomService.SoftDelete(id.Value);
 
-            AnsiConsole.MarkupLine(success
-                ? "[yellow]Rummet är nu markerat som ur funktion.[/]"
-                : "[red]Rummet hittades inte.[/]");
+            BookingRenderer.ShowResult(
+                success,
+                "Rummet är nu markerat som ur funktion.",
+                "Rummet hittades inte."
+            );
 
             WaitForEsc();
         }
@@ -261,13 +279,13 @@ namespace HotelBooking.UI
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
+            AnsiConsole.WriteLine();
 
-            var deletedRooms = _roomService
-                .GetDeletedRooms();
+            var deletedRooms = _roomService.GetDeletedRooms();
 
             if (!deletedRooms.Any())
             {
-                AnsiConsole.MarkupLine("[yellow]Det finns inga rum att återställa.[/]");
+                BookingRenderer.ShowError("Det finns inga rum att återställa.");
                 WaitForEsc();
                 return;
             }
@@ -277,11 +295,21 @@ namespace HotelBooking.UI
             int? id = AskIntOrEsc("Ange rums-ID att återställa");
             if (id == null) return;
 
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa detta rum?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Återställning avbröts.");
+                WaitForEsc();
+                return;
+            }
+
             bool success = _roomService.Restore(id.Value);
 
-            AnsiConsole.MarkupLine(success
-                ? "[green]Rummet är nu återställt![/]"
-                : "[red]Rummet hittades inte.[/]");
+            BookingRenderer.ShowResult(
+                success,
+                "Rummet är nu återställt!",
+                "Rummet hittades inte."
+            );
 
             WaitForEsc();
         }

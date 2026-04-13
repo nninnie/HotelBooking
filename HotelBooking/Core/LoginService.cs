@@ -1,24 +1,22 @@
-﻿using System;
+﻿using HotelBooking.Models;
+using System;
 
 namespace HotelBooking.Core
 {
     public static class LoginService
     {
-        private static string _currentUserName = "Okänd";
+        public static Employee? CurrentEmployee { get; private set; }
 
-        public static string CurrentUserName
+        public static bool IsLoggedIn => CurrentEmployee != null;
+
+        public static void Login(Employee employee)
         {
-            get => _currentUserName;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    _currentUserName = "Okänd";
-                else
-                    _currentUserName = value.Trim();
-            }
+            CurrentEmployee = employee;
         }
 
-        public static bool IsLoggedIn =>
-            _currentUserName != "Okänd";
+        public static void Logout()
+        {
+            CurrentEmployee = null;
+        }
     }
 }

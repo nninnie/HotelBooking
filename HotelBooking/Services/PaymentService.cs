@@ -22,7 +22,7 @@ namespace HotelBooking.Services
         }
 
         // Skapa en betalning
-        public Payment CreatePayment(int invoiceId, decimal amount)
+        public Payment CreatePayment(int invoiceId, decimal amount, string method)
         {
             var payment = new Payment
             {

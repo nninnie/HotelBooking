@@ -15,6 +15,8 @@ namespace HotelBooking.Models
         [ForeignKey(nameof(InvoiceId))]
         public Invoice? Invoice { get; set; }
 
+        [Required]
+        public PaymentMethod Method { get; set; } = PaymentMethod.Faktura;
 
         [Required]
         [Range(0, 999999)]
@@ -24,5 +26,6 @@ namespace HotelBooking.Models
         public DateTime PaymentDate { get; set; }
 
         public bool IsSuccessful { get; set; }
+
     }
 }

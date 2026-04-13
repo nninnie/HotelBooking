@@ -79,5 +79,36 @@ namespace HotelBooking.Services
             _db.SaveChanges();
             return true;
         }
+
+        public IEnumerable<Guest> GetDeletedGuests()
+        {
+            return _db.Guests
+                .Where(g => g.IsDeleted)
+                .OrderBy(g => g.LastName)
+                .ThenBy(g => g.FirstName)
+                .ToList();
+        }
+
+        public bool SoftDelete(int id)
+        {
+            var guest = _db.Guests.FirstOrDefault(g => g.Id == id);
+            if (guest == null)
+                return false;
+
+            guest.IsDeleted = true;
+            _db.SaveChanges();
+            return true;
+        }
+
+        public bool Restore(int id)
+        {
+            var guest = _db.Guests.FirstOrDefault(g => g.Id == id);
+            if (guest == null)
+                return false;
+
+            guest.IsDeleted = false;
+            _db.SaveChanges();
+            return true;
+        }
     }
 }

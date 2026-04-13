@@ -285,5 +285,63 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
+        public void Restore()
+        {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera gäster", "Återställ raderad gäst");
+            AnsiConsole.WriteLine();
+
+            var deletedGuests = _guestService.GetDeletedGuests();
+
+            if (!deletedGuests.Any())
+            {
+                BookingRenderer.ShowError("Det finns inga raderade gäster att återställa.");
+                WaitForEsc();
+                return;
+            }
+
+            // Visa tabell
+            var table = new Table().RoundedBorder();
+            table.AddColumn("[yellow]ID[/]");
+            table.AddColumn("[yellow]Namn[/]");
+            table.AddColumn("[yellow]Kontakt[/]");
+
+            foreach (var g in deletedGuests)
+            {
+                table.AddRow(
+                    g.Id.ToString(),
+                    $"{g.FirstName} {g.LastName}",
+                    $"{g.Email} / {g.PhoneNumber}"
+                );
+            }
+
+            AnsiConsole.Write(table);
+
+            // Fråga efter ID
+            var id = BookingPrompts.AskBookingId(this); // du kan skapa AskGuestId om du vill
+            if (id == null) return;
+
+            // Bekräftelse
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa denna gäst?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Återställning avbröts.");
+                WaitForEsc();
+                return;
+            }
+
+            // Kör restore
+            bool success = _guestService.Restore(id.Value);
+
+            BookingRenderer.ShowResult(
+                success,
+                "Gästen har återställts.",
+                "Gästen kunde inte återställas."
+            );
+
+            WaitForEsc();
+        }
     }
 }

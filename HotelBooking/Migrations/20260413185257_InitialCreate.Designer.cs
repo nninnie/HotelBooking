@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20260413133400_InitialCreate")]
+    [Migration("20260413185257_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,7 +36,7 @@ namespace HotelBooking.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EmployeeId")
+                    b.Property<int>("CreatedByEmployeeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("FromDate")
@@ -59,7 +59,7 @@ namespace HotelBooking.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("CreatedByEmployeeId");
 
                     b.HasIndex("GuestId");
 
@@ -121,6 +121,9 @@ namespace HotelBooking.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -185,6 +188,9 @@ namespace HotelBooking.Migrations
 
                     b.Property<bool>("IsSuccessful")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
@@ -266,9 +272,11 @@ namespace HotelBooking.Migrations
 
             modelBuilder.Entity("Booking", b =>
                 {
-                    b.HasOne("HotelBooking.Models.Employee", null)
+                    b.HasOne("HotelBooking.Models.Employee", "CreatedByEmployee")
                         .WithMany("BookingsCreated")
-                        .HasForeignKey("EmployeeId");
+                        .HasForeignKey("CreatedByEmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HotelBooking.Models.Guest", "Guest")
                         .WithMany("Bookings")
@@ -281,6 +289,8 @@ namespace HotelBooking.Migrations
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedByEmployee");
 
                     b.Navigation("Guest");
 

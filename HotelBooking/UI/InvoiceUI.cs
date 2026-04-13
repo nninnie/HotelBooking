@@ -60,7 +60,10 @@ namespace HotelBooking.UI
         // Visa detaljer
         public void ShowDetails(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera faktura", subtitle);
+            AnsiConsole.WriteLine();
 
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
@@ -69,10 +72,9 @@ namespace HotelBooking.UI
             if (id == null) return;
 
             var invoice = _iinvoiceService.GetInvoice(id.Value);
-
             if (invoice == null)
             {
-                AnsiConsole.MarkupLine("[red]Faktura hittades inte.[/]");
+                BookingRenderer.ShowError("Faktura hittades inte.");
                 WaitForEsc();
                 return;
             }
@@ -80,10 +82,10 @@ namespace HotelBooking.UI
             var panel = new Panel($@"
 [white]Faktura-ID:[/] {invoice.Id}
 [white]Bokning-ID:[/] {invoice.BookingId}
-[white]Gäst-ID:[/] {invoice.GuestId}
+[white]Gäst:[/] {invoice.Guest?.FirstName} {invoice.Guest?.LastName}
 [white]Belopp:[/] {invoice.TotalAmount} kr
 [white]Datum:[/] {invoice.CreatedDate:yyyy-MM-dd}
-[white]Betald:[/] {(invoice.IsPaid ? "Ja" : "Nej")}
+[white]Betald:[/] {(invoice.IsPaid ? "[green]Ja[/]" : "[red]Nej[/]")}
 ")
             {
                 Header = new PanelHeader("[green]Fakturadetaljer[/]"),
@@ -97,65 +99,63 @@ namespace HotelBooking.UI
         // Skapa faktura
         public void Create(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera faktura", subtitle);
-
-            var invoices = _iinvoiceService.GetAllInvoices();
-            ShowInvoiceTable(invoices);
+            AnsiConsole.WriteLine();
 
             int? bookingId = AskIntOrEsc("Ange boknings-ID");
             if (bookingId == null) return;
-            if (bookingId <= 0)
-            {
-                AnsiConsole.MarkupLine("[red]Boknings-ID måste vara ett positivt tal![/]");
-                WaitForEsc();
-                return;
-            }
 
             int? guestId = AskIntOrEsc("Ange gäst-ID");
             if (guestId == null) return;
-            if (guestId <= 0)
+
+            decimal? amount = AskDecimalOrEsc("Ange totalbelopp (kr)");
+            if (amount == null) return;
+
+            bool confirm = BookingPrompts.Confirm("Skapa faktura med dessa uppgifter?");
+            if (!confirm)
             {
-                AnsiConsole.MarkupLine("[red]Gäst-ID måste vara ett positivt tal![/]");
+                BookingRenderer.ShowError("Skapande avbröts.");
                 WaitForEsc();
                 return;
             }
 
-            decimal amount;
-            while (true)
-            {
-                amount = AnsiConsole.Ask<decimal>("Ange [yellow]totalbelopp[/] (kr):");
-                if (amount > 0) break;
-                AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");
-            }
+            var invoice = _iinvoiceService.CreateInvoice(bookingId.Value, guestId.Value, amount.Value);
 
-            var invoice = _iinvoiceService.CreateInvoice(bookingId.Value, guestId.Value, amount);
-
-            AnsiConsole.MarkupLine($"[green]Faktura skapad![/] ID: {invoice.Id}");
+            BookingRenderer.ShowSuccess($"Faktura skapad! ID: {invoice.Id}");
             WaitForEsc();
         }
 
         // Markera som betald
         public void MarkAsPaid(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera faktura", subtitle);
+            AnsiConsole.WriteLine();
 
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
             int? id = AskIntOrEsc("Ange faktura-ID att markera som betald");
             if (id == null) return;
-            if (id <= 0)
+
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera fakturan som betald?");
+            if (!confirm)
             {
-                AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                BookingRenderer.ShowError("Åtgärden avbröts.");
                 WaitForEsc();
                 return;
             }
 
             bool success = _iinvoiceService.MarkAsPaid(id.Value);
 
-            AnsiConsole.MarkupLine(success
-                ? "[green]Fakturan markerades som betald![/]"
-                : "[red]Faktura hittades inte.[/]");
+            BookingRenderer.ShowResult(
+                success,
+                "Fakturan markerades som betald!",
+                "Faktura hittades inte."
+            );
 
             WaitForEsc();
         }
@@ -163,14 +163,26 @@ namespace HotelBooking.UI
         // Annullera obetalda
         public void CancelUnpaid(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera faktura", subtitle);
+            AnsiConsole.WriteLine();
+
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill annullera alla obetalda bokningar?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Åtgärden avbröts.");
+                WaitForEsc();
+                return;
+            }
 
             int cancelled = _iinvoiceService.CancelUnpaidBookings();
 
-            if (cancelled == 0)
-                AnsiConsole.MarkupLine("[yellow]Inga obetalda bokningar behövde annulleras.[/]");
-            else
-                AnsiConsole.MarkupLine($"[red]{cancelled} bokningar annullerades pga obetalda fakturor.[/]");
+            BookingRenderer.ShowResult(
+                cancelled > 0,
+                $"{cancelled} bokningar annullerades pga obetalda fakturor.",
+                "Inga obetalda bokningar behövde annulleras."
+            );
 
             WaitForEsc();
         }

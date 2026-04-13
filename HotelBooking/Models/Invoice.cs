@@ -9,21 +9,18 @@ namespace HotelBooking.Models
     {
         public int Id { get; set; }
 
-        // Relation till Booking
         [Required]
         public int BookingId { get; set; }
 
         [ForeignKey(nameof(BookingId))]
         public Booking? Booking { get; set; }
 
-        // Relation till Guest
         [Required]
         public int GuestId { get; set; }
 
         [ForeignKey(nameof(GuestId))]
         public Guest? Guest { get; set; }
 
-        // Fakturadetaljer
         [Required]
         public DateTime CreatedDate { get; set; }
 
@@ -33,7 +30,6 @@ namespace HotelBooking.Models
 
         public bool IsPaid { get; set; }
 
-        // Navigation till Payments 
         public List<Payment> Payments { get; set; } = new();
     }
 }

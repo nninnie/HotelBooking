@@ -19,11 +19,8 @@ namespace HotelBooking.Models
         [Required]
         [MaxLength(50)]
         public string LastName { get; set; } = string.Empty; 
-
-
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
-
         public int RoleId { get; set; }
         public Role? Role { get; set; }
 

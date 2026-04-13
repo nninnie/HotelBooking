@@ -32,6 +32,7 @@ namespace HotelBooking.UI
                     p.InvoiceId.ToString(),
                     $"{p.Amount} kr",
                     p.PaymentDate.ToString("yyyy-MM-dd"),
+                    p.Method.ToString(),
                     p.IsSuccessful ? "[green]Genomförd[/]" : "[red]Misslyckad[/]"
                 );
             }
@@ -91,38 +92,31 @@ namespace HotelBooking.UI
         // SKAPA NY BETALNING
         public void Create(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera betalning", subtitle);
-
-            var payments = _service.GetAllPayments();
-            ShowPaymentTable(payments);
+            AnsiConsole.WriteLine();
 
             int? invoiceId = AskIntOrEsc("Ange faktura-ID");
             if (invoiceId == null) return;
 
-            if (invoiceId <= 0)
+            decimal? amount = AskDecimalOrEsc("Ange belopp (kr)");
+            if (amount == null) return;
+
+            string? method = AskWithEsc("Ange betalningsmetod (t.ex. Kort, Swish, Faktura)");
+            if (method == null) return;
+
+            bool confirm = BookingPrompts.Confirm("Vill du registrera denna betalning?");
+            if (!confirm)
             {
-                AnsiConsole.MarkupLine("[red]Faktura-ID måste vara ett positivt tal![/]");
+                BookingRenderer.ShowError("Betalning avbröts.");
                 WaitForEsc();
                 return;
             }
 
-            decimal amount;
-            while (true)
-            {
-                amount = AnsiConsole.Ask<decimal>("Ange [yellow]belopp[/] (kr):");
+            var payment = _service.CreatePayment(invoiceId.Value, amount.Value, method);
 
-                if (amount <= 0)
-                {
-                    AnsiConsole.MarkupLine("[red]Belopp måste vara större än 0![/]");
-                    continue;
-                }
-
-                break;
-            }
-
-            var payment = _service.CreatePayment(invoiceId.Value, amount);
-
-            AnsiConsole.MarkupLine($"[green]Betalning registrerad![/] ID: {payment.Id}");
+            BookingRenderer.ShowSuccess($"Betalning registrerad! ID: {payment.Id}");
             WaitForEsc();
         }
     }

@@ -26,7 +26,7 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                int choice = MainMenuUI.ShowMainMenu(LoginService.CurrentUserName);
+                int choice = MainMenuUI.ShowMainMenu(LoginService.CurrentEmployee?.Username ?? "Okänt");
 
                 switch (choice)
                 {
@@ -47,7 +47,7 @@ namespace HotelBooking.Controllers
                         break;
 
                     case 5:
-                        LoginService.CurrentUserName = "Okänd";
+                        LoginService.CurrentEmployee?.Username = "Okänt";
                         return;
 
                     case 6:
