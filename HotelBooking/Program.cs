@@ -6,6 +6,9 @@ class Program
 {
     static void Main(string[] args)
     {
+        // Ställ in UTF-8 som standardkodning för konsolen
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         // Bygg Autofac-container
         var container = AutofacConfig.BuildContainer();
 

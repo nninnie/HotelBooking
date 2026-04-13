@@ -15,7 +15,7 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                string choice = CrudMenuUI.Show("Hantera gäster");
+                string choice = CrudMenuUI.Show("Hantera gäster", "Välj ett alternativ");
 
                 switch (choice)
                 {

@@ -18,8 +18,7 @@ namespace HotelBooking.Controllers
         {
             while (true)
             {
-                // Ingen lista skickas längre – menyn ska vara ren
-                string choice = CrudMenuUI.Show("Hantera rum");
+                string choice = CrudMenuUI.Show("Hantera rum", "Välj ett alternativ");
 
                 switch (choice)
                 {

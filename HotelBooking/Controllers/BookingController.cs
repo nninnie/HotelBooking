@@ -17,7 +17,7 @@ namespace HotelBooking.Controllers
             while (true)
             {
                 // CrudMenuUI returnerar nu TEXT, inte int
-                string choice = CrudMenuUI.Show("Hantera bokningar");
+                string choice = CrudMenuUI.Show("Hantera bokningar", "Välj ett alternativ");
 
                 switch (choice)
                 {

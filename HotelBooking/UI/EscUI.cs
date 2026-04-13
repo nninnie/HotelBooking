@@ -53,6 +53,44 @@ namespace HotelBooking.UI
                 }
             }
         }
+        public int? AskIntOrEsc(string question)
+        {
+            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+
+            string input = "";
+            ConsoleKeyInfo key;
+
+            while (true)
+            {
+                key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Escape)
+                    return null;
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    if (int.TryParse(input, out int value))
+                        return value;
+
+                    AnsiConsole.MarkupLine("[red]Ogiltigt nummer. Försök igen.[/]");
+                    input = "";
+                    AnsiConsole.Markup($"{question}: ");
+                    continue;
+                }
+
+                if (key.Key == ConsoleKey.Backspace && input.Length > 0)
+                {
+                    input = input[..^1];
+                    Console.Write("\b \b");
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input += key.KeyChar;
+                    Console.Write(key.KeyChar);
+                }
+            }
+        }
 
         // Lista med piltangenter + ESC för att avbryta
         public T? SelectWithEsc<T>(List<T> items, Func<T, string> converter, string? header = null)
