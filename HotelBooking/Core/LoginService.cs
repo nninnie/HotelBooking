@@ -18,5 +18,15 @@ namespace HotelBooking.Core
         {
             CurrentEmployee = null;
         }
+
+        public static Employee FallbackEmployee => new Employee
+        {
+            Id = 999,
+            Username = "TestUser",
+            FirstName = "Test",
+            LastName = "User",
+            PasswordHash = "",
+            RoleId = 1
+        };
     }
 }
