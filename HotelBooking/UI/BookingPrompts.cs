@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Models;
+using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 
@@ -73,6 +74,17 @@ namespace HotelBooking.UI
                 break;
             }
 
+            // BirthDate
+            string? birthInput = ui.AskWithEsc("Födelsedatum (yyyy-MM-dd):");
+            if (birthInput == null) return null;
+
+            if (!DateTime.TryParse(birthInput, out DateTime birthDate))
+            {
+                AnsiConsole.MarkupLine("[red]Ogiltigt datum! Ange formatet yyyy-MM-dd[/]");
+                ui.WaitForEsc();
+                return null;
+            }
+
             // Telefon
             string? phone;
             while (true)
@@ -115,7 +127,8 @@ namespace HotelBooking.UI
                 break;
             }
 
-            var guest = guestService.CreateGuest(firstName, lastName, phone, email);
+            var guest = guestService.CreateGuest(firstName, lastName, birthDate, phone, email);
+
             return guest.Id;
         }
 
@@ -159,12 +172,18 @@ namespace HotelBooking.UI
                 for (int i = 0; i < pageItems.Count; i++)
                 {
                     var g = pageItems[i];
-                    string text = $"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}";
+                    string text = Markup.Escape($"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}");
 
                     if (i == index)
-                        AnsiConsole.MarkupLine($"[yellow]> {text}[/]");
+                    {
+                        AnsiConsole.Markup("[yellow]> [/]");
+                        AnsiConsole.MarkupLine(text);
+                    }
                     else
-                        AnsiConsole.MarkupLine($"  {text}");
+                    {
+                        AnsiConsole.Markup("  ");
+                        AnsiConsole.MarkupLine(text);
+                    }
                 }
 
                 var key = Console.ReadKey(true).Key;
@@ -252,7 +271,7 @@ namespace HotelBooking.UI
 
             var selected = ui.SelectWithEsc(
                 rooms.ToList(),
-                r => $"{r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt (Max {r.MaxGuests})"
+                r => Markup.Escape($"{r.RoomNumber} – {r.RoomType} – {r.PricePerNight} kr/natt (Max {r.MaxGuests})")
             );
 
             return selected?.Id;
@@ -302,7 +321,9 @@ namespace HotelBooking.UI
 
             AnsiConsole.MarkupLine("[green]Lämna tomt för att behålla nuvarande värde.[/]");
 
-            string? newGuest = ui.AskWithEsc($"Ny gäst-ID (tomt = {booking.GuestId}):");
+            string? newGuest = ui.AskWithEsc(
+                $"Ny gäst-ID (tomt = {Markup.Escape(booking.GuestId.ToString())}):"
+            );
             if (newGuest == null) return null;
 
             if (!string.IsNullOrWhiteSpace(newGuest) && !int.TryParse(newGuest, out _))
@@ -311,7 +332,9 @@ namespace HotelBooking.UI
                 return null;
             }
 
-            string? newRoom = ui.AskWithEsc($"Nytt rum-ID (tomt = {booking.RoomId}):");
+            string? newRoom = ui.AskWithEsc(
+                $"Nytt rum-ID (tomt = {Markup.Escape(booking.RoomId.ToString())}):"
+            );
             if (newRoom == null) return null;
 
             if (!string.IsNullOrWhiteSpace(newRoom) && !int.TryParse(newRoom, out _))
@@ -320,7 +343,9 @@ namespace HotelBooking.UI
                 return null;
             }
 
-            string? newFrom = ui.AskWithEsc($"Nytt från-datum (yyyy-MM-dd, tomt = {booking.FromDate:yyyy-MM-dd}):");
+            string? newFrom = ui.AskWithEsc(
+                $"Nytt från-datum (yyyy-MM-dd, tomt = {Markup.Escape(booking.FromDate.ToString("yyyy-MM-dd"))}):"
+            );
             if (newFrom == null) return null;
 
             if (!string.IsNullOrWhiteSpace(newFrom) && !DateTime.TryParse(newFrom, out _))
@@ -329,7 +354,9 @@ namespace HotelBooking.UI
                 return null;
             }
 
-            string? newTo = ui.AskWithEsc($"Nytt till-datum (yyyy-MM-dd, tomt = {booking.ToDate:yyyy-MM-dd}):");
+            string? newTo = ui.AskWithEsc(
+                $"Nytt till-datum (yyyy-MM-dd, tomt = {Markup.Escape(booking.ToDate.ToString("yyyy-MM-dd"))}):"
+            );
             if (newTo == null) return null;
 
             if (!string.IsNullOrWhiteSpace(newTo) && !DateTime.TryParse(newTo, out _))
@@ -338,7 +365,9 @@ namespace HotelBooking.UI
                 return null;
             }
 
-            string? newGuests = ui.AskWithEsc($"Nytt antal gäster (tomt = {booking.NumberOfGuests}):");
+            string? newGuests = ui.AskWithEsc(
+                $"Nytt antal gäster (tomt = {Markup.Escape(booking.NumberOfGuests.ToString())}):"
+            );
             if (newGuests == null) return null;
 
             if (!string.IsNullOrWhiteSpace(newGuests) && (!int.TryParse(newGuests, out int g) || g <= 0))
@@ -359,13 +388,18 @@ namespace HotelBooking.UI
 
         public static bool Confirm(string message)
         {
-            var input = AnsiConsole.Prompt(
-                new TextPrompt<string>($"{message} (j/n): ")
-                    .AddChoice("j")
-                    .AddChoice("n")
-            );
+            while (true)
+            {
+                var input = AnsiConsole.Prompt(
+                    new TextPrompt<string>($"{message} (j/n): ")
+                        .AllowEmpty()
+                ).Trim().ToLower();
 
-            return input == "j";
+                if (input == "j") return true;
+                if (input == "n") return false;
+
+                AnsiConsole.MarkupLine("[red]Ogiltigt val. Skriv j eller n.[/]");
+            }
         }
     }
 }

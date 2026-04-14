@@ -14,7 +14,10 @@ namespace HotelBooking.Models
 
         [Required]
         [MaxLength(50)]
-        public string LastName { get; set; } = string.Empty; 
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime BirthDate { get; set; }
 
         [MaxLength(20)]
         public string? PhoneNumber { get; set; }

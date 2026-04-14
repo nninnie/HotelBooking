@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20260413193539_InitialCreate")]
+    [Migration("20260414115805_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -112,6 +112,9 @@ namespace HotelBooking.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -264,6 +267,9 @@ namespace HotelBooking.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("SquareMeters")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

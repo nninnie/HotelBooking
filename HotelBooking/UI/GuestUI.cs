@@ -16,34 +16,33 @@ namespace HotelBooking.UI
             _bookingService = bookingService;   
         }
 
-        private void ShowGuestTable(IEnumerable<Guest> guests)
-        {
-            var table = new Table().RoundedBorder();
+private void ShowGuestTable(IEnumerable<Guest> guests)
+{
+    var table = new Table().RoundedBorder();
 
-            table.AddColumn("[yellow]ID[/]");
-            table.AddColumn("[yellow]Namn[/]");
-            table.AddColumn("[yellow]Telefon[/]");
-            table.AddColumn("[yellow]Email[/]");
-            table.AddColumn("[yellow]Aktiv bokning[/]");
+    table.AddColumn("[yellow]ID[/]");
+    table.AddColumn("[yellow]Namn[/]");
+    table.AddColumn("[yellow]Telefon[/]");
+    table.AddColumn("[yellow]Email[/]");
+    table.AddColumn("[yellow]Aktiv bokning[/]");
 
-            var sortedGuests = guests
-                .OrderBy(g => g.Id);
+    var sortedGuests = guests.OrderBy(g => g.Id);
 
-            foreach (var g in guests)
-            {
-                bool hasActiveBooking = g.Bookings?.Any(b => b.IsActive) == true;
+    foreach (var g in sortedGuests)
+    {
+        bool hasActiveBooking = g.Bookings?.Any(b => b.IsActive) == true;
 
-                table.AddRow(
-                    g.Id.ToString(),
-                    $"{g.LastName}, {g.FirstName}",
-                    g.PhoneNumber ?? "-",
-                    g.Email ?? "-",
-                    hasActiveBooking ? "[green]Ja[/]" : "[red]Nej[/]"
-                );
-            }
+        table.AddRow(
+            Markup.Escape(g.Id.ToString()),
+            Markup.Escape($"{g.LastName}, {g.FirstName}"),
+            Markup.Escape(g.PhoneNumber ?? "-"),
+            Markup.Escape(g.Email ?? "-"),
+            hasActiveBooking ? "[green]Ja[/]" : "[red]Nej[/]"
+        );
+    }
 
-            AnsiConsole.Write(table);
-        }
+    AnsiConsole.Write(table);
+}
 
         // VISA ALLA GÄSTER
         public void ShowAll(string subtitle)
@@ -82,7 +81,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            int? id = AskIntOrEsc("Ange gäst-ID att visa");
+            int? id = AskIntOrEsc("Ange gäst-ID att visa:");
             if (id == null) return;
 
             var guest = _guestService
@@ -154,7 +153,7 @@ namespace HotelBooking.UI
             while (true)
             {
                 firstName = AskWithEsc("Ange förnamn:");
-                if (firstName == null) return; 
+                if (firstName == null) return;
                 if (!string.IsNullOrWhiteSpace(firstName)) break;
                 AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
             }
@@ -163,16 +162,26 @@ namespace HotelBooking.UI
             while (true)
             {
                 lastName = AskWithEsc("Ange efternamn:");
-                if (lastName == null) return; 
+                if (lastName == null) return;
                 if (!string.IsNullOrWhiteSpace(lastName)) break;
                 AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
+            }
+
+            string? birthInput = AskWithEsc("Födelsedatum (yyyy-MM-dd):");
+            if (birthInput == null) return;
+
+            if (!DateTime.TryParse(birthInput, out DateTime birthDate))
+            {
+                AnsiConsole.MarkupLine("[red]Ogiltigt datum! Ange formatet yyyy-MM-dd[/]");
+                WaitForEsc();
+                return;
             }
 
             string? phone;
             while (true)
             {
-                phone = AskWithEsc("Telefonnummer (valfritt):");
-                if (phone == null) return; 
+                phone = AskWithEsc("Telefonnummer:");
+                if (phone == null) return;
                 if (string.IsNullOrWhiteSpace(phone) || phone.All(char.IsDigit)) break;
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
             }
@@ -180,13 +189,14 @@ namespace HotelBooking.UI
             string? email;
             while (true)
             {
-                email = AskWithEsc("Email (valfritt):");
-                if (email == null) return; 
+                email = AskWithEsc("Email:");
+                if (email == null) return;
                 if (string.IsNullOrWhiteSpace(email) || email.Contains("@")) break;
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
             }
 
-            var guest = _guestService.CreateGuest(firstName, lastName, phone, email);
+            // 
+            var guest = _guestService.CreateGuest(firstName, lastName, birthDate, phone, email);
 
             AnsiConsole.MarkupLine($"[green]Gäst skapad![/] ID: {guest.Id}");
             WaitForEsc();
@@ -202,7 +212,7 @@ namespace HotelBooking.UI
             var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
-            int? id = AskIntOrEsc("Ange gäst-ID att uppdatera");
+            int? id = AskIntOrEsc("Ange gäst-ID att uppdatera:");
             if (id == null) return;
 
             var guest = _guestService.GetGuest(id.Value);
@@ -214,10 +224,21 @@ namespace HotelBooking.UI
                 return;
             }
 
-            string newFirst = AnsiConsole.Ask<string>($"Nytt förnamn (tomt = behåll) [{guest.FirstName}]:");
-            string newLast = AnsiConsole.Ask<string>($"Nytt efternamn (tomt = behåll) [{guest.LastName}]:");
+            string newFirst = AnsiConsole.Prompt(
+                new TextPrompt<string>($"Nytt förnamn (tomt = behåll), nuvarande: {guest.FirstName}")
+                    .AllowEmpty()
+            );
 
-            string phone = AnsiConsole.Ask<string>($"Nytt telefonnummer (tomt = behåll) [{guest.PhoneNumber ?? "-"}]:");
+            string newLast = AnsiConsole.Prompt(
+                new TextPrompt<string>($"Nytt efternamn (tomt = behåll), nuvarande: {guest.LastName}")
+                    .AllowEmpty()
+            );
+
+            string phone = AnsiConsole.Prompt(
+                new TextPrompt<string>($"Nytt telefonnummer (tomt = behåll), nuvarande: {guest.PhoneNumber ?? "-"}")
+                    .AllowEmpty()
+            );
+
             if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
             {
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
@@ -225,7 +246,11 @@ namespace HotelBooking.UI
                 return;
             }
 
-            string email = AnsiConsole.Ask<string>($"Ny email (tomt = behåll) [{guest.Email ?? "-"}]:");
+            string email = AnsiConsole.Prompt(
+                new TextPrompt<string>($"Ny email (tomt = behåll), nuvarande: {guest.Email ?? "-"}")
+                    .AllowEmpty()
+            );
+
             if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
             {
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
@@ -258,7 +283,7 @@ namespace HotelBooking.UI
             var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
-            int? id = AskIntOrEsc("Ange gäst-ID att ta bort");
+            int? id = AskIntOrEsc("Ange gäst-ID att ta bort:");
             if (id == null) return;
 
             var guest = _guestService.GetGuest(id.Value);

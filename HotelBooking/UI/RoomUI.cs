@@ -20,7 +20,7 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
             table.AddColumn("[yellow]Typ[/]");
-            table.AddColumn("[yellow]Antal gäster[/]"); 
+            table.AddColumn("[yellow]Max antal gäster[/]");
             table.AddColumn("[yellow]Pris/natt[/]");
             table.AddColumn("[yellow]Status[/]");
 
@@ -30,10 +30,7 @@ namespace HotelBooking.UI
                     r.Id.ToString(),
                     r.RoomNumber,
                     r.RoomType,
-
-                    // visar ordinarie + extra sängar i en kolumn
-                    $"{r.Capacity} ({r.ExtraBeds})",
-
+                    $"{r.Capacity} + {r.ExtraBeds}",
                     $"{r.PricePerNight} kr",
                     r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]"
                 );
@@ -72,7 +69,7 @@ namespace HotelBooking.UI
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
-            int? id = AskIntOrEsc("Ange rums-ID");
+            int? id = AskIntOrEsc("Ange rums-ID:");
             if (id == null) return;
 
             var room = _roomService.GetRoom(id.Value);
@@ -127,6 +124,21 @@ namespace HotelBooking.UI
             string? type = AskWithEsc("Ange rumstyp:");
             if (type == null) return;
 
+
+            int squareMeters;
+            while (true)
+            {
+                string? sqmInput = AskWithEsc("Antal kvadratmeter:");
+                if (sqmInput == null) return;
+
+                if (!int.TryParse(sqmInput, out squareMeters) || squareMeters <= 0)
+                {
+                    AnsiConsole.MarkupLine("[red]Kvadratmeter måste vara ett positivt heltal![/]");
+                    continue;
+                }
+                break;
+            }
+
             int? capacity = AskIntOrEsc("Ange antal ordinarie gäster:");
             if (capacity == null) return;
 
@@ -144,10 +156,10 @@ namespace HotelBooking.UI
             bool hasBathtub = AnsiConsole.Confirm("Har rummet badkar?");
 
             var room = _roomService.CreateRoom(
-                number, type, capacity.Value, extraBeds.Value, price.Value,
+                number, type, squareMeters, capacity.Value, extraBeds.Value, price.Value,
                 outOfService, hasSeaView, hasMinibar,
                 isPetFriendly, hasBalcony, hasBathtub
-            );
+                );
 
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
             WaitForEsc();
@@ -162,7 +174,7 @@ namespace HotelBooking.UI
 
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
-
+              
             int? id = AskIntOrEsc("Ange rums-ID att uppdatera");
             if (id == null) return;
 

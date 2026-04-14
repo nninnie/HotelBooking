@@ -29,17 +29,19 @@ namespace HotelBooking.Services
         }
 
         // Skapa en ny gäst
-        public Guest CreateGuest(string firstName, string lastName, string? phone, string? email)
+        public Guest CreateGuest(string firstName, string lastName, DateTime birthDate, string? phone, string? email)
         {
             var guest = new Guest
             {
-                FirstName = firstName,   
-                LastName = lastName,     
+                FirstName = firstName,
+                LastName = lastName,
+                BirthDate = birthDate,
                 PhoneNumber = phone,
                 Email = email
             };
 
-            _db.Guests.Add(guest);
+
+        _db.Guests.Add(guest);
             _db.SaveChanges();
             return guest;
         }

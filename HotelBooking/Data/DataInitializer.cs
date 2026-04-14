@@ -24,6 +24,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "101",
          RoomType = "Enkelrum",
+         SquareMeters = 15,
          Capacity = 1,
          ExtraBeds = 0,
          PricePerNight = 850m,
@@ -38,6 +39,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "102",
          RoomType = "Enkelrum",
+         SquareMeters = 20,
          Capacity = 1,
          ExtraBeds = 1,
          PricePerNight = 950m,
@@ -52,6 +54,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "103",
          RoomType = "Enkelrum",
+         SquareMeters = 15,
          Capacity = 1,
          ExtraBeds = 0,
          PricePerNight = 900m,
@@ -67,6 +70,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "201",
          RoomType = "Dubbelrum",
+         SquareMeters = 30,
          Capacity = 2,
          ExtraBeds = 1,
          PricePerNight = 1200m,
@@ -81,6 +85,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "202",
          RoomType = "Dubbelrum",
+         SquareMeters = 30,
          Capacity = 2,
          ExtraBeds = 1,
          PricePerNight = 1300m,
@@ -95,6 +100,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "203",
          RoomType = "Dubbelrum",
+         SquareMeters = 30,
          Capacity = 2,
          ExtraBeds = 2,
          PricePerNight = 1450m,
@@ -110,6 +116,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "301",
          RoomType = "Familjerum",
+         SquareMeters = 40,
          Capacity = 3,
          ExtraBeds = 2,
          PricePerNight = 1800m,
@@ -124,6 +131,7 @@ namespace HotelBooking.Data
      {
          RoomNumber = "302",
          RoomType = "Familjerum",
+         SquareMeters = 50,
          Capacity = 4,
          ExtraBeds = 2,
          PricePerNight = 1950m,
@@ -139,8 +147,9 @@ namespace HotelBooking.Data
      {
          RoomNumber = "401",
          RoomType = "Svit",
-         Capacity = 2,
-         ExtraBeds = 1,
+         SquareMeters = 60,
+         Capacity = 3,
+         ExtraBeds = 2,
          PricePerNight = 2600m,
          HasSeaView = true,
          HasMinibar = true,
@@ -153,8 +162,9 @@ namespace HotelBooking.Data
      {
          RoomNumber = "402",
          RoomType = "Svit",
-         Capacity = 2,
-         ExtraBeds = 0,
+         SquareMeters = 60,
+         Capacity = 3,
+         ExtraBeds = 2,
          PricePerNight = 2800m,
          HasSeaView = true,
          HasMinibar = true,
@@ -172,11 +182,11 @@ namespace HotelBooking.Data
             if (!db.Guests.Any())
             {
                 db.Guests.AddRange(
-                    new Guest { FirstName = "Anna", LastName = "Svensson", PhoneNumber = "0701234567", Email = "anna@example.com" },
-                    new Guest { FirstName = "Markus", LastName = "Lindgren", PhoneNumber = "0709876543", Email = "markus@example.com" },
-                    new Guest { FirstName = "Sara", LastName = "Ekström", PhoneNumber = "0735551122", Email = "sara@example.com" },
-                    new Guest { FirstName = "David", LastName = "Holm", PhoneNumber = "0764442211", Email = "david@example.com" }
-                );
+    new Guest { FirstName = "Anna", LastName = "Svensson", BirthDate = new DateTime(1982, 2, 3), PhoneNumber = "0701234567", Email = "anna@example.com" },
+    new Guest { FirstName = "Markus", LastName = "Lindgren", BirthDate = new DateTime(1975, 5, 8), PhoneNumber = "0709876543", Email = "markus@example.com" },
+    new Guest { FirstName = "Sara", LastName = "Ekström", BirthDate = new DateTime(1982, 8, 15), PhoneNumber = "0735551122", Email = "sara@example.com" },
+    new Guest { FirstName = "David", LastName = "Holm", BirthDate = new DateTime(1991, 9, 26), PhoneNumber = "0764442211", Email = "david@example.com" }
+);
             }
         }
 

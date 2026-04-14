@@ -11,18 +11,19 @@ namespace HotelBooking.Services.Interfaces
         Room? GetRoom(int id);
 
         Room CreateRoom(
-            string number,
-            string type,
-            int baseGuests,
-            int extraBeds,
-            decimal price,
-            bool outOfService,
-            bool hasSeaView,
-            bool hasMinibar,
-            bool isPetFriendly,
-            bool hasBalcony,
-            bool hasBathtub
-        );
+    string roomNumber,
+    string roomType,
+    int squareMeters,
+    int capacity,
+    int extraBeds,
+    decimal pricePerNight,
+    bool isOutOfService,
+    bool hasSeaView,
+    bool hasMinibar,
+    bool isPetFriendly,
+    bool hasBalcony,
+    bool hasBathtub
+);
 
         bool UpdateRoom(
             int id,

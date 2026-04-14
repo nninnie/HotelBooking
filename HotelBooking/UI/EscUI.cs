@@ -57,7 +57,7 @@ namespace HotelBooking.UI
         // Numerisk input som kan avbrytas med ESC
         public int? AskIntOrEsc(string question)
         {
-            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+            AnsiConsole.Markup($"{question} ");
 
             string input = "";
             ConsoleKeyInfo key;
@@ -239,7 +239,7 @@ namespace HotelBooking.UI
         // Decimalinput som kan avbrytas med ESC
         public decimal? AskDecimalOrEsc(string question)
         {
-            AnsiConsole.Markup($"{question} (ESC för att avbryta): ");
+            AnsiConsole.Markup($"{question} ");
 
             string input = "";
             ConsoleKeyInfo key;

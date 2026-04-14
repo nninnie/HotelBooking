@@ -46,34 +46,35 @@ namespace HotelBooking.Services
 
         // SKAPA RUM – nu med alla nya features
         public Room CreateRoom(
-            string number,
-            string type,
-            int capacity,
-            int extraBeds,
-            decimal price,
-            bool outOfService,
-            bool hasSeaView,
-            bool hasMinibar,
-            bool isPetFriendly,
-            bool hasBalcony,
-            bool hasBathtub)
+     string roomNumber,
+     string roomType,
+     int squareMeters,
+     int capacity,
+     int extraBeds,
+     decimal pricePerNight,
+     bool isOutOfService,
+     bool hasSeaView,
+     bool hasMinibar,
+     bool isPetFriendly,
+     bool hasBalcony,
+     bool hasBathtub)
         {
             var room = new Room
             {
-                RoomNumber = number,
-                RoomType = type,
+                RoomNumber = roomNumber,
+                RoomType = roomType,
+                SquareMeters = squareMeters,
                 Capacity = capacity,
                 ExtraBeds = extraBeds,
-                PricePerNight = price,
-                IsOutOfService = outOfService,
-
-                // Nya features
+                PricePerNight = pricePerNight,
+                IsOutOfService = isOutOfService,
                 HasSeaView = hasSeaView,
                 HasMinibar = hasMinibar,
                 IsPetFriendly = isPetFriendly,
                 HasBalcony = hasBalcony,
                 HasBathtub = hasBathtub
             };
+
 
             _db.Rooms.Add(room);
             _db.SaveChanges();

@@ -16,7 +16,7 @@ public static class BannerUI
         SpectreCenter.Center($"[white]{title.ToUpper()}[/]");
 
         if (!string.IsNullOrWhiteSpace(subtitle))
-            SpectreCenter.Center($"[grey]{subtitle}[/]");
+            SpectreCenter.Center($"[grey]{Markup.Escape(subtitle)}[/]");
 
         AnsiConsole.WriteLine();
     }
