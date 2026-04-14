@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Models;
+using HotelBooking.Core;
 using Spectre.Console;
 
 namespace HotelBooking.UI
@@ -58,22 +59,23 @@ Badkar: {(room.HasBathtub ? "Ja" : "Nej")}";
             AnsiConsole.Write(panel);
         }
 
+        // Dessa två ersätts av ErrorService
         public static void ShowError(string message)
         {
-            AnsiConsole.MarkupLine($"[red]{message}[/]");
+            ErrorService.Error(message);
         }
 
         public static void ShowSuccess(string message)
         {
-            AnsiConsole.MarkupLine($"[green]{message}[/]");
+            ErrorService.Success(message);
         }
 
         public static void ShowResult(bool success, string successMessage, string failMessage)
         {
             if (success)
-                ShowSuccess(successMessage);
+                ErrorService.Success(successMessage);
             else
-                ShowError(failMessage);
+                ErrorService.Error(failMessage);
         }
 
         public static void ShowBookingTable(

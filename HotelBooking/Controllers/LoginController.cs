@@ -21,11 +21,11 @@ namespace HotelBooking.Controllers
 
                 var esc = new TempEsc();
 
-                string? username = esc.AskWithEsc("[yellow]Användarnamn:[/]");
+                string? username = esc.AskWithEsc("[orange]Användarnamn:[/]");
                 if (username == null)
                     return;
 
-                string? password = esc.AskPasswordOrEsc("[yellow]Lösenord:[/]");
+                string? password = esc.AskPasswordOrEsc("[orange]Lösenord:[/]");
                 if (password == null)
                     return;
 
@@ -37,7 +37,7 @@ namespace HotelBooking.Controllers
                     if (password != "bajskorv")
                     {
                         AnsiConsole.MarkupLine("[red]Fel användarnamn eller lösenord![/]");
-                        AnsiConsole.MarkupLine("[yellow]Det rätta lösenordet är: [bold]bajskorv[/][/]");
+                        AnsiConsole.MarkupLine("[orange]Det rätta lösenordet är: [bold]bajskorv[/][/]");
                         AnsiConsole.MarkupLine("[grey]Tryck på valfri tangent för att fortsätta...[/]");
                         Console.ReadKey();
                         continue;
@@ -87,7 +87,7 @@ namespace HotelBooking.Controllers
             AnsiConsole.WriteLine();
 
             CenteredMarkup($"[green]Välkommen tillbaka, [bold]{username}[/]![/]");
-            CenteredMarkup($"[yellow]Roll: [bold]{role}[/][/]");
+            CenteredMarkup($"[orange]Roll: [bold]{role}[/][/]");
 
             AnsiConsole.WriteLine();
 
@@ -101,7 +101,7 @@ namespace HotelBooking.Controllers
             int width = 70;
             int textLength = markup
                 .Replace("[green]", "")
-                .Replace("[yellow]", "")
+                .Replace("[orange]", "")
                 .Replace("[grey]", "")
                 .Replace("[bold]", "")
                 .Replace("[/]", "")

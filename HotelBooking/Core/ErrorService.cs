@@ -1,43 +1,39 @@
-﻿using System;
+﻿using Spectre.Console;
 
 namespace HotelBooking.Core
 {
     public static class ErrorService
     {
-        private static void PrintMessage(string symbol, ConsoleColor color, string message)
+        private static void Print(string symbol, string color, string message)
         {
-            Console.ForegroundColor = color;
-            Console.WriteLine($"\n{symbol}  {message}\n");
-            Console.ResetColor();
+            AnsiConsole.MarkupLine($"\n[{color}]{symbol}  {message}[/]\n");
         }
 
-        // Generiska meddelanden
-        public static void Show(string message) =>
-            PrintMessage("✖", ConsoleColor.Red, message);
+        public static void Error(string message) =>
+            Print("✖", "red", message);
 
         public static void Warning(string message) =>
-            PrintMessage("!", ConsoleColor.Yellow, message);
+            Print("⚠", "yellow", message);
 
         public static void Success(string message) =>
-            PrintMessage("✔", ConsoleColor.Green, message);
+            Print("✔", "green", message);
 
-        // Fördefinierade felmeddelanden
+        public static void Info(string message) =>
+            Print("ℹ", "cyan", message);
+
         public static void FieldEmpty() =>
-            Show("Fältet får inte vara tomt.");
+            Error("Fältet får inte vara tomt.");
 
         public static void InvalidNumber() =>
-            Show("Vänligen ange ett giltigt nummer.");
+            Error("Du måste ange ett giltigt heltal.");
 
         public static void InvalidDate() =>
-            Show("Vänligen ange ett giltigt datum (ÅÅÅÅ-MM-DD).");
+            Error("Ogiltigt datum! Ange formatet yyyy-MM-dd.");
 
-        public static void NotFound(string itemName) =>
-            Show($"{itemName} hittades inte.");
+        public static void NotFound(string item) =>
+            Error($"{item} hittades inte.");
 
-        public static void AlreadyExists(string itemName) =>
-            Show($"{itemName} finns redan.");
-
-        public static void Unauthorized() =>
-            Show("Du måste vara inloggad för att utföra denna åtgärd.");
+        public static void AlreadyExists(string item) =>
+            Error($"{item} finns redan.");
     }
 }
