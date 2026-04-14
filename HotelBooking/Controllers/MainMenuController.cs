@@ -9,17 +9,20 @@ namespace HotelBooking.Controllers
         private readonly RoomController _roomController;
         private readonly GuestController _guestController;
         private readonly PaymentController _paymentController;
+        private readonly InvoiceController _invoiceController;
 
         public MainMenuController(
             BookingController bookingController,
             RoomController roomController,
             GuestController guestController,
-            PaymentController paymentController)
+            PaymentController paymentController,
+            InvoiceController invoiceController)
         {
             _bookingController = bookingController;
             _roomController = roomController;
             _guestController = guestController;
             _paymentController = paymentController;
+            _invoiceController = invoiceController;
         }
 
         public void Run()
@@ -43,7 +46,7 @@ namespace HotelBooking.Controllers
                         break;
 
                     case 4:
-                        _paymentController.RunCrudMenu();
+                        _invoiceController.RunCrudMenu();
                         break;
 
                     case 5:

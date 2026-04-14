@@ -172,19 +172,19 @@ namespace HotelBooking.UI
                 for (int i = 0; i < pageItems.Count; i++)
                 {
                     var g = pageItems[i];
-                    string text = Markup.Escape($"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}");
+                    string line = Markup.Escape($"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}");
 
                     if (i == index)
                     {
-                        AnsiConsole.Markup("[green]> [/]");
-                        AnsiConsole.MarkupLine(text);
+                        
+                        AnsiConsole.MarkupLine($"[black on green]{line}[/]");
                     }
                     else
                     {
-                        AnsiConsole.Markup("  ");
-                        AnsiConsole.MarkupLine(text);
+                        AnsiConsole.MarkupLine(line);
                     }
                 }
+
 
                 var key = Console.ReadKey(true).Key;
 

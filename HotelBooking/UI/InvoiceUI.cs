@@ -43,7 +43,10 @@ namespace HotelBooking.UI
         // VISA ALLA
         public void ShowAll(string subtitle)
         {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera faktura", subtitle);
+            AnsiConsole.WriteLine();
 
             var invoices = _iinvoiceService.GetAllInvoices();
 
@@ -69,7 +72,7 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int? id = AskIntOrEsc("Ange faktura-ID");
+            int? id = AskIntOrEsc("Ange faktura-ID: ");
             if (id == null) return;
 
             var invoice = _iinvoiceService.GetInvoice(id.Value);
@@ -108,7 +111,7 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int? id = AskIntOrEsc("Ange faktura-ID att markera som betald");
+            int? id = AskIntOrEsc("Ange faktura-ID att markera som betald: ");
             if (id == null) return;
 
             bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera fakturan som betald?");

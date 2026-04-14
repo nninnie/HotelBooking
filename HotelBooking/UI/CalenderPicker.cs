@@ -76,7 +76,7 @@ public static class CalendarPicker
         var sb = new StringBuilder();
 
         // Titel
-        sb.AppendLine($"[bold red]{cursor:MMMM yyyy}[/]".ToUpper());
+        sb.AppendLine($"[darkorange]{cursor:MMMM yyyy}[/]".ToUpper());
         sb.AppendLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
         sb.AppendLine("───────────────────────────────");
 
@@ -113,15 +113,17 @@ public static class CalendarPicker
             else if (isRange)
                 text = $"[yellow]{day,2}[/]";
             else if (isCursor)
-                text = $"[cyan]{day,2}[/]";
+                text = $"[orange1]{day,2}[/]";
             else
                 text = $"{day,2}";
+
 
             sb.Append($"{text}  ");
 
             // Radbyte efter söndag
-            if ((startDay + day) % 7 == 0)
+            if ((startDay + (day - 1)) % 7 == 6)
                 sb.AppendLine();
+
         }
 
         // Panel
@@ -141,12 +143,11 @@ public static class CalendarPicker
         AnsiConsole.MarkupLine("[grey]ESC = avbryt[/]");
 
         if (checkIn != null && !selectingCheckIn)
-            AnsiConsole.MarkupLine($"\n[green]Incheckning vald:[/] [yellow]{checkIn:yyyy-MM-dd}[/]");
-
-        if (checkOut != null && !selectingCheckIn)
-            AnsiConsole.MarkupLine($"[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
-
-
-
+        {
+            AnsiConsole.MarkupLine(
+                $"[yellow]Incheckning vald:[/] [green]{checkIn:yyyy-MM-dd}[/]   " +
+                $"[yellow]Utcheckning vald:[/] [orange]{checkOut:yyyy-MM-dd}[/]"
+            );
+        }
     }
 }

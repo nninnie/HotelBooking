@@ -21,11 +21,11 @@ namespace HotelBooking.Controllers
 
                 var esc = new TempEsc();
 
-                string? username = esc.AskWithEsc("Användarnamn:");
+                string? username = esc.AskWithEsc("[yellow]Användarnamn:[/]");
                 if (username == null)
                     return;
 
-                string? password = esc.AskPasswordOrEsc("Lösenord:");
+                string? password = esc.AskPasswordOrEsc("[yellow]Lösenord:[/]");
                 if (password == null)
                     return;
 
