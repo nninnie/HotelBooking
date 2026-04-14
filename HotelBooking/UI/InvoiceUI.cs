@@ -13,6 +13,7 @@ namespace HotelBooking.UI
             _iinvoiceService = iinvoiceService;
         }
 
+        // TABELL
         private void ShowInvoiceTable(IEnumerable<Invoice> invoices)
         {
             var table = new Table().RoundedBorder();
@@ -29,7 +30,7 @@ namespace HotelBooking.UI
                 table.AddRow(
                     inv.Id.ToString(),
                     inv.BookingId.ToString(),
-                    inv.GuestId.ToString(),
+                    $"{inv.Booking?.Guest?.FirstName} {inv.Booking?.Guest?.LastName}",
                     $"{inv.TotalAmount} kr",
                     inv.CreatedDate.ToString("yyyy-MM-dd"),
                     inv.IsPaid ? "[green]Ja[/]" : "[red]Nej[/]"
@@ -39,7 +40,7 @@ namespace HotelBooking.UI
             AnsiConsole.Write(table);
         }
 
-        // Visa alla fakturor
+        // VISA ALLA
         public void ShowAll(string subtitle)
         {
             BannerUI.PrintHeader("Hantera faktura", subtitle);
@@ -57,7 +58,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Visa detaljer
+        // VISA DETALJER
         public void ShowDetails(string subtitle)
         {
             AnsiConsole.Clear();
@@ -82,7 +83,7 @@ namespace HotelBooking.UI
             var panel = new Panel($@"
 [white]Faktura-ID:[/] {invoice.Id}
 [white]Bokning-ID:[/] {invoice.BookingId}
-[white]Gäst:[/] {invoice.Guest?.FirstName} {invoice.Guest?.LastName}
+[white]Gäst:[/] {invoice.Booking?.Guest?.FirstName} {invoice.Booking?.Guest?.LastName}
 [white]Belopp:[/] {invoice.TotalAmount} kr
 [white]Datum:[/] {invoice.CreatedDate:yyyy-MM-dd}
 [white]Betald:[/] {(invoice.IsPaid ? "[green]Ja[/]" : "[red]Nej[/]")}
@@ -96,38 +97,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Skapa faktura
-        public void Create(string subtitle)
-        {
-            AnsiConsole.Clear();
-            BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera faktura", subtitle);
-            AnsiConsole.WriteLine();
-
-            int? bookingId = AskIntOrEsc("Ange boknings-ID");
-            if (bookingId == null) return;
-
-            int? guestId = AskIntOrEsc("Ange gäst-ID");
-            if (guestId == null) return;
-
-            decimal? amount = AskDecimalOrEsc("Ange totalbelopp (kr)");
-            if (amount == null) return;
-
-            bool confirm = BookingPrompts.Confirm("Skapa faktura med dessa uppgifter?");
-            if (!confirm)
-            {
-                BookingRenderer.ShowError("Skapande avbröts.");
-                WaitForEsc();
-                return;
-            }
-
-            var invoice = _iinvoiceService.CreateInvoice(bookingId.Value, guestId.Value, amount.Value);
-
-            BookingRenderer.ShowSuccess($"Faktura skapad! ID: {invoice.Id}");
-            WaitForEsc();
-        }
-
-        // Markera som betald
+        // MARKERA SOM BETALD
         public void MarkAsPaid(string subtitle)
         {
             AnsiConsole.Clear();
@@ -160,7 +130,7 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // Annullera obetalda
+        // ANNULLERA OBETALDA 
         public void CancelUnpaid(string subtitle)
         {
             AnsiConsole.Clear();

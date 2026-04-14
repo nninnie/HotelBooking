@@ -18,7 +18,6 @@ namespace HotelBooking.Controllers
                 string? choice = CrudMenuUI.Show(
                     "Hantera fakturor",
                     "Välj ett alternativ",
-                    "Skapa ny",
                     "Visa alla",
                     "Visa detaljer",
                     "Markera som betald",
@@ -27,14 +26,10 @@ namespace HotelBooking.Controllers
                 );
 
                 if (choice == null)
-                    return; 
+                    return;
 
                 switch (choice)
                 {
-                    case "Skapa ny":
-                        _invoiceUI.Create(choice);
-                        break;
-
                     case "Visa alla":
                         _invoiceUI.ShowAll(choice);
                         break;

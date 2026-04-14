@@ -1,6 +1,7 @@
 ﻿using HotelBooking.Data;
 using HotelBooking.Models;
 using HotelBooking.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services
 {
@@ -13,76 +14,79 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        // Hämta en specifik faktura
-        public Invoice? GetInvoice(int id)
-        {
-            return _db.Invoices
-                .FirstOrDefault(i => i.Id == id);
-        }
-
-        // Hämta alla fakturor
-        public IEnumerable<Invoice> GetAllInvoices()
-        {
-            return _db.Invoices
-                .OrderBy(i => i.Id)
-                .ToList();
-        }
-
-        // Skapa en faktura kopplad till en bokning
-        public Invoice CreateInvoice(int bookingId, int guestId, decimal totalAmount)
+        // Skapa faktura automatiskt för en bokning
+        public Invoice CreateForBooking(Booking booking)
         {
             var invoice = new Invoice
             {
-                BookingId = bookingId,
-                GuestId = guestId,
-                TotalAmount = totalAmount,
+                BookingId = booking.Id,
                 CreatedDate = DateTime.Now,
+                TotalAmount = booking.TotalPrice,
+                DueDate = booking.BookingDate.AddDays(10),
                 IsPaid = false
             };
 
             _db.Invoices.Add(invoice);
             _db.SaveChanges();
-
             return invoice;
         }
 
-        // Markera faktura som betald
-        public bool MarkAsPaid(int invoiceId)
+        public IEnumerable<Invoice> GetAllInvoices()
         {
-            var invoice = GetInvoice(invoiceId);
-            if (invoice == null)
-                return false;
+            return _db.Invoices
+                .Include(i => i.Booking)
+                .ThenInclude(b => b.Guest)
+                .Include(i => i.Booking.Room)
+                .ToList();
+        }
+
+        public Invoice? GetInvoice(int id)
+        {
+            return _db.Invoices
+                .Include(i => i.Booking)
+                .ThenInclude(b => b.Guest)
+                .Include(i => i.Booking.Room)
+                .FirstOrDefault(i => i.Id == id);
+        }
+
+        public bool MarkAsPaid(int id)
+        {
+            var invoice = _db.Invoices.FirstOrDefault(i => i.Id == id);
+            if (invoice == null) return false;
 
             invoice.IsPaid = true;
             _db.SaveChanges();
             return true;
         }
-        // Ta bort obetalda bokningar som är äldre än 10 dagar  
+
+        // VG-krav: annullera bokningar med obetalda fakturor äldre än 10 dagar
         public int CancelUnpaidBookings()
         {
             var cutoff = DateTime.Now.AddDays(-10);
 
-            var overdueInvoices = _db.Invoices
+            var invoices = _db.Invoices
+                .Include(i => i.Booking)
                 .Where(i => !i.IsPaid && i.CreatedDate < cutoff)
                 .ToList();
 
-            int count = 0;
-
-            foreach (var invoice in overdueInvoices)
+            foreach (var inv in invoices)
             {
-                var booking = _db.Bookings.FirstOrDefault(b => b.Id == invoice.BookingId);
-
-                if (booking != null && !booking.IsDeleted)
-                {
-                    booking.IsDeleted = true;   // Soft delete
-                    count++;
-                }
-
-                _db.Invoices.Remove(invoice);   //  Fakturan tas bort
+                inv.Booking.IsDeleted = true;
             }
 
             _db.SaveChanges();
-            return count;
+            return invoices.Count;
+        }
+
+        // Ta bort faktura när bokning tas bort
+        public void DeleteInvoiceForBooking(int bookingId)
+        {
+            var invoice = _db.Invoices.FirstOrDefault(i => i.BookingId == bookingId);
+            if (invoice != null)
+            {
+                _db.Invoices.Remove(invoice);
+                _db.SaveChanges();
+            }
         }
     }
 }

@@ -10,10 +10,12 @@ namespace HotelBooking.Services
     public class BookingService : IBookingService
     {
         private readonly HotelDBContext _db;
+        private readonly IInvoiceService _invoiceService;
 
-        public BookingService(HotelDBContext db)
+        public BookingService(HotelDBContext db, IInvoiceService invoiceService)
         {
             _db = db;
+            _invoiceService = invoiceService;
         }
 
         // Hämta alla rum som är lediga för ett visst datumintervall och antal gäster
@@ -36,6 +38,7 @@ namespace HotelBooking.Services
                 .Where(r => !r.Bookings
                 .Any(b =>
                     !b.IsDeleted &&
+                    !b.IsCancelled &&
                     (
                         (checkIn >= b.FromDate && checkIn < b.ToDate) ||
                         (checkOut > b.FromDate && checkOut <= b.ToDate) ||
@@ -49,14 +52,12 @@ namespace HotelBooking.Services
         // Skapa en ny bokning
         public Booking CreateBooking(int guestId, int roomId, DateTime checkIn, DateTime checkOut, int guests)
         {
-            // Datumvalidering
             if (checkIn < DateTime.Today)
                 throw new Exception("Incheckning kan inte vara i det förflutna.");
 
             if (checkOut <= checkIn)
                 throw new Exception("Utcheckning måste vara efter incheckning.");
 
-            // Skapa bokningsobjektet
             var booking = new Booking
             {
                 GuestId = guestId,
@@ -65,13 +66,16 @@ namespace HotelBooking.Services
                 ToDate = checkOut,
                 NumberOfGuests = guests,
                 BookingDate = DateTime.Now,
-                IsDeleted = false,
-                CreatedByEmployeeId = LoginService.CurrentEmployee?
-                .Id ?? LoginService.GetFallbackEmployee(_db).Id
+                CreatedByEmployeeId = LoginService.CurrentEmployee?.Id
+                    ?? LoginService.GetFallbackEmployee(_db).Id
             };
 
             _db.Bookings.Add(booking);
             _db.SaveChanges();
+
+            // Skapa faktura direkt
+            _invoiceService.CreateForBooking(booking);
+
             return booking;
         }
 
@@ -79,7 +83,7 @@ namespace HotelBooking.Services
         public Booking? GetBooking(int id)
         {
             return _db.Bookings
-                .Where(b => !b.IsDeleted)
+                .Where(b => !b.IsDeleted && !b.IsCancelled)
                 .Include(b => b.Guest)
                 .Include(b => b.Room)
                 .FirstOrDefault(b => b.Id == id);
@@ -89,7 +93,7 @@ namespace HotelBooking.Services
         public List<Booking> GetAll()
         {
             return _db.Bookings
-                .Where(b => !b.IsDeleted)
+                .Where(b => !b.IsDeleted && !b.IsCancelled)
                 .Include(b => b.Guest)
                 .Include(b => b.Room)
                 .ToList();
@@ -98,10 +102,27 @@ namespace HotelBooking.Services
         // Ta bort bokning permanent (hard delete)
         public bool CancelBooking(int id)
         {
-            var booking = GetBooking(id);
+            var booking = _db.Bookings
+                .Include(b => b.Invoice)
+                .FirstOrDefault(b => b.Id == id);
+
             if (booking == null) return false;
 
+            // Ta bort faktura
+            if (booking.Invoice != null)
+                _db.Invoices.Remove(booking.Invoice);
+
             _db.Bookings.Remove(booking);
+            _db.SaveChanges();
+            return true;
+        }
+
+        public bool CancelDueToUnpaidInvoice(int bookingId)
+        {
+            var booking = _db.Bookings.FirstOrDefault(b => b.Id == bookingId);
+            if (booking == null) return false;
+
+            booking.IsCancelled = true;
             _db.SaveChanges();
             return true;
         }

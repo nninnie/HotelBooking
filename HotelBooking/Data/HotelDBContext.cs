@@ -24,34 +24,24 @@ namespace HotelBooking
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Guest - Booking (många bokningar per gäst)
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Guest)
                 .WithMany(g => g.Bookings)
                 .HasForeignKey(b => b.GuestId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Guest - Invoice (många fakturor per gäst)
             modelBuilder.Entity<Invoice>()
-                .HasOne(i => i.Guest)
-                .WithMany(g => g.Invoices)
-                .HasForeignKey(i => i.GuestId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(i => i.Booking)
+                .WithOne(b => b.Invoice)
+                .HasForeignKey<Invoice>(i => i.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Booking - Invoice (en bokning kan ha EN faktura)
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Invoice)
-                .WithOne(i => i.Booking)
-                .HasForeignKey<Invoice>(i => i.BookingId);
-
-            // Room - Booking (ett rum kan ha många bokningar)
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Room)
                 .WithMany(r => r.Bookings)
                 .HasForeignKey(b => b.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Invoice - Payment (en faktura kan ha flera betalningar)
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.Invoice)
                 .WithMany(i => i.Payments)

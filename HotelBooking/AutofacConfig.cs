@@ -32,29 +32,11 @@ namespace HotelBooking
             .InstancePerLifetimeScope();
 
             // Services (registrera som interface!)
-            builder.RegisterType<BookingService>()
-                .As<IBookingService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<RoomService>()
-                .As<IRoomService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<GuestService>()
-                .As<IGuestService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<PaymentService>()
-                .As<IPaymentService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<InvoiceService>()
-                .As<IInvoiceService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<DataInitializer>()
-                .AsSelf()
-                .InstancePerLifetimeScope();
+            builder.RegisterType<InvoiceService>().As<IInvoiceService>().InstancePerLifetimeScope();
+            builder.RegisterType<PaymentService>().As<IPaymentService>().InstancePerLifetimeScope();
+            builder.RegisterType<BookingService>().As<IBookingService>().InstancePerLifetimeScope();
+            builder.RegisterType<GuestService>().As<IGuestService>().InstancePerLifetimeScope();
+            builder.RegisterType<RoomService>().As<IRoomService>().InstancePerLifetimeScope();
 
             // UI-lager
             builder.RegisterType<BookingUI>().AsSelf().InstancePerLifetimeScope();
@@ -71,7 +53,8 @@ namespace HotelBooking
             builder.RegisterType<InvoiceController>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<MainMenuController>().AsSelf().InstancePerLifetimeScope();
 
-            // DB Builder
+            // DataInitializer & DB Builder
+            builder.RegisterType<DataInitializer>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<BuildDB>().AsSelf().InstancePerLifetimeScope();
 
             // Application

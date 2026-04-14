@@ -102,7 +102,8 @@ namespace HotelBooking.Migrations
                     FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ToDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,10 +135,12 @@ namespace HotelBooking.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingId = table.Column<int>(type: "int", nullable: false),
-                    GuestId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsPaid = table.Column<bool>(type: "bit", nullable: false)
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    GuestId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -152,8 +155,7 @@ namespace HotelBooking.Migrations
                         name: "FK_Invoices_Guests_GuestId",
                         column: x => x.GuestId,
                         principalTable: "Guests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

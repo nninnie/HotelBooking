@@ -11,14 +11,10 @@ public class Booking
 
     [Required]
     public int RoomId { get; set; }
-
-    [ForeignKey(nameof(RoomId))]
     public Room? Room { get; set; }
 
     [Required]
     public int GuestId { get; set; }
-
-    [ForeignKey(nameof(GuestId))]
     public Guest? Guest { get; set; }
 
     public int NumberOfGuests { get; set; }
@@ -30,18 +26,17 @@ public class Booking
     public DateTime ToDate { get; set; }
 
     public DateTime BookingDate { get; set; } = DateTime.Now;
-    
-    public bool IsDeleted { get; set; } = false;
 
-    // Beräknad egenskap för att avgöra om bokningen är aktiv (inte raderad och inom datumintervallet)
-    // [NotMapped] betyder att denna egenskap inte kommer att skapas som en kolumn i databasen
+    public bool IsDeleted { get; set; } = false;     // Soft delete
+    public bool IsCancelled { get; set; } = false;   // Avbokad / obetald
+
     [NotMapped]
     public bool IsActive
     {
         get
         {
             var today = DateTime.Today;
-            return !IsDeleted && today >= FromDate && today <= ToDate;
+            return !IsDeleted && !IsCancelled && today >= FromDate && today <= ToDate;
         }
     }
 
@@ -53,7 +48,7 @@ public class Booking
             if (Room == null) return 0;
 
             int nights = (ToDate - FromDate).Days;
-            if (nights < 1) nights = 1; // säkerhet om datumen är samma
+            if (nights < 1) nights = 1;
 
             return nights * Room.PricePerNight;
         }

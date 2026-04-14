@@ -176,7 +176,7 @@ namespace HotelBooking.UI
 
                     if (i == index)
                     {
-                        AnsiConsole.Markup("[yellow]> [/]");
+                        AnsiConsole.Markup("[green]> [/]");
                         AnsiConsole.MarkupLine(text);
                     }
                     else

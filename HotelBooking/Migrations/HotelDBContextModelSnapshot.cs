@@ -42,6 +42,9 @@ namespace HotelBooking.Migrations
                     b.Property<int>("GuestId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -137,39 +140,6 @@ namespace HotelBooking.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Guests");
-                });
-
-            modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("GuestId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId")
-                        .IsUnique();
-
-                    b.HasIndex("GuestId");
-
-                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("HotelBooking.Models.Payment", b =>
@@ -273,6 +243,45 @@ namespace HotelBooking.Migrations
                     b.ToTable("Rooms");
                 });
 
+            modelBuilder.Entity("Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GuestId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.HasIndex("GuestId");
+
+                    b.ToTable("Invoices");
+                });
+
             modelBuilder.Entity("Booking", b =>
                 {
                     b.HasOne("HotelBooking.Models.Employee", "CreatedByEmployee")
@@ -311,34 +320,30 @@ namespace HotelBooking.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
-                {
-                    b.HasOne("Booking", "Booking")
-                        .WithOne("Invoice")
-                        .HasForeignKey("HotelBooking.Models.Invoice", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HotelBooking.Models.Guest", "Guest")
-                        .WithMany("Invoices")
-                        .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Guest");
-                });
-
             modelBuilder.Entity("HotelBooking.Models.Payment", b =>
                 {
-                    b.HasOne("HotelBooking.Models.Invoice", "Invoice")
+                    b.HasOne("Invoice", "Invoice")
                         .WithMany("Payments")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("Invoice", b =>
+                {
+                    b.HasOne("Booking", "Booking")
+                        .WithOne("Invoice")
+                        .HasForeignKey("Invoice", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HotelBooking.Models.Guest", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("GuestId");
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("Booking", b =>
@@ -358,14 +363,14 @@ namespace HotelBooking.Migrations
                     b.Navigation("Invoices");
                 });
 
-            modelBuilder.Entity("HotelBooking.Models.Invoice", b =>
-                {
-                    b.Navigation("Payments");
-                });
-
             modelBuilder.Entity("HotelBooking.Models.Room", b =>
                 {
                     b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("Invoice", b =>
+                {
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

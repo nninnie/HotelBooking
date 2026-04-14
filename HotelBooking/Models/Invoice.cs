@@ -1,35 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HotelBooking.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelBooking.Models
+public class Invoice
 {
-    public class Invoice
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        public int BookingId { get; set; }
+    [Required]
+    public int BookingId { get; set; }
 
-        [ForeignKey(nameof(BookingId))]
-        public Booking? Booking { get; set; }
+    [ForeignKey(nameof(BookingId))]
+    public Booking? Booking { get; set; }
 
-        [Required]
-        public int GuestId { get; set; }
+    [Required]
+    public DateTime CreatedDate { get; set; }
 
-        [ForeignKey(nameof(GuestId))]
-        public Guest? Guest { get; set; }
+    [Required]
+    public DateTime DueDate { get; set; }  
 
-        [Required]
-        public DateTime CreatedDate { get; set; }
+    public DateTime? PaidDate { get; set; } 
 
-        [Required]
-        [Range(0, 999999)]
-        public decimal TotalAmount { get; set; }
+    [Required]
+    [Range(0, 999999)]
+    public decimal TotalAmount { get; set; }
 
-        public bool IsPaid { get; set; }
+    public bool IsPaid { get; set; }
 
-        public List<Payment> Payments { get; set; } = new();
-    }
+    public List<Payment> Payments { get; set; } = new();
 }
