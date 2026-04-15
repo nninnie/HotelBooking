@@ -136,14 +136,14 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // VISA DETALJER
         public void ShowDetails(string subtitle)
         {
             AnsiConsole.Clear();
             BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera bokningar", "Visa detaljer");
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
             AnsiConsole.WriteLine();
 
+            // Hämta alla bokningar
             var bookings = _bookingService.GetAll();
 
             if (!bookings.Any())
@@ -153,21 +153,16 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Visa LISTAN
             BookingRenderer.ShowBookingTable(
                 bookings,
                 id => _guestService.GetGuest(id),
                 id => _roomService.GetRoom(id)
             );
 
+            // Fråga efter ID
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
-
-            if (bookingId <= 0)
-            {
-                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
-                WaitForEsc();
-                return;
-            }
 
             var booking = _bookingService.GetBooking(bookingId.Value);
             if (booking == null)
@@ -177,12 +172,53 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Hämta gäst och rum
             var guest = _guestService.GetGuest(booking.GuestId);
             var room = _roomService.GetRoom(booking.RoomId);
 
-            BookingRenderer.ShowBookingDetails(booking, guest, room);
+            // Visa DETALJER 
+            int nights = (booking.ToDate - booking.FromDate).Days;
+            if (nights < 1) nights = 1;
+
+            string status = booking.IsCancelled
+                ? "[red]● Avbokad[/]"
+                : booking.IsActive
+                    ? "[green]● Aktiv[/]"
+                    : "[yellow]● Avslutad[/]";
+
+            var panel = new Panel($@"
+[bold dodgerblue1]Bokning[/]
+[grey]Boknings-ID:[/] [white]{booking.Id}[/]
+[grey]Skapad:[/] [white]{booking.BookingDate:yyyy-MM-dd}[/]
+[grey]Status:[/] {status}
+
+[bold dodgerblue1]Gäst[/]
+[grey]Namn:[/] [white]{guest?.FirstName} {guest?.LastName}[/]
+[grey]E-post:[/] [white]{guest?.Email}[/]
+[grey]Telefon:[/] [white]{guest?.PhoneNumber}[/]
+
+[bold dodgerblue1]Rum[/]
+[grey]Rum:[/] [white]{room?.RoomNumber} ({room?.RoomType})[/]
+[grey]Pris per natt:[/] [white]{room?.PricePerNight} kr[/]
+
+[bold dodgerblue1]Datum[/]
+[grey]Incheckning:[/] [white]{booking.FromDate:yyyy-MM-dd}[/]
+[grey]Utcheckning:[/] [white]{booking.ToDate:yyyy-MM-dd}[/]
+[grey]Antal nätter:[/] [white]{nights}[/]
+
+[bold dodgerblue1]Pris[/]
+[grey]Totalpris:[/] [bold white]{booking.TotalPrice} kr[/]
+")
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
+            };
+
+            AnsiConsole.Write(panel);
+
             WaitForEsc();
         }
+
 
         // SOFT DELETE
         public void SoftDelete(string subtitle)
@@ -213,6 +249,14 @@ namespace HotelBooking.UI
             if (bookingId <= 0)
             {
                 BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                WaitForEsc();
+                return;
+            }
+
+            bool confirm = BookingPrompts.Confirm("\nÄr du säker att du vill tabort denna bokning?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Avbokning avbröts.");
                 WaitForEsc();
                 return;
             }
@@ -261,7 +305,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa denna bokning?");
+            bool confirm = BookingPrompts.Confirm("\nÄr du säker att du vill återställa denna bokning?");
             if (!confirm)
             {
                 BookingRenderer.ShowError("Avbokning avbröts.");

@@ -21,7 +21,7 @@ namespace HotelBooking.Controllers
                     "Visa alla",
                     "Visa detaljer",
                     "Markera som betald",
-                    "Annullera obetalda",
+
                     "Tillbaka"
                 );
 
@@ -40,10 +40,6 @@ namespace HotelBooking.Controllers
 
                     case "Markera som betald":
                         _invoiceUI.MarkAsPaid(choice);
-                        break;
-
-                    case "Annullera obetalda":
-                        _invoiceUI.CancelUnpaid(choice);
                         break;
 
                     case "Tillbaka":

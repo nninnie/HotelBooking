@@ -8,7 +8,5 @@ namespace HotelBooking.Services.Interfaces
         Invoice? GetInvoice(int id);
         IEnumerable<Invoice> GetAllInvoices();
         bool MarkAsPaid(int invoiceId);
-        int CancelUnpaidBookings();
-        void DeleteInvoiceForBooking(int bookingId);
     }
 }

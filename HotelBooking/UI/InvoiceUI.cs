@@ -22,7 +22,8 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]Bokning[/]");
             table.AddColumn("[yellow]Gäst[/]");
             table.AddColumn("[yellow]Belopp[/]");
-            table.AddColumn("[yellow]Datum[/]");
+            table.AddColumn("[yellow]Skapad[/]");
+            table.AddColumn("[yellow]Betald[/]");
             table.AddColumn("[yellow]Status[/]");
 
             foreach (var inv in invoices)
@@ -39,6 +40,7 @@ namespace HotelBooking.UI
                     $"{inv.Booking?.Guest?.FirstName} {inv.Booking?.Guest?.LastName}",
                     $"{inv.TotalAmount} kr",
                     inv.CreatedDate.ToString("yyyy-MM-dd"),
+                    inv.PaidDate?.ToString("yyyy-MM-dd") ?? "-",
                     status
                 );
             }
@@ -89,28 +91,54 @@ namespace HotelBooking.UI
                 return;
             }
 
+            var booking = invoice.Booking;
+            var guest = booking?.Guest;
+            var room = booking?.Room;
+
+            int nights = (int)(booking!.ToDate - booking.FromDate).TotalDays;
+            if (nights < 1) nights = 1;
+
             string status = invoice.IsCancelled
-                ? "[grey]Annullerad[/]"
+                ? "[red]● Annullerad[/]"
                 : invoice.IsPaid
-                    ? "[green]Betald[/]"
-                    : "[red]Obetald[/]";
+                    ? "[green]● Betald[/]"
+                    : "[yellow]● Obetald[/]";
 
             var panel = new Panel($@"
-[white]Faktura-ID:[/] {invoice.Id}
-[white]Bokning-ID:[/] {invoice.BookingId}
-[white]Gäst:[/] {invoice.Booking?.Guest?.FirstName} {invoice.Booking?.Guest?.LastName}
-[white]Belopp:[/] {invoice.TotalAmount} kr
-[white]Datum:[/] {invoice.CreatedDate:yyyy-MM-dd}
-[white]Status:[/] {status}
+[bold dodgerblue1]Faktura[/]
+[grey]Faktura-ID:[/] [white]{invoice.Id}[/]
+[grey]Bokning-ID:[/] [white]{invoice.BookingId}[/]
+
+[bold dodgerblue1]Gäst[/]
+[grey]Namn:[/] [white]{guest?.FirstName} {guest?.LastName}[/]
+[grey]E-post:[/] [white]{guest?.Email}[/]
+[grey]Telefon:[/] [white]{guest?.PhoneNumber}[/]
+
+[bold dodgerblue1]Bokning[/]
+[grey]Rum:[/] [white]{room?.RoomNumber} ({room?.RoomType})[/]
+[grey]Period:[/] [white]{booking.FromDate:yyyy-MM-dd} → {booking.ToDate:yyyy-MM-dd}[/]
+[grey]Antal nätter:[/] [white]{nights}[/]
+[grey]Pris per natt:[/] [white]{room?.PricePerNight} kr[/]
+
+[bold dodgerblue1]Fakturainfo[/]
+[grey]Skapad:[/] [white]{invoice.CreatedDate:yyyy-MM-dd}[/]
+[grey]Förfallodatum:[/] [white]{invoice.DueDate:yyyy-MM-dd}[/]
+[grey]Betald datum:[/] [white]{(invoice.PaidDate?.ToString("yyyy-MM-dd") ?? "-")}[/]
+
+[grey]Totalbelopp:[/] [bold white]{invoice.TotalAmount} kr[/]
+[grey]Status:[/] {status}
 ")
             {
-                Header = new PanelHeader("[green]Fakturadetaljer[/]"),
-                Border = BoxBorder.Rounded
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
             };
 
             AnsiConsole.Write(panel);
+
             WaitForEsc();
         }
+
+
 
         // MARKERA SOM BETALD
         public void MarkAsPaid(string subtitle)
@@ -123,7 +151,7 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int? id = AskIntOrEsc("Ange faktura-ID att markera som betald: ");
+            int? id = AskIntOrEsc("\nAnge faktura-ID att markera som betald: ");
             if (id == null) return;
 
             var invoice = _iinvoiceService.GetInvoice(id.Value);
@@ -137,7 +165,7 @@ namespace HotelBooking.UI
             // ❗ Stoppa betalning av annullerad faktura
             if (invoice.IsCancelled)
             {
-                BookingRenderer.ShowError("Fakturan är annullerad och kan inte betalas.");
+                BookingRenderer.ShowError("Bokningen är avbokad. Därför är fakturan annullerad och kan inte betalas.");
                 WaitForEsc();
                 return;
             }
@@ -152,6 +180,7 @@ namespace HotelBooking.UI
 
             bool success = _iinvoiceService.MarkAsPaid(id.Value);
 
+
             BookingRenderer.ShowResult(
                 success,
                 "Fakturan markerades som betald!",
@@ -161,46 +190,6 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
-        // ANNULLERA OBETALDA 
-        public void CancelUnpaid(string subtitle)
-        {
-            AnsiConsole.Clear();
-            BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera faktura", subtitle);
-            AnsiConsole.WriteLine();
-
-            // Visa endast obetalda & ej annullerade fakturor
-            var unpaid = _iinvoiceService
-                .GetAllInvoices()
-                .Where(i => !i.IsPaid && !i.IsCancelled)
-                .ToList();
-
-            if (!unpaid.Any())
-            {
-                BookingRenderer.ShowError("Inga obetalda fakturor att annullera.");
-                WaitForEsc();
-                return;
-            }
-
-            ShowInvoiceTable(unpaid);
-
-            bool confirm = BookingPrompts.Confirm("Är du säker att du vill annullera alla obetalda bokningar?");
-            if (!confirm)
-            {
-                BookingRenderer.ShowError("Åtgärden avbröts.");
-                WaitForEsc();
-                return;
-            }
-
-            int cancelled = _iinvoiceService.CancelUnpaidBookings();
-
-            BookingRenderer.ShowResult(
-                cancelled > 0,
-                $"{cancelled} bokningar annullerades pga obetalda fakturor.",
-                "Inga obetalda bokningar behövde annulleras."
-            );
-
-            WaitForEsc();
-        }
+ 
     }
 }

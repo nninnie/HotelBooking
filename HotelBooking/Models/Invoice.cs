@@ -16,9 +16,9 @@ public class Invoice
     public DateTime CreatedDate { get; set; }
 
     [Required]
-    public DateTime DueDate { get; set; }  
+    public DateTime DueDate { get; set; }
 
-    public DateTime? PaidDate { get; set; } 
+    public DateTime? PaidDate { get; set; }
 
     [Required]
     [Range(0, 999999)]
