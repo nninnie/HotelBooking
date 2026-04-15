@@ -25,6 +25,6 @@ public class Invoice
     public decimal TotalAmount { get; set; }
 
     public bool IsPaid { get; set; }
-
+    public bool IsCancelled { get; set; } = false;
     public List<Payment> Payments { get; set; } = new();
 }

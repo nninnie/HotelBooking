@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelBooking.Migrations
 {
     [DbContext(typeof(HotelDBContext))]
-    [Migration("20260414171153_InitialCreate")]
+    [Migration("20260415124523_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -265,6 +265,9 @@ namespace HotelBooking.Migrations
 
                     b.Property<int?>("GuestId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");

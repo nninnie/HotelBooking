@@ -1,13 +1,12 @@
 ﻿using Autofac;
 using HotelBooking.Controllers;
-using HotelBooking.Data;
 using HotelBooking.Services;
 using HotelBooking.Services.Interfaces;
 using HotelBooking.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace HotelBooking
+namespace HotelBooking.Data
 {
     public static class AutofacConfig
     {

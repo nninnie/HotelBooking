@@ -1,4 +1,4 @@
-﻿using System;
+﻿miusing System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -140,6 +140,7 @@ namespace HotelBooking.Migrations
                     PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
                     GuestId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

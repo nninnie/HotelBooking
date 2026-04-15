@@ -50,8 +50,18 @@ public static class CalendarPicker
                         {
                             checkOut = cursor;
 
-                            AnsiConsole.MarkupLine($"\n[green]Utcheckning vald:[/] [yellow]{checkOut:yyyy-MM-dd}[/]");
-                            Thread.Sleep(1200);
+                            // Visa vald utcheckning
+                            AnsiConsole.MarkupLine($"[yellow]Utcheckning vald: [/][green]{checkOut:yyyy-MM-dd}[/]");
+                            Thread.Sleep(400);
+
+                            // Visa intervallet innan vi går vidare
+                            AnsiConsole.Clear();
+                            BannerUI.ShowLogo();
+                            BannerUI.PrintHeader("Hantera bokningar", "Valt datumintervall");
+
+                            RenderCalendar(cursor, checkIn, checkOut, selectingCheckIn: false);
+
+                            Thread.Sleep(900);
 
                             return (checkIn, checkOut);
                         }
@@ -76,7 +86,7 @@ public static class CalendarPicker
         var sb = new StringBuilder();
 
         // Titel
-        sb.AppendLine($"[darkorange]{cursor:MMMM yyyy}[/]".ToUpper());
+        sb.AppendLine($"[blue]{cursor:MMMM yyyy}[/]".ToUpper());
         sb.AppendLine("Mån  Tis  Ons  Tor  Fre  Lör  Sön");
         sb.AppendLine("───────────────────────────────");
 
@@ -104,26 +114,27 @@ public static class CalendarPicker
                 current > checkIn.Value &&
                 current < checkOut.Value;
 
+            bool isPast = current < DateTime.Today;
+
             string text;
 
             if (isCheckIn)
                 text = $"[bold green]{day,2}[/]";
             else if (isCheckOut)
-                text = $"[bold red]{day,2}[/]";
+                text = $"[bold green]{day,2}[/]"; // utcheckning också grön
             else if (isRange)
-                text = $"[yellow]{day,2}[/]";
+                text = $"[green3]{day,2}[/]";     // ljusgrön
             else if (isCursor)
-                text = $"[orange1]{day,2}[/]";
+                text = selectingCheckIn ? $"[orange1]{day,2}[/]" : $"[green]{day,2}[/]";
+            else if (isPast)
+                text = $"[grey]{day,2}[/]";
             else
                 text = $"{day,2}";
 
-
             sb.Append($"{text}  ");
 
-            // Radbyte efter söndag
             if ((startDay + (day - 1)) % 7 == 6)
                 sb.AppendLine();
-
         }
 
         // Panel
@@ -131,7 +142,7 @@ public static class CalendarPicker
         {
             Border = BoxBorder.Double,
             Header = new PanelHeader(
-                selectingCheckIn ? "[green]Välj incheckning[/]" : "[red]Välj utcheckning[/]",
+                selectingCheckIn ? "[green]Välj incheckning[/]" : "[green]Välj utcheckning[/]",
                 Justify.Center)
         };
 
@@ -142,12 +153,11 @@ public static class CalendarPicker
         AnsiConsole.MarkupLine("[grey]Enter = välj datum[/]");
         AnsiConsole.MarkupLine("[grey]ESC = avbryt[/]");
 
-        if (checkIn != null && !selectingCheckIn)
-        {
-            AnsiConsole.MarkupLine(
-                $"[yellow]Incheckning vald:[/] [green]{checkIn:yyyy-MM-dd}[/]   " +
-                $"[yellow]Utcheckning vald:[/] [orange]{checkOut:yyyy-MM-dd}[/]"
-            );
-        }
+        // Visa valda datum
+        if (checkIn != null)
+            AnsiConsole.MarkupLine($"\n[yellow]Incheckning vald:[/] [green]{checkIn:yyyy-MM-dd}[/]");
+
+        if (checkOut != null)
+            AnsiConsole.MarkupLine($"[yellow]Utcheckning vald:[/] [green]{checkOut:yyyy-MM-dd}[/]");
     }
 }

@@ -263,6 +263,9 @@ namespace HotelBooking.Migrations
                     b.Property<int?>("GuestId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
