@@ -132,7 +132,15 @@ Databasen skapas och seedas automatiskt.
 
 ### 🧩 Arkitektur, SOLID & lärdomar
 Jag har arbetat enligt **SOLID‑principerna**, framför allt **Single Responsibility Principle**, där varje klass har ett tydligt och avgränsat ansvar.  
-Exempel: *BookingPrompts* (input), *BookingRenderer* (visning), *CalendarPicker* (datumval), *BannerUI* (header), *EscUI* (ESC‑flöden), *Services* (affärslogik), *Controllers* (menyflöden) och *DbContext* (databas).  
+Exempel: 
+*BookingPrompts* (input) 
+*BookingRenderer* (visning)
+*CalendarPicker* (datumval)
+*BannerUI* (header)
+*EscUI* (ESC‑flöden)
+*Services* (affärslogik)
+*Controllers* (menyflöden) 
+*DbContext* (databas)
 Detta gav ett mer strukturerat, testbart och lättutbyggt system.
 
 Jag följde även **DIP (Dependency Inversion Principle)** genom att använda **Autofac** för beroendeinjektion.  
