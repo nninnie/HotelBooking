@@ -16,7 +16,7 @@ All data lagras i en SQL‑databas som genereras via EF Core Code First.
 - Pris per natt, kapacitet och rumsinfo  
 
 👤 **Gäster**  
-- - Skapa, visa, uppdatera och ta bort gäster  
+- Skapa, visa, uppdatera och ta bort gäster  
 - Kontroll vid borttagning om gästen har bokningar  
 
 📅 **Bokningar**  
