@@ -98,7 +98,7 @@ public static class CalendarPicker
 
         // Tomma rutor innan månadens start
         for (int i = 0; i < startDay; i++)
-            sb.Append("     ");
+            sb.Append("    "); 
 
         // Dagar
         for (int day = 1; day <= daysInMonth; day++)
@@ -131,7 +131,7 @@ public static class CalendarPicker
             else
                 text = $"{day,2}";
 
-            sb.Append($"{text}  ");
+            sb.Append($"{text}   ");
 
             if ((startDay + (day - 1)) % 7 == 6)
                 sb.AppendLine();

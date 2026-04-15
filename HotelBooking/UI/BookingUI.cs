@@ -1,6 +1,7 @@
 ﻿using HotelBooking.Models;
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HotelBooking.UI
 {
@@ -31,25 +32,29 @@ namespace HotelBooking.UI
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
 
-            // NYTT: välj båda datumen i ett steg
-            var (checkIn, checkOut) = CalendarPicker.SelectDateRange();
+            // Välj datumintervall
+            var (checkInDate, checkOutDate) = CalendarPicker.SelectDateRange();
 
-            if (checkIn == null || checkOut == null)
+            if (checkInDate == null || checkOutDate == null)
                 return;
 
-            if (checkIn.Value.Date < DateTime.Today)
+            if (checkInDate.Value.Date < DateTime.Today)
             {
                 BookingRenderer.ShowError("Incheckningsdatum kan inte vara bakåt i tiden.");
                 WaitForEsc();
                 return;
             }
 
-            if (checkOut.Value <= checkIn.Value)
+            if (checkOutDate.Value <= checkInDate.Value)
             {
                 BookingRenderer.ShowError("Utcheckningsdatum måste vara efter incheckningsdatum!");
                 WaitForEsc();
                 return;
             }
+
+            // ⭐ Sätt tiderna här
+            var checkIn = checkInDate.Value.Date.AddHours(15);   // 15:00
+            var checkOut = checkOutDate.Value.Date.AddHours(11); // 11:00
 
             var guestsCount = BookingPrompts.AskGuestCount(this);
             if (guestsCount == null || guestsCount <= 0)
@@ -60,8 +65,8 @@ namespace HotelBooking.UI
             }
 
             var availableRooms = _bookingService.GetAvailableRooms(
-                checkIn.Value,
-                checkOut.Value,
+                checkIn,
+                checkOut,
                 guestsCount.Value
             );
 
@@ -75,11 +80,12 @@ namespace HotelBooking.UI
             var roomId = BookingPrompts.SelectRoom(this, availableRooms);
             if (roomId == null) return;
 
+            // Skapa bokningen med tider
             var booking = _bookingService.CreateBooking(
                 guestId.Value,
                 roomId.Value,
-                checkIn.Value,
-                checkOut.Value,
+                checkIn,
+                checkOut,
                 guestsCount.Value
             );
 
@@ -92,12 +98,14 @@ namespace HotelBooking.UI
                 return;
             }
 
-            int nights = (checkOut.Value - checkIn.Value).Days;
-            decimal totalPrice = nights * room.PricePerNight;  
+            int nights = (checkOut - checkIn).Days;
+            decimal totalPrice = nights * room.PricePerNight;
 
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine("[green]Bokningen är klar![/]");
             AnsiConsole.MarkupLine($"Rum: [yellow]{room.RoomNumber}[/] ({room.RoomType})");
+            AnsiConsole.MarkupLine($"Incheckning: [yellow]{checkIn:yyyy-MM-dd HH:mm}[/]");
+            AnsiConsole.MarkupLine($"Utcheckning: [yellow]{checkOut:yyyy-MM-dd HH:mm}[/]");
             AnsiConsole.MarkupLine($"Antal nätter: [yellow]{nights}[/]");
             AnsiConsole.MarkupLine($"Pris per natt: [yellow]{room.PricePerNight} kr[/]");
             AnsiConsole.MarkupLine($"Totalpris: [bold yellow]{totalPrice} kr[/]");
@@ -107,6 +115,7 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine($"[green]✔ Nyckelkort till rum {room.RoomNumber} överlämnat till kunden.[/]");
             WaitForEsc();
         }
+
 
         // VISA ALLA
         public void ShowAll(string subtitle)
@@ -180,40 +189,7 @@ namespace HotelBooking.UI
             int nights = (booking.ToDate - booking.FromDate).Days;
             if (nights < 1) nights = 1;
 
-            string status = booking.IsCancelled
-                ? "[red]● Avbokad[/]"
-                : booking.IsActive
-                    ? "[green]● Aktiv[/]"
-                    : "[yellow]● Avslutad[/]";
-
-            var panel = new Panel($@"
-[bold dodgerblue1]Bokning[/]
-[grey]Boknings-ID:[/] [white]{booking.Id}[/]
-[grey]Skapad:[/] [white]{booking.BookingDate:yyyy-MM-dd}[/]
-[grey]Status:[/] {status}
-
-[bold dodgerblue1]Gäst[/]
-[grey]Namn:[/] [white]{guest?.FirstName} {guest?.LastName}[/]
-[grey]E-post:[/] [white]{guest?.Email}[/]
-[grey]Telefon:[/] [white]{guest?.PhoneNumber}[/]
-
-[bold dodgerblue1]Rum[/]
-[grey]Rum:[/] [white]{room?.RoomNumber} ({room?.RoomType})[/]
-[grey]Pris per natt:[/] [white]{room?.PricePerNight} kr[/]
-
-[bold dodgerblue1]Datum[/]
-[grey]Incheckning:[/] [white]{booking.FromDate:yyyy-MM-dd}[/]
-[grey]Utcheckning:[/] [white]{booking.ToDate:yyyy-MM-dd}[/]
-[grey]Antal nätter:[/] [white]{nights}[/]
-
-[bold dodgerblue1]Pris[/]
-[grey]Totalpris:[/] [bold white]{booking.TotalPrice} kr[/]
-")
-            {
-                Border = BoxBorder.Rounded,
-                Padding = new Padding(1, 1, 1, 1)
-            };
-
+            var panel = BuildBookingPanel(booking, guest, room);
             AnsiConsole.Write(panel);
 
             WaitForEsc();
@@ -298,21 +274,33 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
-            if (bookingId <= 0)
+            var booking = _bookingService.GetBooking(bookingId.Value);
+            if (booking == null)
             {
-                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                BookingRenderer.ShowError("Bokningen hittades inte.");
                 WaitForEsc();
                 return;
             }
 
+            // Hämta gäst och rum
+            var guest = _guestService.GetGuest(booking.GuestId);
+            var room = _roomService.GetRoom(booking.RoomId);
+
+            // Beräkna nätter
+            int nights = (booking.ToDate - booking.FromDate).Days;
+            if (nights < 1) nights = 1;
+
+            var panel = BuildBookingPanel(booking, guest, room);
+            AnsiConsole.Write(panel);
+
+            // BEKRÄFTA EFTER PANELEN
             bool confirm = BookingPrompts.Confirm("\nÄr du säker att du vill återställa denna bokning?");
             if (!confirm)
             {
-                BookingRenderer.ShowError("Avbokning avbröts.");
+                BookingRenderer.ShowError("Återställning avbröts.");
                 WaitForEsc();
                 return;
             }
-
 
             bool success = _bookingService.Restore(bookingId.Value);
 
@@ -324,6 +312,7 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
 
         // UPDATE
         public void Update(string subtitle)
@@ -359,8 +348,25 @@ namespace HotelBooking.UI
                 return;
             }
 
+            // Hämta gäst och rum
+            var guest = _guestService.GetGuest(booking.GuestId);
+            var room = _roomService.GetRoom(booking.RoomId);
+
+            // Beräkna nätter
+            int nights = (booking.ToDate - booking.FromDate).Days;
+            if (nights < 1) nights = 1;
+
+            var panel = BuildBookingPanel(booking, guest, room);
+            AnsiConsole.Write(panel);
+
+            // HÄR EFTER PANELEN FRÅGAR VI EFTER ÄNDRINGAR
             var updates = BookingPrompts.AskBookingUpdates(this, booking);
             if (updates == null) return;
+
+            // Lägg på standardtider
+            updates.FromDate = updates.FromDate!.Value.Date.AddHours(15);
+            updates.ToDate = updates.ToDate!.Value.Date.AddHours(11);
+
 
             if (updates.FromDate >= updates.ToDate)
             {
@@ -384,6 +390,7 @@ namespace HotelBooking.UI
                 updates.NumberOfGuests
             );
 
+
             BookingRenderer.ShowResult(
                 success,
                 "Bokningen uppdaterades!",
@@ -392,5 +399,46 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
+        private Panel BuildBookingPanel(Booking booking, Guest? guest, Room? room)
+        {
+            int nights = (booking.ToDate - booking.FromDate).Days;
+            if (nights < 1) nights = 1;
+
+            string status = booking.IsCancelled
+                ? "[red]● Avbokad[/]"
+                : booking.IsActive
+                    ? "[green]● Aktiv[/]"
+                    : "[yellow]● Avslutad[/]";
+
+            return new Panel($@"
+[bold dodgerblue1]Bokning[/]
+[grey]Boknings-ID:[/] [white]{booking.Id}[/]
+[grey]Skapad:[/] [white]{booking.BookingDate:yyyy-MM-dd HH:mm}[/]
+[grey]Status:[/] {status}
+
+[bold dodgerblue1]Gäst[/]
+[grey]Namn:[/] [white]{guest?.FirstName} {guest?.LastName}[/]
+[grey]E-post:[/] [white]{guest?.Email}[/]
+[grey]Telefon:[/] [white]{guest?.PhoneNumber}[/]
+
+[bold dodgerblue1]Rum[/]
+[grey]Rum:[/] [white]{room?.RoomNumber} ({room?.RoomType})[/]
+[grey]Pris per natt:[/] [white]{room?.PricePerNight} kr[/]
+
+[bold dodgerblue1]Datum[/]
+[grey]Incheckning:[/] [white]{booking.FromDate:yyyy-MM-dd HH:mm}[/]
+[grey]Utcheckning:[/] [white]{booking.ToDate:yyyy-MM-dd HH:mm}[/]
+[grey]Antal nätter:[/] [white]{nights}[/]
+
+[bold dodgerblue1]Pris[/]
+[grey]Totalpris:[/] [bold white]{booking.TotalPrice} kr[/]
+")
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
+            };
+        }
+
     }
 }

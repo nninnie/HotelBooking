@@ -224,20 +224,30 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
+            // Förnamn
             string newFirst = AnsiConsole.Prompt(
-                new TextPrompt<string>($"Nytt förnamn (tomt = behåll), nuvarande: {guest.FirstName}")
+                new TextPrompt<string>($"Nytt förnamn (ENTER = behåll [green]{guest.FirstName}[/]):")
                     .AllowEmpty()
             );
+            if (string.IsNullOrWhiteSpace(newFirst))
+                newFirst = guest.FirstName;
 
+            // Efternamn
             string newLast = AnsiConsole.Prompt(
-                new TextPrompt<string>($"Nytt efternamn (tomt = behåll), nuvarande: {guest.LastName}")
+                new TextPrompt<string>($"Nytt efternamn (ENTER = behåll [green]{guest.LastName}[/]):")
                     .AllowEmpty()
             );
+            if (string.IsNullOrWhiteSpace(newLast))
+                newLast = guest.LastName;
 
+            // Telefon
             string phone = AnsiConsole.Prompt(
-                new TextPrompt<string>($"Nytt telefonnummer (tomt = behåll), nuvarande: {guest.PhoneNumber ?? "-"}")
+                new TextPrompt<string>($"Nytt telefonnummer (ENTER = behåll [green]{guest.PhoneNumber ?? "-"}[/]):")
                     .AllowEmpty()
             );
+            if (string.IsNullOrWhiteSpace(phone))
+                 phone = guest.PhoneNumber ?? "";
+
 
             if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
             {
@@ -246,10 +256,13 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
+            // Email
             string email = AnsiConsole.Prompt(
-                new TextPrompt<string>($"Ny email (tomt = behåll), nuvarande: {guest.Email ?? "-"}")
+                new TextPrompt<string>($"Ny email (ENTER = behåll [green]{guest.Email ?? "-"}[/]):")
                     .AllowEmpty()
             );
+            if (string.IsNullOrWhiteSpace(email))
+                email = guest.Email ?? "";
 
             if (!string.IsNullOrWhiteSpace(email) && !email.Contains("@"))
             {
@@ -260,10 +273,10 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 
             bool success = _guestService.UpdateGuest(
                 id.Value,
-                string.IsNullOrWhiteSpace(newFirst) ? null : newFirst,
-                string.IsNullOrWhiteSpace(newLast) ? null : newLast,
-                string.IsNullOrWhiteSpace(phone) ? null : phone,
-                string.IsNullOrWhiteSpace(email) ? null : email
+                newFirst,
+                newLast,
+                phone,
+                email
             );
 
             AnsiConsole.MarkupLine(success
@@ -272,6 +285,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 
             WaitForEsc();
         }
+
 
         // TA BORT GÄST
         public void SoftDelete(string subtitle)

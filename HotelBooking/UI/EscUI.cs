@@ -343,5 +343,19 @@ namespace HotelBooking.UI
                     return defaultValue;
             }
         }
+
+        public int? AskIntOrEsc(string question, int defaultValue)
+        {
+            var result = AskIntOrEsc(question);
+            return result == null && Console.CursorLeft == 0 ? defaultValue : result;
+        }
+
+
+        public decimal? AskDecimalOrEsc(string question, decimal defaultValue)
+        {
+            var result = AskDecimalOrEsc(question);
+            return result == null && Console.CursorLeft == 0 ? defaultValue : result;
+        }
+
     }
 }

@@ -20,7 +20,8 @@ namespace HotelBooking.UI
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
             table.AddColumn("[yellow]Typ[/]");
-            table.AddColumn("[yellow]Max antal gäster[/]");
+            table.AddColumn("[yellow]Kapacitet[/]");
+            table.AddColumn("[yellow]Extrabäddar[/]");
             table.AddColumn("[yellow]Pris/natt[/]");
             table.AddColumn("[yellow]Status[/]");
 
@@ -30,7 +31,8 @@ namespace HotelBooking.UI
                     r.Id.ToString(),
                     r.RoomNumber,
                     r.RoomType,
-                    $"{r.Capacity} + {r.ExtraBeds}",
+                    $"{r.Capacity}",
+                    $"{r.ExtraBeds}",
                     $"{r.PricePerNight} kr",
                     r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]"
                 );
@@ -69,7 +71,7 @@ namespace HotelBooking.UI
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
-            int? id = AskIntOrEsc("Ange rums-ID:");
+            int? id = AskIntOrEsc("\nAnge rums-ID:");
             if (id == null) return;
 
             var room = _roomService.GetRoom(id.Value);
@@ -86,22 +88,28 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader("Hantera rum", subtitle);
 
             var panel = new Panel($@"
-[white]Rums-ID:[/] {room.Id}
-[white]Nummer:[/] {room.RoomNumber}
-[white]Typ:[/] {room.RoomType}
-[white]Ordinarie platser:[/] {room.Capacity}
-[white]Extrabäddar:[/] {room.ExtraBeds}
-[white]Pris per natt:[/] {room.PricePerNight} kr
-[white]Havsutsikt:[/] {(room.HasSeaView ? "[green]Ja[/]" : "[red]Nej[/]")}
-[white]Minibar:[/] {(room.HasMinibar ? "[green]Ja[/]" : "[red]Nej[/]")}
-[white]Husdjur tillåtet:[/] {(room.IsPetFriendly ? "[green]Ja[/]" : "[red]Nej[/]")}
-[white]Balkong:[/] {(room.HasBalcony ? "[green]Ja[/]" : "[red]Nej[/]")}
-[white]Badkar:[/] {(room.HasBathtub ? "[green]Ja[/]" : "[red]Nej[/]")}
-[white]Status:[/] {(room.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]")}
+[bold dodgerblue1]Rum[/]
+[grey]Rums-ID:[/] [white]{room.Id}[/]
+[grey]Nummer:[/] [white]{room.RoomNumber}[/]
+[grey]Typ:[/] [white]{room.RoomType}[/]
+[grey]Ordinarie platser:[/] [white]{room.Capacity}[/]
+[grey]Extrabäddar:[/] [white]{room.ExtraBeds}[/]
+[grey]Pris per natt:[/] [white]{room.PricePerNight} kr[/]
+
+[bold dodgerblue1]Faciliteter[/]
+[grey]Havsutsikt:[/] {(room.HasSeaView ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Minibar:[/] {(room.HasMinibar ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Husdjur tillåtet:[/] {(room.IsPetFriendly ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Balkong:[/] {(room.HasBalcony ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Badkar:[/] {(room.HasBathtub ? "[green]Ja[/]" : "[red]Nej[/]")}
+
+[bold dodgerblue1]Status[/]
+[grey]Tillgänglighet:[/] {(room.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]")}
 ")
             {
-                Header = new PanelHeader("[green]Rumsinformation[/]"),
-                Border = BoxBorder.Rounded
+                Header = new PanelHeader("[green]Rumsinformation[/]", Justify.Center),
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
             };
 
             AnsiConsole.Write(panel);
@@ -123,7 +131,6 @@ namespace HotelBooking.UI
 
             string? type = AskWithEsc("Ange rumstyp:");
             if (type == null) return;
-
 
             int squareMeters;
             while (true)
@@ -159,7 +166,7 @@ namespace HotelBooking.UI
                 number, type, squareMeters, capacity.Value, extraBeds.Value, price.Value,
                 outOfService, hasSeaView, hasMinibar,
                 isPetFriendly, hasBalcony, hasBathtub
-                );
+            );
 
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
             WaitForEsc();
@@ -174,8 +181,8 @@ namespace HotelBooking.UI
 
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
-              
-            int? id = AskIntOrEsc("Ange rums-ID att uppdatera");
+
+            int? id = AskIntOrEsc("\nAnge rums-ID att uppdatera: ");
             if (id == null) return;
 
             var existing = _roomService.GetRoom(id.Value);
@@ -187,40 +194,113 @@ namespace HotelBooking.UI
                 return;
             }
 
-            string? number = AskWithEsc($"Rumsnummer ({existing.RoomNumber}):");
+            // Visa detaljerad panel innan redigering
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera rum", subtitle);
+
+            var panel = new Panel($@"
+[bold dodgerblue1]Rum[/]
+[grey]Rums-ID:[/] [white]{existing.Id}[/]
+[grey]Nummer:[/] [white]{existing.RoomNumber}[/]
+[grey]Typ:[/] [white]{existing.RoomType}[/]
+[grey]Ordinarie platser:[/] [white]{existing.Capacity}[/]
+[grey]Extrabäddar:[/] [white]{existing.ExtraBeds}[/]
+[grey]Pris per natt:[/] [white]{existing.PricePerNight} kr[/]
+
+[bold dodgerblue1]Faciliteter[/]
+[grey]Havsutsikt:[/] {(existing.HasSeaView ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Minibar:[/] {(existing.HasMinibar ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Husdjur tillåtet:[/] {(existing.IsPetFriendly ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Balkong:[/] {(existing.HasBalcony ? "[green]Ja[/]" : "[red]Nej[/]")}
+[grey]Badkar:[/] {(existing.HasBathtub ? "[green]Ja[/]" : "[red]Nej[/]")}
+
+[bold dodgerblue1]Status[/]
+[grey]Tillgänglighet:[/] {(existing.IsOutOfService ? "[red]Ur funktion[/]" : "[green]Tillgänglig[/]")}
+")
+            {
+                Header = new PanelHeader("[green]Rumsinformation[/]", Justify.Center),
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
+            };
+
+            AnsiConsole.Write(panel);
+
+            // Rumsnummer
+            string? number = AskWithEsc(
+                $"[grey]Rumsnummer[/] (ENTER = behåll [green]{existing.RoomNumber}[/]):"
+            );
             if (number == null) return;
             if (number == "") number = existing.RoomNumber;
 
-            string? type = AskWithEsc($"Rumstyp ({existing.RoomType}):");
+            // Rumstyp
+            string? type = AskWithEsc(
+                $"[grey]Rumstyp[/] (ENTER = behåll [green]{existing.RoomType}[/]):"
+            );
             if (type == null) return;
             if (type == "") type = existing.RoomType;
 
-            int? capacity = AskIntOrEsc($"Antal ordinarie gäster ({existing.Capacity}):");
+            // Ordinarie gäster
+            int? capacity = AskIntOrEsc(
+                $"[grey]Antal ordinarie gäster[/] (ENTER = behåll [green]{existing.Capacity}[/]):",
+                existing.Capacity
+            );
             if (capacity == null) return;
 
-
-            int? extraBeds = AskIntOrEsc($"Extrabäddar ({existing.ExtraBeds}):");
+            // Extrabäddar
+            int? extraBeds = AskIntOrEsc(
+                $"[grey]Extrabäddar[/] (ENTER = behåll [green]{existing.ExtraBeds}[/]):",
+                existing.ExtraBeds
+            );
             if (extraBeds == null) return;
 
-            decimal? price = AskDecimalOrEsc($"Pris per natt ({existing.PricePerNight}):");
+            // Pris per natt
+            decimal? price = AskDecimalOrEsc(
+                $"[grey]Pris per natt[/] (ENTER = behåll [green]{existing.PricePerNight}[/]):",
+                existing.PricePerNight
+            );
             if (price == null) return;
 
-            bool? outOfService = AskBoolOrEsc("Är rummet ur funktion?", existing.IsOutOfService);
+            // Ur funktion
+            bool? outOfService = AskBoolOrEsc(
+                $"[grey]Är rummet ur funktion?[/] (ENTER = behåll [green]{(existing.IsOutOfService ? "Ja" : "Nej")}[/])",
+                existing.IsOutOfService
+            );
             if (outOfService == null) return;
 
-            bool? hasSeaView = AskBoolOrEsc("Har rummet havsutsikt?", existing.HasSeaView);
+            // Havsutsikt
+            bool? hasSeaView = AskBoolOrEsc(
+                $"[grey]Har rummet havsutsikt?[/] (ENTER = behåll [green]{(existing.HasSeaView ? "Ja" : "Nej")}[/])",
+                existing.HasSeaView
+            );
             if (hasSeaView == null) return;
 
-            bool? hasMinibar = AskBoolOrEsc("Har rummet minibar?", existing.HasMinibar);
+            // Minibar
+            bool? hasMinibar = AskBoolOrEsc(
+                $"[grey]Har rummet minibar?[/] (ENTER = behåll [green]{(existing.HasMinibar ? "Ja" : "Nej")}[/])",
+                existing.HasMinibar
+            );
             if (hasMinibar == null) return;
 
-            bool? isPetFriendly = AskBoolOrEsc("Är rummet husdjursvänligt?", existing.IsPetFriendly);
+            // Husdjursvänligt
+            bool? isPetFriendly = AskBoolOrEsc(
+                $"[grey]Är rummet husdjursvänligt?[/] (ENTER = behåll [green]{(existing.IsPetFriendly ? "Ja" : "Nej")}[/])",
+                existing.IsPetFriendly
+            );
             if (isPetFriendly == null) return;
 
-            bool? hasBalcony = AskBoolOrEsc("Har rummet balkong?", existing.HasBalcony);
+            // Balkong
+            bool? hasBalcony = AskBoolOrEsc(
+                $"[grey]Har rummet balkong?[/] (ENTER = behåll [green]{(existing.HasBalcony ? "Ja" : "Nej")}[/])",
+                existing.HasBalcony
+            );
             if (hasBalcony == null) return;
 
-            bool? hasBathtub = AskBoolOrEsc("Har rummet badkar?", existing.HasBathtub);
+            // Badkar
+            bool? hasBathtub = AskBoolOrEsc(
+                $"[grey]Har rummet badkar?[/] (ENTER = behåll [green]{(existing.HasBathtub ? "Ja" : "Nej")}[/])",
+                existing.HasBathtub
+            );
             if (hasBathtub == null) return;
 
             bool success = _roomService.UpdateRoom(
@@ -244,6 +324,7 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
         // SOFT DELETE (MARKERA SOM UR FUNKTION)    
         public void SoftDelete(string subtitle)
         {

@@ -80,7 +80,7 @@ namespace HotelBooking.UI
             var invoices = _iinvoiceService.GetAllInvoices();
             ShowInvoiceTable(invoices);
 
-            int? id = AskIntOrEsc("Ange faktura-ID: ");
+            int? id = AskIntOrEsc("\nAnge faktura-ID: ");
             if (id == null) return;
 
             var invoice = _iinvoiceService.GetInvoice(id.Value);
@@ -171,6 +171,7 @@ namespace HotelBooking.UI
             }
 
             bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera fakturan som betald?");
+
             if (!confirm)
             {
                 BookingRenderer.ShowError("Åtgärden avbröts.");
