@@ -150,7 +150,7 @@ Det gjorde koden mer flexibel, minskade kopplingar mellan klasser och gjorde det
 Jag valde också att **seeda bokningar** för att enklare kunna testa datumlogik och lediga rum.
 
 Jag använder inga repositories eftersom EF Core redan fungerar som både repository (DbSet) och unit‑of‑work (DbContext).  
-Ett extra repository‑lager hade bara skapat onödig och duplicerad kod, så mina services arbetar direkt mot DbContext enligt modern EF Core‑praxis.
+Ett extra repository‑lager hade bara skapat onödig och duplicerad kod, så mina services arbetar direkt mot DbContext enligt modern EF Core‑praxis. (Unit‑of‑Work betyder att alla databasändringar hanteras som en enda transaktion, så antingen sparas allt eller så rullas allt tillbaka om något går fel.)
 
 En viktig lärdom är att jag hade velat lägga mer tid på **planeringen av mina POCO‑modeller**.  
 Jag arbetade iterativt och uppdaterade modellerna flera gånger, och till slut valde jag att rensa databasen och migrationerna för att bygga upp allt från början igen.  
