@@ -340,6 +340,11 @@ namespace HotelBooking.UI
                 return;
             }
 
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", $"Uppdatera boknings ID: {bookingId.Value}");
+            AnsiConsole.WriteLine();
+
             var booking = _bookingService.GetBooking(bookingId.Value);
             if (booking == null)
             {
@@ -411,7 +416,8 @@ namespace HotelBooking.UI
                     ? "[green]● Aktiv[/]"
                     : "[yellow]● Avslutad[/]";
 
-            return new Panel($@"
+            return new Panel($@"[grey]Boknings-ID:[/] [white]{booking.Id}[/]
+
 [bold dodgerblue1]Bokning[/]
 [grey]Boknings-ID:[/] [white]{booking.Id}[/]
 [grey]Skapad:[/] [white]{booking.BookingDate:yyyy-MM-dd HH:mm}[/]

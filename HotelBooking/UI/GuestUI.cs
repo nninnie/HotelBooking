@@ -224,6 +224,46 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
+            var bookings = _bookingService.GetBookingsByGuestId(guest.Id);
+
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
+
+            int active = bookings.Count(b => b.IsActive);
+            int history = bookings.Count(b => !b.IsActive);
+            decimal totalSpent = bookings.Sum(b => b.TotalPrice);
+
+            var lastBooking = bookings
+                .OrderByDescending(b => b.FromDate)
+                .FirstOrDefault();
+
+            string lastBookingText = lastBooking == null
+                ? "[grey]Ingen bokningshistorik[/]"
+                : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:MM-dd} – {lastBooking.ToDate:MM-dd})";
+
+            var panel = new Panel($@"[white]Gäst-ID:[/] {guest.Id}
+[white]Förnamn:[/] {guest.FirstName}
+[white]Efternamn:[/] {guest.LastName}
+
+[white]Telefon:[/] {(string.IsNullOrWhiteSpace(guest.PhoneNumber) ? "[red]Saknas[/]" : guest.PhoneNumber)}
+[white]Email:[/] {(string.IsNullOrWhiteSpace(guest.Email) ? "[red]Saknas[/]" : guest.Email)}
+
+[white]Antal bokningar:[/] {bookings.Count}
+[white]Aktiva bokningar:[/] {active}
+[white]Historiska bokningar:[/] {history}
+
+[white]Totalt spenderat:[/] {totalSpent} kr
+
+[white]Senaste bokning:[/]
+{lastBookingText}")
+            {
+                Header = new PanelHeader("[green]Gästinformation[/]"),
+                Border = BoxBorder.Rounded
+            };
+
+            AnsiConsole.Write(panel);
+
             // Förnamn
             string newFirst = AnsiConsole.Prompt(
                 new TextPrompt<string>($"Nytt förnamn (ENTER = behåll [green]{guest.FirstName}[/]):")
@@ -246,8 +286,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                     .AllowEmpty()
             );
             if (string.IsNullOrWhiteSpace(phone))
-                 phone = guest.PhoneNumber ?? "";
-
+                phone = guest.PhoneNumber ?? "";
 
             if (!string.IsNullOrWhiteSpace(phone) && phone.Any(c => !char.IsDigit(c)))
             {
@@ -285,6 +324,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 
             WaitForEsc();
         }
+
 
 
         // TA BORT GÄST
@@ -359,7 +399,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             AnsiConsole.Write(table);
 
             // Fråga efter ID
-            var id = BookingPrompts.AskBookingId(this); // du kan skapa AskGuestId om du vill
+            var id = BookingPrompts.AskBookingId(this); 
             if (id == null) return;
 
             // Bekräftelse

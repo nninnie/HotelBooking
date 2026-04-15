@@ -199,9 +199,9 @@ namespace HotelBooking.UI
             BannerUI.ShowLogo();
             BannerUI.PrintHeader("Hantera rum", subtitle);
 
-            var panel = new Panel($@"
+            var panel = new Panel($@"[grey]Rums-ID:[/] [white]{existing.Id}[/]
+
 [bold dodgerblue1]Rum[/]
-[grey]Rums-ID:[/] [white]{existing.Id}[/]
 [grey]Nummer:[/] [white]{existing.RoomNumber}[/]
 [grey]Typ:[/] [white]{existing.RoomType}[/]
 [grey]Ordinarie platser:[/] [white]{existing.Capacity}[/]

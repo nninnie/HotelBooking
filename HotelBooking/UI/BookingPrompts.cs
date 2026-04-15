@@ -307,13 +307,7 @@ namespace HotelBooking.UI
         // Fråga efter uppdateringar
         public static BookingUpdateModel? AskBookingUpdates(EscUI ui, Booking booking)
         {
-            AnsiConsole.Clear();
-            BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera bokningar", "Uppdatera bokning");
-            AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine();
-
-            AnsiConsole.MarkupLine("[green]Lämna tomt för att behålla nuvarande värde.[/]");
+            AnsiConsole.MarkupLine("[green]Tryck ENTER för att behålla nuvarande värde.[/]\n");
 
             string? newGuest = ui.AskWithEsc(
                 $"Ny gäst-ID (tomt = {Markup.Escape(booking.GuestId.ToString())}):"
