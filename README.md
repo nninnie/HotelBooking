@@ -149,6 +149,9 @@ Det gjorde koden mer flexibel, minskade kopplingar mellan klasser och gjorde det
 **Spectre.Console** hjälpte mig att skapa ett tydligt och visuellt UI med paneler, tabeller och färger.  
 Jag valde också att **seeda bokningar** för att enklare kunna testa datumlogik och lediga rum.
 
+Jag använder inga repositories eftersom EF Core redan fungerar som både repository (DbSet) och unit‑of‑work (DbContext).  
+Ett extra repository‑lager hade bara skapat onödig och duplicerad kod, så mina services arbetar direkt mot DbContext enligt modern EF Core‑praxis.
+
 En viktig lärdom är att jag hade velat lägga mer tid på **planeringen av mina POCO‑modeller**.  
 Jag arbetade iterativt och uppdaterade modellerna flera gånger, och till slut valde jag att rensa databasen och migrationerna för att bygga upp allt från början igen.  
 Det gjorde mig betydligt tryggare i hur modeller, relationer och EF Core hänger ihop och gav mig en djupare förståelse för datamodellering.
