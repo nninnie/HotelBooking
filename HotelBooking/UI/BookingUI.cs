@@ -52,7 +52,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // ⭐ Sätt tiderna här
+            // Sätt tiderna här
             var checkIn = checkInDate.Value.Date.AddHours(15);   // 15:00
             var checkOut = checkOutDate.Value.Date.AddHours(11); // 11:00
 
@@ -181,6 +181,11 @@ namespace HotelBooking.UI
                 return;
             }
 
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.WriteLine();
+
             // Hämta gäst och rum
             var guest = _guestService.GetGuest(booking.GuestId);
             var room = _roomService.GetRoom(booking.RoomId);
@@ -196,7 +201,6 @@ namespace HotelBooking.UI
         }
 
 
-        // SOFT DELETE
         public void SoftDelete(string subtitle)
         {
             AnsiConsole.Clear();
@@ -222,14 +226,16 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
-            if (bookingId <= 0)
+            // ⭐ Kontrollera att bokningen finns i listan du visade
+            var booking = bookings.FirstOrDefault(b => b.Id == bookingId.Value);
+            if (booking == null)
             {
-                BookingRenderer.ShowError("Ogiltigt boknings-ID.");
+                BookingRenderer.ShowError("Bokningen hittades inte.");
                 WaitForEsc();
                 return;
             }
 
-            bool confirm = BookingPrompts.Confirm("\nÄr du säker att du vill tabort denna bokning?");
+            bool confirm = BookingPrompts.Confirm("\nÄr du säker att du vill ta bort denna bokning?");
             if (!confirm)
             {
                 BookingRenderer.ShowError("Avbokning avbröts.");
@@ -274,13 +280,19 @@ namespace HotelBooking.UI
             var bookingId = BookingPrompts.AskBookingId(this);
             if (bookingId == null) return;
 
-            var booking = _bookingService.GetBooking(bookingId.Value);
+            var booking = bookings.FirstOrDefault(b => b.Id == bookingId.Value);
+
             if (booking == null)
             {
                 BookingRenderer.ShowError("Bokningen hittades inte.");
                 WaitForEsc();
                 return;
             }
+
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", $"Återställ boknings ID: {bookingId.Value}");
+            AnsiConsole.WriteLine();
 
             // Hämta gäst och rum
             var guest = _guestService.GetGuest(booking.GuestId);
@@ -368,10 +380,17 @@ namespace HotelBooking.UI
             var updates = BookingPrompts.AskBookingUpdates(this, booking);
             if (updates == null) return;
 
-            // Lägg på standardtider
-            updates.FromDate = updates.FromDate!.Value.Date.AddHours(15);
-            updates.ToDate = updates.ToDate!.Value.Date.AddHours(11);
+            // Fallback till befintliga datum om användaren lämnar tomt
+            var from = updates.FromDate ?? booking.FromDate;
+            var to = updates.ToDate ?? booking.ToDate;
 
+            // Lägg på standardtider
+            from = from.Date.AddHours(15);
+            to = to.Date.AddHours(11);
+
+            // Spara tillbaka
+            updates.FromDate = from;
+            updates.ToDate = to;
 
             if (updates.FromDate >= updates.ToDate)
             {
@@ -446,5 +465,68 @@ namespace HotelBooking.UI
             };
         }
 
+        public void CheckIn(string subtitle)
+        {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+            var bookings = _bookingService.GetAll()
+                .Where(b => !b.IsCheckedIn && !b.IsCompleted)
+                .ToList();
+
+            if (!bookings.Any())
+            {
+                BookingRenderer.ShowError("Inga bokningar att checka in.");
+                WaitForEsc();
+                return;
+            }
+
+            var bookingId = BookingPrompts.SelectBooking(this, bookings);
+            if (bookingId == null) return;
+
+            if (_bookingService.CheckIn(bookingId.Value))
+                AnsiConsole.MarkupLine("[green]✔ Gästen är nu incheckad.[/]");
+            else
+                BookingRenderer.ShowError("Kunde inte checka in gästen.");
+
+            WaitForEsc();
+        }
+
+        public void CheckOut(string subtitle)
+        {
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+            var bookings = _bookingService.GetAll()
+                .Where(b => b.IsCheckedIn)
+                .ToList();
+
+            if (!bookings.Any())
+            {
+                BookingRenderer.ShowError("Inga gäster är incheckade.");
+                WaitForEsc();
+                return;
+            }
+
+            var bookingId = BookingPrompts.SelectBooking(this, bookings);
+            if (bookingId == null) return;
+
+            bool? pay = AskBoolOrEsc("Vill du betala fakturan nu?", defaultValue: false);
+
+            if (pay == null)
+            {
+                // ESC → avbryt
+                return;
+            }
+
+            if (_bookingService.CheckOut(bookingId.Value, pay.Value))
+                AnsiConsole.MarkupLine("[green]✔ Gäst utcheckad.[/]");
+            else
+                BookingRenderer.ShowError("Kunde inte checka ut gästen.");
+        }
+
+
+        }
     }
-}

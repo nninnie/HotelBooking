@@ -389,5 +389,40 @@ namespace HotelBooking.UI
                 ErrorService.Error("Ogiltigt val. Skriv j eller n.");
             }
         }
+
+        public static int? SelectBooking(BookingUI ui, List<Booking> bookings)
+        {
+            // Om listan är tom
+            if (bookings == null || bookings.Count == 0)
+                return null;
+
+            var prompt = new SelectionPrompt<Booking>()
+                .Title("[yellow]Välj en bokning:[/]")
+                .PageSize(10)
+                .MoreChoicesText("[grey](scrolla för fler)[/]")
+                .UseConverter(b =>
+                {
+                    var guest = b.Guest != null
+                        ? $"{b.Guest.FirstName} {b.Guest.LastName}"
+                        : "Okänd gäst";
+
+                    var room = b.Room != null
+                        ? $"Rum {b.Room.RoomNumber}"
+                        : "Okänt rum";
+
+                    return $"#{b.Id} | {guest} | {room} | {b.FromDate:yyyy-MM-dd}";
+                });
+
+            // Lägg till valen
+            prompt.AddChoices(bookings);
+
+            // Kör prompten
+            var selected = AnsiConsole.Prompt(prompt);
+
+            // Returnera ID
+            return selected?.Id;
+        }
+
+
     }
 }

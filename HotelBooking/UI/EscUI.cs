@@ -55,7 +55,7 @@ namespace HotelBooking.UI
             }
         }
         // Numerisk input som kan avbrytas med ESC
-        public int? AskIntOrEsc(string question)
+        public int? AskIntOrEsc(string question, int? defaultValue = null)
         {
             AnsiConsole.Markup($"{question} ");
 
@@ -72,12 +72,17 @@ namespace HotelBooking.UI
                 if (key.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
+
+                    // ⭐ ENTER = behåll värde
+                    if (string.IsNullOrWhiteSpace(input))
+                        return defaultValue;
+
                     if (int.TryParse(input, out int value))
                         return value;
 
                     AnsiConsole.MarkupLine("[red]Ogiltigt nummer. Försök igen.[/]");
                     input = "";
-                    AnsiConsole.Markup($"{question}: ");
+                    AnsiConsole.Markup($"{question} ");
                     continue;
                 }
 
@@ -93,6 +98,7 @@ namespace HotelBooking.UI
                 }
             }
         }
+
 
         // Lista med piltangenter + ESC för att avbryta
         public T? SelectWithEsc<T>(List<T> items, Func<T, string> converter, string? header = null)

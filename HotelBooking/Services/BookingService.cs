@@ -228,5 +228,37 @@ namespace HotelBooking.Services
                 .OrderBy(b => b.FromDate)
                 .ToList();
         }
+
+        public bool CheckIn(int bookingId)
+        {
+            var booking = GetBooking(bookingId);
+            if (booking == null) return false;
+
+            if (DateTime.Now < booking.FromDate)
+                return false;
+
+            booking.IsCheckedIn = true;
+            _db.SaveChanges();
+            return true;
+        }
+
+        public bool CheckOut(int bookingId, bool payInvoice)
+        {
+            var booking = GetBooking(bookingId);
+            if (booking == null) return false;
+
+            if (!booking.IsCheckedIn)
+                return false;
+
+            if (payInvoice && booking.Invoice != null)
+                booking.Invoice.IsPaid = true;
+
+            booking.IsCheckedIn = false;
+            booking.IsCompleted = true;
+
+            _db.SaveChanges();
+            return true;
+        }
+
     }
 }

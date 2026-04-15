@@ -18,5 +18,9 @@ namespace HotelBooking.Services.Interfaces
         decimal GetTotalSpentByGuest(int guestId);
         List<Booking> GetBookingsByGuestId(int guestId);
         IEnumerable<Booking> GetDeleted();
+        bool CheckIn(int bookingId);
+        bool CheckOut(int bookingId, bool payInvoice);
+
+
     }
 }

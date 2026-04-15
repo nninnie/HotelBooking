@@ -26,9 +26,11 @@ public class Booking
     public DateTime ToDate { get; set; }
 
     public DateTime BookingDate { get; set; } = DateTime.Now;
+    public bool IsCheckedIn { get; set; }
+    public bool IsCompleted { get; set; }
 
-    public bool IsDeleted { get; set; } = false;     // Soft delete
-    public bool IsCancelled { get; set; } = false;   // Avbokad / obetald
+    public bool IsDeleted { get; set; } = false;    
+    public bool IsCancelled { get; set; } = false;   
 
     [NotMapped]
     public bool IsActive

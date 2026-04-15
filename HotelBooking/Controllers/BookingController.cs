@@ -18,16 +18,19 @@ namespace HotelBooking.Controllers
             {
                 // CrudMenuUI 
                 string? choice = CrudMenuUI.Show(
-     "Hantera bokningar",
-     "Välj ett alternativ",
-     "Skapa ny",
-     "Visa alla",
-     "Visa detaljer",
-     "Uppdatera",
-     "Ta bort",
-     "Återställ",
-     "Tillbaka"
- );
+    "Hantera bokningar",
+    "Välj ett alternativ",
+    "Skapa ny",
+    "Visa alla",
+    "Visa detaljer",
+    "Uppdatera",
+    "Ta bort",
+    "Återställ",
+    "Checka in",
+    "Checka ut",
+    "Tillbaka"
+);
+
 
                 if (choice == null)
                     return; 
@@ -56,6 +59,14 @@ namespace HotelBooking.Controllers
 
                     case "Återställ":
                         _bookingUI.Restore(choice);
+                        break;
+
+                    case "Checka in":
+                        _bookingUI.CheckIn(choice);
+                        break;
+
+                    case "Checka ut":
+                        _bookingUI.CheckOut(choice);
                         break;
 
                     case "Tillbaka":
