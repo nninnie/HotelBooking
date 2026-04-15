@@ -535,7 +535,7 @@ namespace HotelBooking.UI
 
             if (_bookingService.CheckOut(bookingId.Value, pay.Value))
             {
-                AnsiConsole.MarkupLine("[green]✔ Gäst utcheckad.[/]");
+                AnsiConsole.MarkupLine("\n[green]✔ Gäst utcheckad.[/]");
                 WaitForEsc();
             }
             else

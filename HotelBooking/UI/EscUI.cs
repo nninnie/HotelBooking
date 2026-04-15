@@ -330,25 +330,20 @@ namespace HotelBooking.UI
 
         public bool? AskBoolOrEsc(string question, bool defaultValue)
         {
-            AnsiConsole.Markup($"{question} (j/n, ENTER = {defaultValue}, ESC för att avbryta): ");
+            AnsiConsole.Markup($"{question} [grey](j/n, ENTER = {defaultValue}, ESC = avbryt)[/]: ");
 
             while (true)
             {
-                var key = Console.ReadKey(true);
-
-                if (key.Key == ConsoleKey.Escape)
-                    return null;
-
-                if (key.Key == ConsoleKey.J)
-                    return true;
-
-                if (key.Key == ConsoleKey.N)
-                    return false;
-
-                if (key.Key == ConsoleKey.Enter)
-                    return defaultValue;
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.J: return true;
+                    case ConsoleKey.N: return false;
+                    case ConsoleKey.Enter: return defaultValue;
+                    case ConsoleKey.Escape: return null;
+                }
             }
         }
+
 
         public int? AskIntOrEsc(string question, int defaultValue)
         {
