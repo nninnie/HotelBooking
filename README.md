@@ -41,28 +41,58 @@ All data lagras i en SQL‑databas som genereras via EF Core Code First.
 
 ## 🧱 Arkitektur
 
-📦 **Data**  
-- `HotelDBContext` – EF Core databas  
-- `BuildDB` – migrationer + seed  
+## 📦 Data
+Data‑lagret innehåller allt som rör databasen och kopplingen mellan C# och SQL.
 
-🧠 **Services (affärslogik)**  
-- RoomService  
-- GuestService  
-- BookingService  
-- InvoiceService  
-- PaymentService  
+- **HotelDBContext** – EF Core‑databasen och alla DbSets  
+- **BuildDB** – ansvarar för migreringar och seed‑data  
 
-🎛️ **Controllers (menyflöden)**  
-- MainMenuController  
-- LoginController  
-- Undermenyer för rum, gäster, bokningar, fakturor  
 
-🖥️ **UI‑lager**  
-- RoomUI  
-- GuestUI  
-- BookingUI  
-- InvoiceUI  
-- PaymentUI  
+## 🧠 Services (affärslogik)
+Services‑lagret innehåller all affärslogik.  
+Här ligger reglerna för hur gäster, rum, bokningar, fakturor och betalningar ska hanteras.
+
+- **RoomService** – logik för rum  
+- **GuestService** – logik för gäster  
+- **BookingService** – logik för bokningar och datumkontroller  
+- **InvoiceService** – logik för fakturor  
+- **PaymentService** – logik för betalstatus  
+
+**Notering:**  
+Jag använder **inga repositories**.  
+Services pratar direkt med **HotelDBContext**, vilket är ett renare och mer modernt sätt att arbeta med EF Core eftersom EF Core redan fungerar som repository + unit‑of‑work.
+
+## 🎛️ Controllers (menyflöden)
+Controllers styr navigeringen i systemet och kopplar ihop UI med services.
+
+- **MainMenuController** – huvudmenyn och navigation  
+- **LoginController** – inloggning och åtkomst  
+- **RoomController** – undermeny för rum  
+- **GuestController** – undermeny för gäster  
+- **BookingController** – undermeny för bokningar  
+- **InvoiceController** – undermeny för fakturor  
+- **PaymentController** – undermeny för betalningar  
+
+Controllers ansvarar för flödet, medan UI‑klasserna visar innehållet och Services utför logiken.
+
+
+## 🖥️ UI‑lager
+UI‑lagret innehåller alla användarflöden och menyer. Varje UI‑klass ansvarar för ett specifikt område i systemet, vilket gör strukturen tydlig, separerad och lätt att underhålla.
+
+- **MainMenuUI** – huvudmenyn och navigering  
+- **CrudMenuUI** – CRUD‑menyer för gäster, rum och bokningar  
+- **BookingUI** – bokningsflöden, datumval och logik kopplat till bokningar  
+- **GuestUI** – hanterar alla flöden för gäster  
+- **RoomUI** – hanterar alla flöden för rum  
+- **InvoiceUI** – visar och hanterar fakturor  
+- **PaymentUI** – hanterar betalstatus och betalningsflöden  
+- **BookingPrompts** – all input och validering för bokningar  
+- **BookingRenderer** – tabeller, paneler och visuell presentation av bokningar  
+- **CalenderPicker** – kalendern för datumval  
+- **BannerUI** – visar projektets banner och branding  
+- **SpectreCenter** – centrerings‑hjälp för UI‑element  
+- **EscUI** – hanterar ESC‑flöden och återgångar i menyer  
+
 
 UI‑klasserna hanterar input/output och använder Spectre.Console för tabeller, paneler och färg.
 
