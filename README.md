@@ -130,23 +130,20 @@ Databasen skapas och seedas automatiskt.
 - C#  
 - LINQ  
 
-## 💬 Reflektioner
+### 🧩 Arkitektur, SOLID & lärdomar
+Jag har arbetat enligt **SOLID‑principerna**, framför allt **Single Responsibility Principle**, där varje klass har ett tydligt och avgränsat ansvar.  
+Exempel: *BookingPrompts* (input), *BookingRenderer* (visning), *CalendarPicker* (datumval), *BannerUI* (header), *EscUI* (ESC‑flöden), *Services* (affärslogik), *Controllers* (menyflöden) och *DbContext* (databas).  
+Detta gav ett mer strukturerat, testbart och lättutbyggt system.
 
-Jag tyckte det var väldigt roligt att arbeta med **Autofac**, eftersom det gjorde projektet mer strukturerat och gav mig en tydlig separation mellan logik och beroenden.  
-Det var också kul att jobba med **Spectre.Console**, som gjorde det möjligt att skapa ett mer visuellt och professionellt UI med paneler, tabeller och färger.
+Jag följde även **DIP (Dependency Inversion Principle)** genom att använda **Autofac** för beroendeinjektion.  
+Det gjorde koden mer flexibel, minskade kopplingar mellan klasser och gjorde det enkelt att byta implementationer utan att ändra i UI eller controllers.
 
-För att underlätta testningen valde jag att **seeda bokningar**, vilket gjorde det mycket enklare att testa datumlogik, lediga rum och bokningsflöden utan att behöva skapa allt manuellt varje gång.
+**Spectre.Console** hjälpte mig att skapa ett tydligt och visuellt UI med paneler, tabeller och färger.  
+Jag valde också att **seeda bokningar** för att enklare kunna testa datumlogik och lediga rum.
 
-Jag byggde även flera UI‑hjälpklasser som gjorde utvecklingen smidigare:
-
-- **BannerUI** gav projektet en tydlig identitet och gjorde att varje meny fick en enhetlig header.  
-- **EscUI** gjorde navigeringen mer användarvänlig genom att hantera ESC‑flöden och återgångar.  
-- **BookingPrompts** och **BookingRenderer** hjälpte mig att separera input och visning, vilket gjorde koden renare och UI:t mer konsekvent.  
-- **CalendarPicker** var rolig att bygga och gjorde datumvalet mycket mer intuitivt.
-
-En sak jag hade gjort annorlunda är att lägga ännu mer tid på **planeringen av mina POCO‑modeller**.  
-Jag har arbetat iterativt och uppdaterat modellerna flera gånger under projektets gång — vilket är naturligt — men med mer förarbete hade vissa ändringar kunnat undvikas.  
-Samtidigt har det lärt mig mycket om datamodellering och hur ett system växer fram i praktiken.
+En lärdom är att jag hade velat lägga mer tid på planeringen av mina POCO‑modeller.  
+Jag arbetade iterativt och uppdaterade modellerna flera gånger, och till slut valde jag att ta bort databasen och migrationerna för att bygga upp allt från början igen.  
+Det gjorde mig mycket tryggare i hur modeller, relationer och EF Core hänger ihop, och gav mig en djupare förståelse för datamodellering.
 
 
 ## ✍️ Utvecklat av
