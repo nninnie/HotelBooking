@@ -132,15 +132,22 @@ Databasen skapas och seedas automatiskt.
 
 ## 💬 Reflektioner
 
-Jag tyckte det var väldigt roligt att arbeta med **Autofac**.  
-Det gjorde projektet mer strukturerat och gav mig en tydligare separation mellan logik och beroenden.  
-Det var också kul att jobba med **Spectre.Console**, eftersom det gav mig möjlighet att skapa ett mer visuellt och professionellt UI direkt i konsolen med paneler, tabeller och färger.
+Jag tyckte det var väldigt roligt att arbeta med **Autofac**, eftersom det gjorde projektet mer strukturerat och gav mig en tydlig separation mellan logik och beroenden.  
+Det var också kul att jobba med **Spectre.Console**, som gjorde det möjligt att skapa ett mer visuellt och professionellt UI med paneler, tabeller och färger.
 
-För att underlätta testningen valde jag att **seeda bokningar**, vilket gjorde det mycket enklare att kontrollera datumlogik, lediga rum och flöden utan att behöva skapa allt manuellt varje gång.
+För att underlätta testningen valde jag att **seeda bokningar**, vilket gjorde det mycket enklare att testa datumlogik, lediga rum och bokningsflöden utan att behöva skapa allt manuellt varje gång.
+
+Jag byggde även flera UI‑hjälpklasser som gjorde utvecklingen smidigare:
+
+- **BannerUI** gav projektet en tydlig identitet och gjorde att varje meny fick en enhetlig header.  
+- **EscUI** gjorde navigeringen mer användarvänlig genom att hantera ESC‑flöden och återgångar.  
+- **BookingPrompts** och **BookingRenderer** hjälpte mig att separera input och visning, vilket gjorde koden renare och UI:t mer konsekvent.  
+- **CalendarPicker** var rolig att bygga och gjorde datumvalet mycket mer intuitivt.
 
 En sak jag hade gjort annorlunda är att lägga ännu mer tid på **planeringen av mina POCO‑modeller**.  
-Jag har arbetat iterativt och uppdaterat modellerna flera gånger under projektets gång, vilket är naturligt — men med mer förarbete hade vissa justeringar kunnat undvikas.  
+Jag har arbetat iterativt och uppdaterat modellerna flera gånger under projektets gång — vilket är naturligt — men med mer förarbete hade vissa ändringar kunnat undvikas.  
 Samtidigt har det lärt mig mycket om datamodellering och hur ett system växer fram i praktiken.
+
 
 ## ✍️ Utvecklat av
 **Ninnie – Hotel Booking Console App**
