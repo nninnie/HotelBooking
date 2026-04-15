@@ -95,7 +95,6 @@ UI‑lagret innehåller alla användarflöden och menyer. Varje UI‑klass ansva
 - **SpectreCenter** – centrerings‑hjälp för UI‑element  
 - **EscUI** – hanterar ESC‑flöden och återgångar i menyer  
 
-
 UI‑klasserna hanterar input/output och använder Spectre.Console för tabeller, paneler och färg.
 
 🧩 **Dependency Injection**  
@@ -130,6 +129,18 @@ Databasen skapas och seedas automatiskt.
 - Spectre.Console  
 - C#  
 - LINQ  
+
+## 💬 Reflektioner
+
+Jag tyckte det var väldigt roligt att arbeta med **Autofac**.  
+Det gjorde projektet mer strukturerat och gav mig en tydligare separation mellan logik och beroenden.  
+Det var också kul att jobba med **Spectre.Console**, eftersom det gav mig möjlighet att skapa ett mer visuellt och professionellt UI direkt i konsolen med paneler, tabeller och färger.
+
+För att underlätta testningen valde jag att **seeda bokningar**, vilket gjorde det mycket enklare att kontrollera datumlogik, lediga rum och flöden utan att behöva skapa allt manuellt varje gång.
+
+En sak jag hade gjort annorlunda är att lägga ännu mer tid på **planeringen av mina POCO‑modeller**.  
+Jag har arbetat iterativt och uppdaterat modellerna flera gånger under projektets gång, vilket är naturligt — men med mer förarbete hade vissa justeringar kunnat undvikas.  
+Samtidigt har det lärt mig mycket om datamodellering och hur ett system växer fram i praktiken.
 
 ## ✍️ Utvecklat av
 **Ninnie – Hotel Booking Console App**
