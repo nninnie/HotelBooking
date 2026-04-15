@@ -141,9 +141,9 @@ Det gjorde koden mer flexibel, minskade kopplingar mellan klasser och gjorde det
 **Spectre.Console** hjälpte mig att skapa ett tydligt och visuellt UI med paneler, tabeller och färger.  
 Jag valde också att **seeda bokningar** för att enklare kunna testa datumlogik och lediga rum.
 
-En lärdom är att jag hade velat lägga mer tid på planeringen av mina POCO‑modeller.  
-Jag arbetade iterativt och uppdaterade modellerna flera gånger, och till slut valde jag att ta bort databasen och migrationerna för att bygga upp allt från början igen.  
-Det gjorde mig mycket tryggare i hur modeller, relationer och EF Core hänger ihop, och gav mig en djupare förståelse för datamodellering.
+En viktig lärdom är att jag hade velat lägga mer tid på **planeringen av mina POCO‑modeller**.  
+Jag arbetade iterativt och uppdaterade modellerna flera gånger, och till slut valde jag att rensa databasen och migrationerna för att bygga upp allt från början igen.  
+Det gjorde mig betydligt tryggare i hur modeller, relationer och EF Core hänger ihop och gav mig en djupare förståelse för datamodellering.
 
 
 ## ✍️ Utvecklat av
