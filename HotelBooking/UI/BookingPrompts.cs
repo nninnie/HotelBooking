@@ -174,10 +174,11 @@ namespace HotelBooking.UI
                     var g = pageItems[i];
                     string line = Markup.Escape($"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}");
 
+                    // ⭐ IDENTISK SPECTRE‑HIGHLIGHT SOM SELECTBOOKING
                     if (i == index)
-                        AnsiConsole.MarkupLine($"[black on green]{line}[/]");
+                        AnsiConsole.MarkupLine($"[black on green]> {line}[/]");
                     else
-                        AnsiConsole.MarkupLine(line);
+                        AnsiConsole.MarkupLine($"  {line}");
                 }
 
                 var key = Console.ReadKey(true).Key;
@@ -234,6 +235,7 @@ namespace HotelBooking.UI
                 }
             }
         }
+
 
         // Antal gäster
         public static int? AskGuestCount(EscUI ui)
@@ -390,37 +392,120 @@ namespace HotelBooking.UI
             }
         }
 
-        public static int? SelectBooking(BookingUI ui, List<Booking> bookings)
+        public static int? SelectBooking(EscUI ui, List<Booking> bookings, string subtitle)
         {
-            // Om listan är tom
-            if (bookings == null || bookings.Count == 0)
+            if (!bookings.Any())
+            {
+                AnsiConsole.MarkupLine("[red]Inga bokningar hittades.[/]");
+                ui.WaitForEsc();
                 return null;
+            }
 
-            var prompt = new SelectionPrompt<Booking>()
-                .Title("[yellow]Välj en bokning:[/]")
-                .PageSize(10)
-                .MoreChoicesText("[grey](scrolla för fler)[/]")
-                .UseConverter(b =>
+            int pageSize = 10;
+            int page = 0;
+            int index = 0;
+
+            while (true)
+            {
+                AnsiConsole.Clear();
+                BannerUI.ShowLogo();
+                BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+                int totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
+
+                var pageItems = bookings
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                if (index >= pageItems.Count)
+                    index = pageItems.Count - 1;
+
+                AnsiConsole.MarkupLine($"[grey]Sida {page + 1} / {totalPages}[/]");
+                AnsiConsole.WriteLine();
+
+                for (int i = 0; i < pageItems.Count; i++)
                 {
-                    var guest = b.Guest != null
+                    var b = pageItems[i];
+
+                    string guest = b.Guest != null
                         ? $"{b.Guest.FirstName} {b.Guest.LastName}"
                         : "Okänd gäst";
 
-                    var room = b.Room != null
+                    string room = b.Room != null
                         ? $"Rum {b.Room.RoomNumber}"
                         : "Okänt rum";
 
-                    return $"#{b.Id} | {guest} | {room} | {b.FromDate:yyyy-MM-dd}";
-                });
+                    string text = $"#{b.Id} – {guest} – {room} – {b.FromDate:yyyy-MM-dd}";
 
-            // Lägg till valen
-            prompt.AddChoices(bookings);
+                    if (i == index)
+                        AnsiConsole.MarkupLine($"[black on green]> {text}[/]");
+                    else
+                        AnsiConsole.MarkupLine($"  {text}");
+                }
 
-            // Kör prompten
-            var selected = AnsiConsole.Prompt(prompt);
+                var key = Console.ReadKey(true).Key;
 
-            // Returnera ID
-            return selected?.Id;
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        index--;
+                        if (index < 0)
+                        {
+                            if (page > 0)
+                            {
+                                page--;
+                                index = pageSize - 1;
+                            }
+                            else index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        index++;
+                        if (index >= pageItems.Count)
+                        {
+                            if (page < totalPages - 1)
+                            {
+                                page++;
+                                index = 0;
+                            }
+                            else index = pageItems.Count - 1;
+                        }
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        if (page > 0)
+                        {
+                            page--;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (page < totalPages - 1)
+                        {
+                            page++;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        return pageItems[index].Id;
+
+                    case ConsoleKey.Escape:
+                        return null;
+                }
+            }
+        }
+
+        public static int? SelectCheckedInBooking(EscUI ui, IBookingService bookingService, string subtitle)
+        {
+            var bookings = bookingService.GetAll()
+                .Where(b => b.IsCheckedIn)
+                .ToList();
+
+            return SelectBooking(ui, bookings, subtitle);
         }
 
 

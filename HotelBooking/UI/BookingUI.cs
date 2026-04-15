@@ -482,8 +482,9 @@ namespace HotelBooking.UI
                 return;
             }
 
-            var bookingId = BookingPrompts.SelectBooking(this, bookings);
-            if (bookingId == null) return;
+            var bookingId = BookingPrompts.SelectBooking(this, bookings, subtitle);
+            if (bookingId == null)
+                return;
 
             if (_bookingService.CheckIn(bookingId.Value))
                 AnsiConsole.MarkupLine("[green]✔ Gästen är nu incheckad.[/]");
@@ -492,6 +493,7 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
+
 
         public void CheckOut(string subtitle)
         {
@@ -510,23 +512,26 @@ namespace HotelBooking.UI
                 return;
             }
 
-            var bookingId = BookingPrompts.SelectBooking(this, bookings);
-            if (bookingId == null) return;
+            // RÄTT METOD
+            var bookingId = BookingPrompts.SelectCheckedInBooking(this, _bookingService, subtitle);
+            if (bookingId == null)
+                return;
 
             bool? pay = AskBoolOrEsc("Vill du betala fakturan nu?", defaultValue: false);
-
             if (pay == null)
-            {
-                // ESC → avbryt
                 return;
-            }
 
             if (_bookingService.CheckOut(bookingId.Value, pay.Value))
+            {
                 AnsiConsole.MarkupLine("[green]✔ Gäst utcheckad.[/]");
+                WaitForEsc();
+            }
             else
+            {
                 BookingRenderer.ShowError("Kunde inte checka ut gästen.");
+                WaitForEsc();
+            }
         }
 
-
-        }
     }
+}

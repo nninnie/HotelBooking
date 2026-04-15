@@ -21,13 +21,13 @@ namespace HotelBooking.Controllers
     "Hantera bokningar",
     "Välj ett alternativ",
     "Skapa ny",
+    "Checka in",
+    "Checka ut",
     "Visa alla",
     "Visa detaljer",
     "Uppdatera",
     "Ta bort",
     "Återställ",
-    "Checka in",
-    "Checka ut",
     "Tillbaka"
 );
 
@@ -39,6 +39,14 @@ namespace HotelBooking.Controllers
                 {
                     case "Skapa ny":
                         _bookingUI.Create(choice);  
+                        break;
+
+                    case "Checka in":
+                        _bookingUI.CheckIn(choice);
+                        break;
+
+                    case "Checka ut":
+                        _bookingUI.CheckOut(choice);
                         break;
 
                     case "Visa alla":
@@ -61,13 +69,7 @@ namespace HotelBooking.Controllers
                         _bookingUI.Restore(choice);
                         break;
 
-                    case "Checka in":
-                        _bookingUI.CheckIn(choice);
-                        break;
 
-                    case "Checka ut":
-                        _bookingUI.CheckOut(choice);
-                        break;
 
                     case "Tillbaka":
                         return;
