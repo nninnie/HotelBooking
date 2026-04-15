@@ -11,16 +11,16 @@ All data lagras i en SQL‑databas som genereras via EF Core Code First.
 
 🛏️ **Rum**  
 - Skapa, visa, uppdatera och ta bort rum  
-- Enkelrum, dubbelrum och familjerum  
-- Extrasängar beroende på rumstyp  
+- Enkelrum, dubbelrum, familjerum  och svit
+- Extrasängar beroende på rumstyp (kvm)  
 - Pris per natt, kapacitet och rumsinfo  
 
 👤 **Gäster**  
-- Registrera nya gäster  
-- Uppdatera och visa gäster  
+- - Skapa, visa, uppdatera och ta bort gäster  
 - Kontroll vid borttagning om gästen har bokningar  
 
 📅 **Bokningar**  
+- Skapa, visa, uppdatera och ta bort bokning  
 - Boka rum för valfritt datumintervall  
 - Kontroll av dubbelbokningar  
 - Giltiga datum (ej dåtid, ej check‑out före check‑in)  
