@@ -9,7 +9,7 @@ namespace HotelBooking.UI
         public static void ShowBookingDetails(Booking booking, Guest? guest, Room? room)
         {
             // Prisberäkning
-            int nights = (booking.ToDate - booking.FromDate).Days;
+            int nights = (booking.ToDate.Date - booking.FromDate.Date).Days;
             if (nights < 1) nights = 1;
 
             decimal pricePerNight = room?.PricePerNight ?? 0;

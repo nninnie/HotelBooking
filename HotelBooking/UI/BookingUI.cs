@@ -2,6 +2,7 @@
 using HotelBooking.Services.Interfaces;
 using Spectre.Console;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HotelBooking.UI
 {
@@ -481,15 +482,26 @@ namespace HotelBooking.UI
                 WaitForEsc();
                 return;
             }
-
             var bookingId = BookingPrompts.SelectBooking(this, bookings, subtitle);
             if (bookingId == null)
                 return;
 
             if (_bookingService.CheckIn(bookingId.Value))
-                AnsiConsole.MarkupLine("[green]✔ Gästen är nu incheckad.[/]");
+            {
+                var date = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+
+                var panel = new Panel($"[green]✔ Gästen är nu incheckad[/]\n[grey]{date}[/]")
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1)
+                };
+
+                AnsiConsole.Write(panel);
+            }
             else
+            {
                 BookingRenderer.ShowError("Kunde inte checka in gästen.");
+            }
 
             WaitForEsc();
         }
