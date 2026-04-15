@@ -60,8 +60,10 @@ Här ligger reglerna för hur gäster, rum, bokningar, fakturor och betalningar 
 
 **Notering:**  
 Jag använder **inga repositories**.  
-Services pratar direkt med **HotelDBContext**, vilket är ett renare och mer modernt sätt att arbeta med EF Core eftersom EF Core redan fungerar som repository + unit‑of‑work.
-
+Services pratar direkt med **HotelDBContext**, vilket är ett renare och mer modernt sätt att arbeta med EF Core eftersom EF Core redan fungerar som repository + unit‑of‑work, så ett extra repository‑lager hade bara skapat onödig och duplicerad kod.
+- DbSet fungerar som repository
+- DbContext fungerar som unit‑of‑work
+- 
 ## 🎛️ Controllers (menyflöden)
 Controllers styr navigeringen i systemet och kopplar ihop UI med services.
 
