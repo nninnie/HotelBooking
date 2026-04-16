@@ -344,6 +344,21 @@ namespace HotelBooking.UI
             }
         }
 
+        public bool? AskBoolOrEsc(bool defaultValue)
+        {
+            while (true)
+            {
+                switch (Console.ReadKey(true).Key)
+                {
+                    case ConsoleKey.J: return true;
+                    case ConsoleKey.N: return false;
+                    case ConsoleKey.Enter: return defaultValue;
+                    case ConsoleKey.Escape: return null;
+                }
+            }
+        }
+
+
 
         public int? AskIntOrEsc(string question, int defaultValue)
         {

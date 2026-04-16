@@ -139,7 +139,6 @@ namespace HotelBooking.UI
         }
 
 
-
         // MARKERA SOM BETALD
         public void MarkAsPaid(string subtitle)
         {
@@ -181,6 +180,54 @@ namespace HotelBooking.UI
 
             bool success = _iinvoiceService.MarkAsPaid(id.Value);
 
+            // ⭐ MINI-FAKTURA (endast UI, ingen logik ändrad)
+            if (success)
+            {
+                // Hämta om fakturan så PaidDate är uppdaterad
+                invoice = _iinvoiceService.GetInvoice(id.Value);
+
+                if (invoice == null)
+                {
+                    BookingRenderer.ShowError("Fakturan kunde inte laddas efter betalning.");
+                    WaitForEsc();
+                    return;
+                }
+
+                // Null-säkra relaterade objekt
+                if (invoice.Booking == null || invoice.Booking.Guest == null || invoice.Booking.Room == null)
+                {
+                    BookingRenderer.ShowError("Kunde inte ladda boknings-, gäst- eller rumsinformation.");
+                    WaitForEsc();
+                    return;
+                }
+
+                var booking = invoice.Booking;
+                var guest = booking.Guest;
+                var room = booking.Room;
+
+                string paidDate = invoice.PaidDate?.ToString("yyyy-MM-dd") ?? "-";
+                string status = invoice.IsPaid ? "[green]Betald[/]" : "[red]Obetald[/]";
+
+                var invoiceText =
+                    $"[white]Faktura-ID:[/] {invoice.Id}\n" +
+                    $"[white]Boknings-ID:[/] {booking.Id}\n" +
+                    $"[white]Gäst:[/] {Markup.Escape(guest.FirstName)} {Markup.Escape(guest.LastName)}\n" +
+                    $"[white]Rum:[/] {room.RoomNumber}\n" +
+                    $"[white]Totalbelopp:[/] {invoice.TotalAmount} kr\n" +
+                    $"[white]Skapad:[/] {invoice.CreatedDate:yyyy-MM-dd}\n" +
+                    $"[white]Betald datum:[/] {paidDate}\n" +
+                    $"[white]Status:[/] {status}";
+
+                var invoicePanel = new Panel(invoiceText)
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1),
+                    Header = new PanelHeader("Faktura")
+                };
+
+                AnsiConsole.WriteLine();
+                AnsiConsole.Write(invoicePanel);
+            }
 
             BookingRenderer.ShowResult(
                 success,
@@ -191,6 +238,6 @@ namespace HotelBooking.UI
             WaitForEsc();
         }
 
- 
+
     }
 }

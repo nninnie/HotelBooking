@@ -54,7 +54,7 @@ namespace HotelBooking.UI
             }
 
             // Sätt tiderna här
-            var checkIn = checkInDate.Value.Date.AddHours(15);   // 15:00
+            var checkIn = checkInDate.Value.Date.AddHours(13);   // 13:00
             var checkOut = checkOutDate.Value.Date.AddHours(11); // 11:00
 
             var guestsCount = BookingPrompts.AskGuestCount(this);
@@ -99,8 +99,8 @@ namespace HotelBooking.UI
                 return;
             }
 
-            int nights = (checkOut - checkIn).Days;
-            decimal totalPrice = nights * room.PricePerNight;
+            int nights = booking.Nights;
+            decimal totalPrice = booking.TotalPrice;
 
             AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine("[green]Bokningen är klar![/]");
@@ -192,7 +192,7 @@ namespace HotelBooking.UI
             var room = _roomService.GetRoom(booking.RoomId);
 
             // Visa DETALJER 
-            int nights = (booking.ToDate - booking.FromDate).Days;
+            int nights = booking.Nights;
             if (nights < 1) nights = 1;
 
             var panel = BuildBookingPanel(booking, guest, room);
@@ -300,7 +300,8 @@ namespace HotelBooking.UI
             var room = _roomService.GetRoom(booking.RoomId);
 
             // Beräkna nätter
-            int nights = (booking.ToDate - booking.FromDate).Days;
+            int nights = booking.Nights;
+
             if (nights < 1) nights = 1;
 
             var panel = BuildBookingPanel(booking, guest, room);
@@ -371,7 +372,7 @@ namespace HotelBooking.UI
             var room = _roomService.GetRoom(booking.RoomId);
 
             // Beräkna nätter
-            int nights = (booking.ToDate - booking.FromDate).Days;
+            int nights = booking.Nights;
             if (nights < 1) nights = 1;
 
             var panel = BuildBookingPanel(booking, guest, room);
@@ -386,7 +387,7 @@ namespace HotelBooking.UI
             var to = updates.ToDate ?? booking.ToDate;
 
             // Lägg på standardtider
-            from = from.Date.AddHours(15);
+            from = from.Date.AddHours(13);
             to = to.Date.AddHours(11);
 
             // Spara tillbaka
@@ -427,7 +428,8 @@ namespace HotelBooking.UI
 
         private Panel BuildBookingPanel(Booking booking, Guest? guest, Room? room)
         {
-            int nights = (booking.ToDate - booking.FromDate).Days;
+            int nights = booking.Nights;
+
             if (nights < 1) nights = 1;
 
             string status = booking.IsCancelled
@@ -482,21 +484,39 @@ namespace HotelBooking.UI
                 WaitForEsc();
                 return;
             }
-            var bookingId = BookingPrompts.SelectBooking(this, bookings, subtitle);
+
+            var bookingId = BookingPrompts.SelectBookingFromList(this, bookings, subtitle);
             if (bookingId == null)
                 return;
 
-            if (_bookingService.CheckIn(bookingId.Value))
+            // HÄMTA BOOKING FÖRST
+            var booking = bookings.First(b => b.Id == bookingId.Value);
+
+            // Visa detaljerad panel
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+            var guest = _guestService.GetGuest(booking.GuestId);
+            var room = _roomService.GetRoom(booking.RoomId);
+
+            var panel = BuildBookingPanel(booking, guest, room);
+            AnsiConsole.Write(panel);
+
+            // Check-in logik
+            if (_bookingService.CheckIn(booking.Id))
             {
                 var date = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
-                var panel = new Panel($"[green]✔ Gästen är nu incheckad[/]\n[grey]{date}[/]")
+                var donePanel = new Panel(
+                    $"[black on green]✔ Gästen är nu incheckad[/]\n[grey]{date}[/]"
+                )
                 {
                     Border = BoxBorder.Rounded,
                     Padding = new Padding(1, 1)
                 };
 
-                AnsiConsole.Write(panel);
+                AnsiConsole.Write(donePanel);
             }
             else
             {
@@ -505,7 +525,6 @@ namespace HotelBooking.UI
 
             WaitForEsc();
         }
-
 
         public void CheckOut(string subtitle)
         {
@@ -524,25 +543,132 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // RÄTT METOD
             var bookingId = BookingPrompts.SelectCheckedInBooking(this, _bookingService, subtitle);
             if (bookingId == null)
                 return;
 
-            bool? pay = AskBoolOrEsc("Vill du betala fakturan nu?", defaultValue: false);
+            var booking = bookings.First(b => b.Id == bookingId.Value);
+
+            // Visa detaljerad panel först
+            var guest = _guestService.GetGuest(booking.GuestId);
+            var room = _roomService.GetRoom(booking.RoomId);
+
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.WriteLine();
+
+            var panel = BuildBookingPanel(booking, guest, room);
+            AnsiConsole.Write(panel);
+
+            // Bekräftelse
+            bool confirm = AnsiConsole.Confirm(
+                "[white]Är du säker att du vill checka ut gästen?[/]", defaultValue: true);
+            if (!confirm)
+                return;
+
+            // Visa “Gäst utcheckad”
+            var donePanel = new Panel("[green]✔ Gäst utcheckad[/]")
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1)
+            };
+            AnsiConsole.Write(donePanel);
+
+            // Fakturafråga
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("[white]Vill du betala fakturan nu?[/]");
+            AnsiConsole.MarkupLine("[grey](j = JA, ENTER = nej, ESC = avbryt)[/]");
+
+            bool? pay = AskBoolOrEsc(defaultValue: false);
             if (pay == null)
                 return;
 
-            if (_bookingService.CheckOut(bookingId.Value, pay.Value))
+            // Extra säkerhetsfråga
+            if (pay == true)
             {
-                AnsiConsole.MarkupLine("\n[green]✔ Gäst utcheckad.[/]");
-                WaitForEsc();
+                bool confirmInvoice = AnsiConsole.Confirm(
+                    "[yellow]Är du säker på att du vill markera fakturan som betald?[/]", defaultValue: true);
+
+
+                if (!confirmInvoice)
+                    pay = false;
+            }
+
+            // Utför utcheckning
+            if (_bookingService.CheckOut(booking.Id, pay.Value))
+            {
+                // Hämta om bokningen så PaidDate är uppdaterad
+                booking = _bookingService.GetBooking(booking.Id);
             }
             else
             {
                 BookingRenderer.ShowError("Kunde inte checka ut gästen.");
-                WaitForEsc();
             }
+
+            // Visa mini-faktura om betald
+            if (pay == true)
+            {
+                if (booking == null || booking.Invoice == null)
+                {
+                    BookingRenderer.ShowError("Ingen faktura hittades för bokningen.");
+                    return;
+                }
+
+                // Null-säkra guest/room som används i panelen
+                if (guest == null || room == null)
+                {
+                    BookingRenderer.ShowError("Kunde inte ladda gästens eller rummets information.");
+                    return;
+                }
+
+                var inv = booking.Invoice;
+
+                int nights = (booking.ToDate - booking.FromDate).Days;
+
+                string paidDate = inv.PaidDate?.ToString("yyyy-MM-dd") ?? "-";
+                string status = inv.IsCancelled
+                    ? "[red]● Annullerad[/]"
+                    : inv.IsPaid
+                        ? "[green]● Betald[/]"
+                        : "[yellow]● Obetald[/]";
+
+                var invoicePanel = new Panel($@"
+[bold dodgerblue1]Faktura[/]
+[grey]Faktura-ID:[/] [white]{inv.Id}[/]
+[grey]Bokning-ID:[/] [white]{inv.BookingId}[/]
+
+[bold dodgerblue1]Gäst[/]
+[grey]Namn:[/] [white]{guest.FirstName} {guest.LastName}[/]
+[grey]E-post:[/] [white]{guest.Email}[/]
+[grey]Telefon:[/] [white]{guest.PhoneNumber}[/]
+
+[bold dodgerblue1]Bokning[/]
+[grey]Rum:[/] [white]{room.RoomNumber} ({room.RoomType})[/]
+[grey]Period:[/] [white]{booking.FromDate:yyyy-MM-dd} → {booking.ToDate:yyyy-MM-dd}[/]
+[grey]Antal nätter:[/] [white]{nights}[/]
+[grey]Pris per natt:[/] [white]{room.PricePerNight} kr[/]
+
+[bold dodgerblue1]Fakturainfo[/]
+[grey]Skapad:[/] [white]{inv.CreatedDate:yyyy-MM-dd}[/]
+[grey]Förfallodatum:[/] [white]{inv.DueDate:yyyy-MM-dd}[/]
+[grey]Betald datum:[/] [white]{paidDate}[/]
+
+[grey]Totalbelopp:[/] [bold white]{inv.TotalAmount} kr[/]
+[grey]Status:[/] {status}
+")
+                {
+                    Border = BoxBorder.Rounded,
+                    Padding = new Padding(1, 1, 1, 1)
+                };
+
+                AnsiConsole.WriteLine();
+                AnsiConsole.Write(invoicePanel);
+            }
+
+
+            WaitForEsc();
         }
 
     }

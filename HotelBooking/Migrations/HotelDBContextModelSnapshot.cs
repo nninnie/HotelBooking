@@ -33,6 +33,12 @@ namespace HotelBooking.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckOutTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CreatedByEmployeeId")
                         .HasColumnType("int");
 

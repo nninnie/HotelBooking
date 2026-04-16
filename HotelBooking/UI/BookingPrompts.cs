@@ -172,9 +172,13 @@ namespace HotelBooking.UI
                 for (int i = 0; i < pageItems.Count; i++)
                 {
                     var g = pageItems[i];
-                    string line = Markup.Escape($"{g.LastName}, {g.FirstName} – {g.Email} – {g.PhoneNumber}");
+                    string line = Markup.Escape(
+                    $"#{g.Id} | {g.LastName ?? ""} {g.FirstName ?? ""} | {g.Email ?? ""} | {g.PhoneNumber ?? ""} | {g.BirthDate:yyyy-MM-dd}"
+                    );
 
-                    // ⭐ IDENTISK SPECTRE‑HIGHLIGHT SOM SELECTBOOKING
+
+
+
                     if (i == index)
                         AnsiConsole.MarkupLine($"[black on green]> {line}[/]");
                     else
@@ -506,6 +510,116 @@ namespace HotelBooking.UI
                 .ToList();
 
             return SelectBooking(ui, bookings, subtitle);
+        }
+
+        public static int? SelectBookingFromList(EscUI ui, List<Booking> bookings, string subtitle)
+        {
+            if (bookings == null || bookings.Count == 0)
+                return null;
+
+            int pageSize = 10;
+            int page = 0;
+            int index = 0;
+
+            while (true)
+            {
+                AnsiConsole.Clear();
+                BannerUI.ShowLogo();
+                BannerUI.PrintHeader("Hantera bokningar", subtitle);
+
+                int totalPages = (int)Math.Ceiling(bookings.Count / (double)pageSize);
+
+                var pageItems = bookings
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                if (index >= pageItems.Count)
+                    index = pageItems.Count - 1;
+                if (index < 0)
+                    index = 0;
+
+                AnsiConsole.MarkupLine($"[grey]Sida {page + 1} / {totalPages}[/]");
+                AnsiConsole.WriteLine();
+
+                for (int i = 0; i < pageItems.Count; i++)
+                {
+                    var b = pageItems[i];
+
+                    // Null-säkra gästdata
+                    var g = b.Guest;
+                    string first = Markup.Escape(g?.FirstName ?? "");
+                    string last = Markup.Escape(g?.LastName ?? "");
+
+                    // Rum
+                    string room = b.Room != null
+                        ? $"Rum {Markup.Escape(b.Room.RoomNumber.ToString())}"
+                        : "Okänt rum";
+
+                    // Text för listan
+                    string text =
+                        $"#{b.Id} | {first} {last} | {room} | {b.NumberOfGuests} gäster | {b.FromDate:yyyy-MM-dd} → {b.ToDate:yyyy-MM-dd}";
+
+
+                    if (i == index)
+                        AnsiConsole.MarkupLine($"[black on green]> {text}[/]");
+                    else
+                        AnsiConsole.MarkupLine($"  {text}");
+                }
+
+                var key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        index--;
+                        if (index < 0)
+                        {
+                            if (page > 0)
+                            {
+                                page--;
+                                index = pageSize - 1;
+                            }
+                            else index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.DownArrow:
+                        index++;
+                        if (index >= pageItems.Count)
+                        {
+                            if (page < totalPages - 1)
+                            {
+                                page++;
+                                index = 0;
+                            }
+                            else index = pageItems.Count - 1;
+                        }
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        if (page > 0)
+                        {
+                            page--;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (page < totalPages - 1)
+                        {
+                            page++;
+                            index = 0;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        return pageItems[index].Id;
+
+                    case ConsoleKey.Escape:
+                        return null;
+                }
+            }
         }
 
 

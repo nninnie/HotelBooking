@@ -44,7 +44,7 @@ public static class CalendarPicker
                         if (cursor <= checkIn)
                         {
                             AnsiConsole.MarkupLine("[red]Utcheckning måste vara efter incheckning![/]");
-                            Thread.Sleep(1200);
+                            Thread.Sleep(500);
                         }
                         else
                         {
@@ -52,7 +52,7 @@ public static class CalendarPicker
 
                             // Visa vald utcheckning
                             AnsiConsole.MarkupLine($"[yellow]Utcheckning vald: [/][green]{checkOut:yyyy-MM-dd}[/]");
-                            Thread.Sleep(400);
+                            Thread.Sleep(100);
 
                             // Visa intervallet innan vi går vidare
                             AnsiConsole.Clear();
@@ -61,7 +61,7 @@ public static class CalendarPicker
 
                             RenderCalendar(cursor, checkIn, checkOut, selectingCheckIn: false);
 
-                            Thread.Sleep(900);
+                            Thread.Sleep(500);
 
                             return (checkIn, checkOut);
                         }

@@ -5,32 +5,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Booking
 {
     public int Id { get; set; }
-
     public int CreatedByEmployeeId { get; set; }
     public Employee? CreatedByEmployee { get; set; }
-
     [Required]
     public int RoomId { get; set; }
     public Room? Room { get; set; }
-
     [Required]
     public int GuestId { get; set; }
     public Guest? Guest { get; set; }
-
     public int NumberOfGuests { get; set; }
-
     [Required]
     public DateTime FromDate { get; set; }
-
     [Required]
     public DateTime ToDate { get; set; }
-
     public DateTime BookingDate { get; set; } = DateTime.Now;
     public bool IsCheckedIn { get; set; }
     public bool IsCompleted { get; set; }
-
-    public bool IsDeleted { get; set; } = false;    
-    public bool IsCancelled { get; set; } = false;   
+    public bool IsDeleted { get; set; } = false;   
+    public bool IsCancelled { get; set; } = false;
+    public DateTime? CheckInTime { get; set; }
+    public DateTime? CheckOutTime { get; set; }
 
     [NotMapped]
     public bool IsActive
@@ -38,23 +32,20 @@ public class Booking
         get
         {
             var today = DateTime.Today;
-            return !IsDeleted && !IsCancelled && today >= FromDate && today <= ToDate;
+            return !IsDeleted && !IsCancelled &&
+                   today >= FromDate.Date &&
+                   today <= ToDate.Date;
         }
     }
+
 
     [NotMapped]
-    public decimal TotalPrice
-    {
-        get
-        {
-            if (Room == null) return 0;
+    public int Nights => Math.Max(1, (ToDate.Date - FromDate.Date).Days);
 
-            int nights = (ToDate - FromDate).Days;
-            if (nights < 1) nights = 1;
-
-            return nights * Room.PricePerNight;
-        }
-    }
+    [NotMapped]
+    public decimal TotalPrice => Room?.PricePerNight is decimal price
+    ? Nights * price
+    : 0;
 
     public Invoice? Invoice { get; set; }
 }

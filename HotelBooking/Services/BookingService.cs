@@ -93,11 +93,11 @@ namespace HotelBooking.Services
         public List<Booking> GetAll()
         {
             return _db.Bookings
-                .Where(b => !b.IsDeleted && !b.IsCancelled)
-                .Include(b => b.Guest)
                 .Include(b => b.Room)
+                .Include(b => b.Guest)
                 .ToList();
         }
+
 
         // Ta bort bokning permanent (hard delete)
         public bool CancelBooking(int id)
@@ -232,12 +232,16 @@ namespace HotelBooking.Services
         public bool CheckIn(int bookingId)
         {
             var booking = GetBooking(bookingId);
-            if (booking == null) return false;
+            if (booking == null)
+                return false;
 
-            if (DateTime.Now < booking.FromDate)
+            // Tillåt check-in hela dagen
+            if (DateTime.Today < booking.FromDate.Date)
                 return false;
 
             booking.IsCheckedIn = true;
+            booking.CheckInTime = DateTime.Now;
+
             _db.SaveChanges();
             return true;
         }
@@ -245,13 +249,22 @@ namespace HotelBooking.Services
         public bool CheckOut(int bookingId, bool payInvoice)
         {
             var booking = GetBooking(bookingId);
-            if (booking == null) return false;
+            if (booking == null)
+                return false;
 
             if (!booking.IsCheckedIn)
                 return false;
 
+            // Betala faktura om vald
+
             if (payInvoice && booking.Invoice != null)
+            {
                 booking.Invoice.IsPaid = true;
+                booking.Invoice.PaidDate = DateTime.Now;
+            }
+
+            // Spara faktisk utcheckningstid
+            booking.CheckOutTime = DateTime.Now;
 
             booking.IsCheckedIn = false;
             booking.IsCompleted = true;

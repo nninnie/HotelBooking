@@ -105,7 +105,9 @@ namespace HotelBooking.Migrations
                     IsCheckedIn = table.Column<bool>(type: "bit", nullable: false),
                     IsCompleted = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    IsCancelled = table.Column<bool>(type: "bit", nullable: false)
+                    IsCancelled = table.Column<bool>(type: "bit", nullable: false),
+                    CheckInTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CheckOutTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
