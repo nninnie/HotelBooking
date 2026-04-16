@@ -21,22 +21,16 @@ namespace HotelBooking.Services
         // Hämta alla rum som är lediga för ett visst datumintervall och antal gäster
         public List<Room> GetAvailableRooms(DateTime checkIn, DateTime checkOut, int guests)
         {
-            // Grundläggande datumvalidering
             if (checkIn.Date < DateTime.Today)
                 throw new Exception("Incheckningsdatum kan inte vara i det förflutna.");
 
             if (checkOut <= checkIn)
                 throw new Exception("Utcheckningsdatum måste vara efter incheckningsdatum.");
 
-            // Filtrera rum:
-            //  Rummet måste klara antal gäster
-            //  Rummet får inte vara ur bruk
-            //  Rummet får inte ha en aktiv bokning som överlappar datumintervallet
-            return _db.Rooms
-                .Where(r => (r.Capacity + r.ExtraBeds) >= guests && !r
-                .IsOutOfService)
-                .Where(r => !r.Bookings
-                .Any(b =>
+            // Hämta alla lediga rum (utan kapacitetsfilter)
+            var availableRooms = _db.Rooms
+                .Where(r => !r.IsOutOfService)
+                .Where(r => !r.Bookings.Any(b =>
                     !b.IsDeleted &&
                     !b.IsCancelled &&
                     (
@@ -45,9 +39,15 @@ namespace HotelBooking.Services
                         (checkIn <= b.FromDate && checkOut >= b.ToDate)
                     )
                 ))
-                .OrderBy(r => r.PricePerNight) // Visa billigaste först
+                .ToList();
+
+            // Filtrera på antal gäster
+            return availableRooms
+                .Where(r => (r.Capacity + r.ExtraBeds) >= guests)
+                .OrderBy(r => r.PricePerNight)
                 .ToList();
         }
+
 
         // Skapa en ny bokning
         public Booking CreateBooking(int guestId, int roomId, DateTime checkIn, DateTime checkOut, int guests)
@@ -86,6 +86,7 @@ namespace HotelBooking.Services
                 .Where(b => !b.IsDeleted && !b.IsCancelled)
                 .Include(b => b.Guest)
                 .Include(b => b.Room)
+                .Include(b => b.Invoice)
                 .FirstOrDefault(b => b.Id == id);
         }
 
@@ -95,6 +96,7 @@ namespace HotelBooking.Services
             return _db.Bookings
                 .Include(b => b.Room)
                 .Include(b => b.Guest)
+                .Include(b => b.Invoice)
                 .ToList();
         }
 

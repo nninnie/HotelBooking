@@ -93,6 +93,10 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera gäster", subtitle);
+
             // Hämta bokningar via service
             var bookings = _bookingService
                 .GetBookingsByGuestId(guest.Id);
@@ -385,16 +389,33 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             var table = new Table().RoundedBorder();
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Namn[/]");
-            table.AddColumn("[yellow]Kontakt[/]");
+            table.AddColumn("[yellow]Email[/]");
+            table.AddColumn("[yellow]Telefon[/]");
+            table.AddColumn("[yellow]Totala bokningar[/]");
+            table.AddColumn("[yellow]Senaste bokning[/]");
 
             foreach (var g in deletedGuests)
             {
+                int totalBookings = _bookingService.GetBookingsByGuestId(g.Id).Count;
+                var lastBooking = _bookingService.GetBookingsByGuestId(g.Id)
+                    .OrderByDescending(b => b.FromDate)
+                    .FirstOrDefault();
+
+                string lastBookingText = lastBooking == null
+                    ? "-"
+                    : $"{lastBooking.FromDate:yyyy-MM-dd} → {lastBooking.ToDate:yyyy-MM-dd}";
+
                 table.AddRow(
-                    g.Id.ToString(),
-                    $"{g.FirstName} {g.LastName}",
-                    $"{g.Email} / {g.PhoneNumber}"
-                );
+    g.Id.ToString(),
+    $"{g.FirstName ?? "-"} {g.LastName ?? "-"}",
+    g.Email ?? "-",
+    g.PhoneNumber ?? "-",
+    totalBookings.ToString(),
+    lastBookingText ?? "-"
+);
+
             }
+
 
             AnsiConsole.Write(table);
 

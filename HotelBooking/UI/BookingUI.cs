@@ -549,7 +549,7 @@ namespace HotelBooking.UI
 
             var booking = bookings.First(b => b.Id == bookingId.Value);
 
-            // Visa detaljerad panel först
+            // Hämta gäst och rum
             var guest = _guestService.GetGuest(booking.GuestId);
             var room = _roomService.GetRoom(booking.RoomId);
 
@@ -562,8 +562,7 @@ namespace HotelBooking.UI
             AnsiConsole.Write(panel);
 
             // Bekräftelse
-            bool confirm = AnsiConsole.Confirm(
-                "[white]Är du säker att du vill checka ut gästen?[/]", defaultValue: true);
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill checka ut gästen?");
             if (!confirm)
                 return;
 
@@ -577,9 +576,8 @@ namespace HotelBooking.UI
 
             // Fakturafråga
             AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine();
             AnsiConsole.MarkupLine("[white]Vill du betala fakturan nu?[/]");
-            AnsiConsole.MarkupLine("[grey](j = JA, ENTER = nej, ESC = avbryt)[/]");
+            AnsiConsole.MarkupLine("[grey](j = ja, ENTER = nej, ESC = avbryt)[/]");
 
             bool? pay = AskBoolOrEsc(defaultValue: false);
             if (pay == null)
@@ -588,35 +586,58 @@ namespace HotelBooking.UI
             // Extra säkerhetsfråga
             if (pay == true)
             {
-                bool confirmInvoice = AnsiConsole.Confirm(
-                    "[yellow]Är du säker på att du vill markera fakturan som betald?[/]", defaultValue: true);
-
-
+                bool confirmInvoice = BookingPrompts.Confirm("Är du säker på att du vill markera fakturan som betald?");
                 if (!confirmInvoice)
                     pay = false;
             }
 
+            // Rensa och visa utcheckad-panel igen
+            AnsiConsole.Clear();
+            BannerUI.ShowLogo();
+            BannerUI.PrintHeader("Hantera bokningar", subtitle);
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(donePanel);
+            AnsiConsole.WriteLine();
+
             // Utför utcheckning
             if (_bookingService.CheckOut(booking.Id, pay.Value))
             {
-                // Hämta om bokningen så PaidDate är uppdaterad
+                // Hämta om bokningen så PaidDate och Invoice är uppdaterade
                 booking = _bookingService.GetBooking(booking.Id);
+
+                // Hämta om guest/room för att undvika null
+                guest = _guestService.GetGuest(booking.GuestId);
+                if (guest == null)
+                {
+                    BookingRenderer.ShowError("Kunde inte ladda gästens information.");
+                    return;
+                }
+
+
+                room = _roomService.GetRoom(booking.RoomId);
+                if (room == null)
+                {
+                    BookingRenderer.ShowError("Kunde inte ladda rummets information.");
+                    return;
+                }
+
             }
             else
             {
                 BookingRenderer.ShowError("Kunde inte checka ut gästen.");
+                WaitForEsc();
+                return;
             }
 
             // Visa mini-faktura om betald
             if (pay == true)
             {
-                if (booking == null || booking.Invoice == null)
+                if (booking?.Invoice == null)
                 {
                     BookingRenderer.ShowError("Ingen faktura hittades för bokningen.");
                     return;
                 }
 
-                // Null-säkra guest/room som används i panelen
                 if (guest == null || room == null)
                 {
                     BookingRenderer.ShowError("Kunde inte ladda gästens eller rummets information.");
@@ -624,15 +645,14 @@ namespace HotelBooking.UI
                 }
 
                 var inv = booking.Invoice;
-
                 int nights = (booking.ToDate - booking.FromDate).Days;
 
                 string paidDate = inv.PaidDate?.ToString("yyyy-MM-dd") ?? "-";
                 string status = inv.IsCancelled
-                    ? "[red]● Annullerad[/]"
+                    ? "[yellow]● Annullerad[/]"
                     : inv.IsPaid
                         ? "[green]● Betald[/]"
-                        : "[yellow]● Obetald[/]";
+                        : "[red]● Obetald[/]";
 
                 var invoicePanel = new Panel($@"
 [bold dodgerblue1]Faktura[/]
@@ -660,16 +680,16 @@ namespace HotelBooking.UI
 ")
                 {
                     Border = BoxBorder.Rounded,
-                    Padding = new Padding(1, 1, 1, 1)
+                    Padding = new Padding(1, 1)
                 };
 
                 AnsiConsole.WriteLine();
                 AnsiConsole.Write(invoicePanel);
             }
 
-
             WaitForEsc();
         }
+
 
     }
 }

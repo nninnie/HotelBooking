@@ -93,12 +93,11 @@ public static class CalendarPicker
         DateTime firstDay = new DateTime(cursor.Year, cursor.Month, 1);
         int daysInMonth = DateTime.DaysInMonth(cursor.Year, cursor.Month);
 
-        int startDay = (int)firstDay.DayOfWeek;
-        startDay = (startDay == 0) ? 6 : startDay - 1;
+        int startDay = ((int)firstDay.DayOfWeek + 6) % 7;
 
         // Tomma rutor innan månadens start
         for (int i = 0; i < startDay; i++)
-            sb.Append("    "); 
+            sb.Append("     "); 
 
         // Dagar
         for (int day = 1; day <= daysInMonth; day++)
