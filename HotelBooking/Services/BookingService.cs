@@ -27,26 +27,30 @@ namespace HotelBooking.Services
             if (checkOut <= checkIn)
                 throw new Exception("Utcheckningsdatum måste vara efter incheckningsdatum.");
 
-            // Hämta alla lediga rum (utan kapacitetsfilter)
-            var availableRooms = _db.Rooms
+            // Hämta rum + bokningar
+            var rooms = _db.Rooms
+                .Include(r => r.Bookings)
                 .Where(r => !r.IsOutOfService)
-                .Where(r => !r.Bookings.Any(b =>
-                    !b.IsDeleted &&
-                    !b.IsCancelled &&
-                    (
-                        (checkIn >= b.FromDate && checkIn < b.ToDate) ||
-                        (checkOut > b.FromDate && checkOut <= b.ToDate) ||
-                        (checkIn <= b.FromDate && checkOut >= b.ToDate)
-                    )
-                ))
                 .ToList();
 
-            // Filtrera på antal gäster
-            return availableRooms
+            // Filtrera bort rum som har aktiva överlappande bokningar
+            var available = rooms.Where(r =>
+                !r.Bookings.Any(b =>
+                    !b.IsDeleted &&
+                    !b.IsCancelled &&
+                    !b.IsCompleted &&
+                    b.FromDate < checkOut &&
+                    b.ToDate > checkIn
+                )
+            );
+
+            // Filtrera på kapacitet
+            return available
                 .Where(r => (r.Capacity + r.ExtraBeds) >= guests)
                 .OrderBy(r => r.PricePerNight)
                 .ToList();
         }
+
 
 
         // Skapa en ny bokning

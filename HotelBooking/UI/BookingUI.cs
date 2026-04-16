@@ -21,7 +21,7 @@ namespace HotelBooking.UI
             _invoiceUI = invoiceUI;
         }
 
-        // SKAPA NY BOKNING
+        // SKAPA BOKNING
         public void Create(string subtitle)
         {
             // HEADER
@@ -30,12 +30,12 @@ namespace HotelBooking.UI
             BannerUI.PrintHeader("Hantera bokningar", "Skapa ny bokning");
             AnsiConsole.WriteLine();
 
+            // Välj eller skapa gäst
             var guestId = BookingPrompts.SelectOrCreateGuest(this, _guestService);
             if (guestId == null) return;
 
             // Välj datumintervall
             var (checkInDate, checkOutDate) = CalendarPicker.SelectDateRange();
-
             if (checkInDate == null || checkOutDate == null)
                 return;
 
@@ -53,10 +53,11 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // Sätt tiderna här
-            var checkIn = checkInDate.Value.Date.AddHours(13);   // 13:00
-            var checkOut = checkOutDate.Value.Date.AddHours(11); // 11:00
+            // Sätt standardtider
+            var checkIn = checkInDate.Value.Date.AddHours(13);
+            var checkOut = checkOutDate.Value.Date.AddHours(11);
 
+            // Fråga antal gäster
             var guestsCount = BookingPrompts.AskGuestCount(this);
             if (guestsCount == null || guestsCount <= 0)
             {
@@ -65,23 +66,46 @@ namespace HotelBooking.UI
                 return;
             }
 
-            var availableRooms = _bookingService.GetAvailableRooms(
+            // Hämta ALLA lediga rum för datumintervallet
+            var allRooms = _bookingService.GetAvailableRooms(
                 checkIn,
                 checkOut,
-                guestsCount.Value
+                int.MaxValue 
             );
 
-            if (!availableRooms.Any())
+            if (!allRooms.Any())
             {
                 BookingRenderer.ShowError("Inga lediga rum för dessa datum.");
                 WaitForEsc();
                 return;
             }
 
+            // Filtrera rum baserat på antal gäster
+            var availableRooms = allRooms
+                .Where(r => (r.Capacity + r.ExtraBeds) >= guestsCount.Value)
+                .OrderBy(r => r.PricePerNight)
+                .ToList();
+
+            if (!availableRooms.Any())
+            {
+                BookingRenderer.ShowError("Inga rum klarar det antalet gäster.");
+                WaitForEsc();
+                return;
+            }
+
+            // Låt användaren välja rum (SelectRoom visar listan)
             var roomId = BookingPrompts.SelectRoom(this, availableRooms);
             if (roomId == null) return;
 
-            // Skapa bokningen med tider
+            var room = _roomService.GetRoom(roomId.Value);
+            if (room == null)
+            {
+                BookingRenderer.ShowError("Kunde inte hämta rumsinformation.");
+                WaitForEsc();
+                return;
+            }
+
+            // Skapa bokningen
             var booking = _bookingService.CreateBooking(
                 guestId.Value,
                 roomId.Value,
@@ -90,15 +114,7 @@ namespace HotelBooking.UI
                 guestsCount.Value
             );
 
-            var room = _roomService.GetRoom(roomId.Value);
-
-            if (room == null)
-            {
-                BookingRenderer.ShowError("Kunde inte hämta rumsinformation.");
-                WaitForEsc();
-                return;
-            }
-
+            // Bekräftelse
             int nights = booking.Nights;
             decimal totalPrice = booking.TotalPrice;
 
@@ -112,11 +128,11 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine($"Totalpris: [bold yellow]{totalPrice} kr[/]");
             AnsiConsole.WriteLine();
 
+            AnsiConsole.MarkupLine("[blue]Faktura skapas...[/]");
             AnsiConsole.MarkupLine("[blue]Nyckelkort skapas...[/]");
             AnsiConsole.MarkupLine($"[green]✔ Nyckelkort till rum {room.RoomNumber} överlämnat till kunden.[/]");
             WaitForEsc();
         }
-
 
         // VISA ALLA
         public void ShowAll(string subtitle)
@@ -603,15 +619,21 @@ namespace HotelBooking.UI
             if (_bookingService.CheckOut(booking.Id, pay.Value))
             {
                 // Hämta om bokningen så PaidDate och Invoice är uppdaterade
-                booking = _bookingService.GetBooking(booking.Id);
+                if (booking == null)
+                {
+                    BookingRenderer.ShowError("Kunde inte ladda bokningen.");
+                    return;
+                }
 
-                // Hämta om guest/room för att undvika null
+                // Hämta gäst
                 guest = _guestService.GetGuest(booking.GuestId);
+
                 if (guest == null)
                 {
                     BookingRenderer.ShowError("Kunde inte ladda gästens information.");
                     return;
                 }
+     
 
 
                 room = _roomService.GetRoom(booking.RoomId);

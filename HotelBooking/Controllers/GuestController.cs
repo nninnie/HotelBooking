@@ -23,11 +23,12 @@ namespace HotelBooking.Controllers
                     "Visa detaljer",
                     "Uppdatera",
                     "Ta bort",
+                    "Återställ",
                     "Tillbaka"
                 );
 
                 if (choice == null)
-                    return; 
+                    return;
 
                 switch (choice)
                 {
@@ -49,6 +50,10 @@ namespace HotelBooking.Controllers
 
                     case "Ta bort":
                         _guestUI.SoftDelete(choice);
+                        break;
+
+                    case "Återställ":
+                        _guestUI.Restore();
                         break;
 
                     case "Tillbaka":
