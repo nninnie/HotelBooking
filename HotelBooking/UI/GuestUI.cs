@@ -16,33 +16,31 @@ namespace HotelBooking.UI
             _bookingService = bookingService;   
         }
 
-private void ShowGuestTable(IEnumerable<Guest> guests)
-{
-    var table = new Table().RoundedBorder();
+        private void ShowGuestTable(IEnumerable<Guest> guests)
+        {
+            var table = new Table().RoundedBorder();
 
-    table.AddColumn("[yellow]ID[/]");
-    table.AddColumn("[yellow]Namn[/]");
-    table.AddColumn("[yellow]Telefon[/]");
-    table.AddColumn("[yellow]Email[/]");
-    table.AddColumn("[yellow]Aktiv bokning[/]");
+            table.AddColumn("[yellow]ID[/]");
+            table.AddColumn("[yellow]Namn[/]");
+            table.AddColumn("[yellow]Telefon[/]");
+            table.AddColumn("[yellow]Email[/]");
+            table.AddColumn("[yellow]Aktiv bokning[/]");
 
-    var sortedGuests = guests.OrderBy(g => g.Id);
+            foreach (var g in guests.OrderBy(g => g.Id))
+            {
+                bool hasActiveBooking = g.Bookings?.Any(b => b.IsActive) == true;
 
-    foreach (var g in sortedGuests)
-    {
-        bool hasActiveBooking = g.Bookings?.Any(b => b.IsActive) == true;
+                table.AddRow(
+                    g.Id.ToString(),
+                    $"{g.LastName}, {g.FirstName}",
+                    g.PhoneNumber ?? "-",
+                    g.Email ?? "-",
+                    hasActiveBooking ? "[green]Ja[/]" : "[red]Nej[/]"
+                );
+            }
 
-        table.AddRow(
-            Markup.Escape(g.Id.ToString()),
-            Markup.Escape($"{g.LastName}, {g.FirstName}"),
-            Markup.Escape(g.PhoneNumber ?? "-"),
-            Markup.Escape(g.Email ?? "-"),
-            hasActiveBooking ? "[green]Ja[/]" : "[red]Nej[/]"
-        );
-    }
-
-    AnsiConsole.Write(table);
-}
+            AnsiConsole.Write(table);
+        }
 
         // VISA ALLA GÄSTER
         public void ShowAll(string subtitle)
@@ -84,8 +82,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             int? id = AskIntOrEsc("Ange gäst-ID att visa:");
             if (id == null) return;
 
-            var guest = _guestService
-                .GetGuest(id.Value);
+            var guest = _guestService.GetGuest(id.Value);
             if (guest == null)
             {
                 AnsiConsole.MarkupLine("[red]Gäst hittades inte.[/]");
@@ -93,57 +90,47 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
-            AnsiConsole.Clear();
-            BannerUI.ShowLogo();
-            BannerUI.PrintHeader("Hantera gäster", subtitle);
+            var bookings = _bookingService.GetBookingsByGuestId(guest.Id);
 
-            // Hämta bokningar via service
-            var bookings = _bookingService
-                .GetBookingsByGuestId(guest.Id);
+            int active = bookings.Count(b => b.IsActive);
+            int history = bookings.Count(b => !b.IsActive);
+            decimal totalSpent = bookings.Sum(b => b.TotalPrice);
 
-            int active = bookings
-                .Count(b => b.IsActive);
-            int history = bookings
-                .Count(b => !b.IsActive);
-            decimal totalSpent = bookings
-                .Sum(b => b.TotalPrice);
-
-            var lastBooking = bookings
-                .OrderByDescending(b => b.FromDate)
-                .FirstOrDefault();
+            var lastBooking = bookings.OrderByDescending(b => b.FromDate).FirstOrDefault();
 
             string lastBookingText = lastBooking == null
                 ? "[grey]Ingen bokningshistorik[/]"
-                : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:MM-dd} – {lastBooking.ToDate:MM-dd})";
+                : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:yyyy-MM-dd} → {lastBooking.ToDate:yyyy-MM-dd})";
 
             var panel = new Panel($@"
-[white]Gäst-ID:[/] {guest.Id}
+[bold dodgerblue1]Gäst[/]
+[grey]ID:[/] [white]{guest.Id}[/]
+[grey]Namn:[/] [white]{guest.FirstName} {guest.LastName}[/]
+[grey]Telefon:[/] [white]{(string.IsNullOrWhiteSpace(guest.PhoneNumber) ? "[red]Saknas[/]" : guest.PhoneNumber)}[/]
+[grey]Email:[/] [white]{(string.IsNullOrWhiteSpace(guest.Email) ? "[red]Saknas[/]" : guest.Email)}[/]
 
-[white]Förnamn:[/] {guest.FirstName}
-[white]Efternamn:[/] {guest.LastName}
+[bold dodgerblue1]Bokningar[/]
+[grey]Totalt:[/] [white]{bookings.Count}[/]
+[grey]Aktiva:[/] [white]{active}[/]
+[grey]Historik:[/] [white]{history}[/]
+[grey]Har aktiv bokning:[/] {(active > 0 ? "[green]Ja[/]" : "[red]Nej[/]")}
 
-[white]Telefon:[/] {(string.IsNullOrWhiteSpace(guest.PhoneNumber) ? "[red]Saknas[/]" : guest.PhoneNumber)}
-[white]Email:[/] {(string.IsNullOrWhiteSpace(guest.Email) ? "[red]Saknas[/]" : guest.Email)}
+[bold dodgerblue1]Ekonomi[/]
+[grey]Totalt spenderat:[/] [white]{totalSpent} kr[/]
 
-[white]Antal bokningar:[/] {bookings.Count}
-[white]Aktiva bokningar:[/] {active}
-[white]Historiska bokningar:[/] {history}
-[white]Har aktiv bokning:[/] {(active > 0 ? "[green]Ja[/]" : "[red]Nej[/]")}
-
-[white]Totalt spenderat:[/] {totalSpent} kr
-
-[white]Senaste bokning:[/]
+[bold dodgerblue1]Senaste bokning[/]
 {lastBookingText}
 ")
             {
                 Header = new PanelHeader("[green]Gästinformation[/]"),
-                Border = BoxBorder.Rounded
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
             };
-
 
             AnsiConsole.Write(panel);
             WaitForEsc();
         }
+
 
         // SKAPA GÄST
         public void Create(string subtitle)

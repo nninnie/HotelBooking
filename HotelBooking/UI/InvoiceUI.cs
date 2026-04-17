@@ -28,11 +28,12 @@ namespace HotelBooking.UI
 
             foreach (var inv in invoices)
             {
-                string status = inv.IsCancelled
-                    ? "[grey]Annullerad[/]"
-                    : inv.IsPaid
-                        ? "[green]Betald[/]"
-                        : "[red]Obetald[/]";
+                string status =
+                    inv.IsCancelled ? "[red]Annullerad[/]" :
+                    inv.IsPaid ? "[green]Betald[/]" :
+                    "[yellow]Obetald[/]";
+
+                string paidDate = inv.PaidDate?.ToString("yyyy-MM-dd") ?? "-";
 
                 table.AddRow(
                     inv.Id.ToString(),
@@ -40,13 +41,14 @@ namespace HotelBooking.UI
                     $"{inv.Booking?.Guest?.FirstName} {inv.Booking?.Guest?.LastName}",
                     $"{inv.TotalAmount} kr",
                     inv.CreatedDate.ToString("yyyy-MM-dd"),
-                    inv.PaidDate?.ToString("yyyy-MM-dd") ?? "-",
+                    paidDate,
                     status
                 );
             }
 
             AnsiConsole.Write(table);
         }
+
 
         // VISA ALLA
         public void ShowAll(string subtitle)

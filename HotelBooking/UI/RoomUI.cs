@@ -18,6 +18,7 @@ namespace HotelBooking.UI
         private void ShowRoomTable(IEnumerable<Room> rooms)
         {
             var table = new Table().RoundedBorder();
+
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Nummer[/]");
             table.AddColumn("[yellow]Typ[/]");
@@ -31,6 +32,14 @@ namespace HotelBooking.UI
             {
                 bool isBooked = r.Bookings.Any(b => b.IsActive);
 
+                string status = r.IsOutOfService
+                    ? "[red]Ur funktion[/]"
+                    : "[green]I drift[/]";
+
+                string activeBooking = isBooked
+                    ? "[red]Bokad[/]"
+                    : "[green]Ledig[/]";
+
                 table.AddRow(
                     r.Id.ToString(),
                     r.RoomNumber,
@@ -38,14 +47,14 @@ namespace HotelBooking.UI
                     $"{r.Capacity}",
                     $"{r.ExtraBeds}",
                     $"{r.PricePerNight} kr",
-                    r.IsOutOfService ? "[red]Ur funktion[/]" : "[green]I drift[/]",
-                    isBooked ? "[red]Bokad[/]" : "[green]Ledig[/]"
-
+                    status,
+                    activeBooking
                 );
             }
 
             AnsiConsole.Write(table);
         }
+
 
         // VISA ALLA RUM
         public void ShowAll(string subtitle)
@@ -95,7 +104,7 @@ namespace HotelBooking.UI
 
             var panel = new Panel($@"
 [bold dodgerblue1]Rum[/]
-[grey]Rums-ID:[/] [white]{room.Id}[/]
+[grey]ID:[/] [white]{room.Id}[/]
 [grey]Nummer:[/] [white]{room.RoomNumber}[/]
 [grey]Typ:[/] [white]{room.RoomType}[/]
 [grey]Ordinarie platser:[/] [white]{room.Capacity}[/]
@@ -121,6 +130,7 @@ namespace HotelBooking.UI
             AnsiConsole.Write(panel);
             WaitForEsc();
         }
+
 
         // SKAPA RUM
         public void Create(string subtitle)
