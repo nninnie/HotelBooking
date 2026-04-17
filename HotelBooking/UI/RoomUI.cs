@@ -126,16 +126,16 @@ namespace HotelBooking.UI
             var rooms = _roomService.GetAllRooms();
             ShowRoomTable(rooms);
 
-            string? number = AskWithEsc("Ange rumsnummer:");
+            string? number = AskWithEsc("[grey]Ange rumsnummer[/]: ");
             if (number == null) return;
 
-            string? type = AskWithEsc("Ange rumstyp:");
+            string? type = AskWithEsc("[grey]Ange rumstyp[/]: ");
             if (type == null) return;
 
             int squareMeters;
             while (true)
             {
-                string? sqmInput = AskWithEsc("Antal kvadratmeter:");
+                string? sqmInput = AskWithEsc("[grey]Antal kvadratmeter[/]: ");
                 if (sqmInput == null) return;
 
                 if (!int.TryParse(sqmInput, out squareMeters) || squareMeters <= 0)
@@ -146,21 +146,22 @@ namespace HotelBooking.UI
                 break;
             }
 
-            int? capacity = AskIntOrEsc("Ange antal ordinarie gäster:");
+            int? capacity = AskIntOrEsc("[grey]Antal ordinarie gäster[/]: ");
             if (capacity == null) return;
 
-            int? extraBeds = AskIntOrEsc("Ange extrabäddar (0–2):");
+            int? extraBeds = AskIntOrEsc("[grey]Antal extrabäddar (0–2)[/]: ");
             if (extraBeds == null) return;
 
-            decimal? price = AskDecimalOrEsc("Ange pris per natt (kr):");
+            decimal? price = AskDecimalOrEsc("[grey]Pris per natt (kr)[/]: ");
             if (price == null) return;
 
-            bool outOfService = AnsiConsole.Confirm("Är rummet ur funktion?");
-            bool hasSeaView = AnsiConsole.Confirm("Har rummet havsutsikt?");
-            bool hasMinibar = AnsiConsole.Confirm("Har rummet minibar?");
-            bool isPetFriendly = AnsiConsole.Confirm("Är rummet husdjursvänligt?");
-            bool hasBalcony = AnsiConsole.Confirm("Har rummet balkong?");
-            bool hasBathtub = AnsiConsole.Confirm("Har rummet badkar?");
+            // Nu använder vi DIN Confirm-metod
+            bool outOfService = BookingPrompts.Confirm("[grey]Är rummet ur funktion[/]");
+            bool hasSeaView = BookingPrompts.Confirm("[grey]Har rummet havsutsikt[/]");
+            bool hasMinibar = BookingPrompts.Confirm("[grey]Har rummet minibar[/]");
+            bool isPetFriendly = BookingPrompts.Confirm("[grey]Är rummet husdjursvänligt[/]");
+            bool hasBalcony = BookingPrompts.Confirm("[grey]Har rummet balkong[/]");
+            bool hasBathtub = BookingPrompts.Confirm("[grey]Har rummet badkar[/]");
 
             var room = _roomService.CreateRoom(
                 number, type, squareMeters, capacity.Value, extraBeds.Value, price.Value,
@@ -171,6 +172,8 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine($"[green]Rum skapat![/] ID: {room.Id}");
             WaitForEsc();
         }
+
+
 
         // UPPDATERA RUM
         public void Update(string subtitle)

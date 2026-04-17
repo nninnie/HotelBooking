@@ -24,7 +24,7 @@ namespace HotelBooking.UI
         // Textinput som kan avbrytas med ESC
         public string? AskWithEsc(string question)
         {
-            AnsiConsole.Markup($"{question} ");
+            AnsiConsole.Markup(question);
 
             string input = "";
             ConsoleKeyInfo key;
@@ -254,14 +254,16 @@ namespace HotelBooking.UI
             {
                 key = Console.ReadKey(true);
 
-                // ESC - avbryt
                 if (key.Key == ConsoleKey.Escape)
                     return null;
 
-                // ENTER - validera
                 if (key.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
+
+
+                    if (string.IsNullOrWhiteSpace(input))
+                        return null;
 
                     if (decimal.TryParse(input, out decimal value))
                         return value;
@@ -288,6 +290,7 @@ namespace HotelBooking.UI
                 }
             }
         }
+
         // Lösenordsinput som kan avbrytas med ESC
         public string? AskPasswordOrEsc(string question)
         {

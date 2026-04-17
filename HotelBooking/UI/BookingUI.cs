@@ -68,7 +68,7 @@ namespace HotelBooking.UI
             var allRooms = _bookingService.GetAvailableRooms(
                 checkIn,
                 checkOut,
-                int.MaxValue 
+                guestsCount.Value
             );
 
             if (!allRooms.Any())

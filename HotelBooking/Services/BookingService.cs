@@ -38,11 +38,10 @@ namespace HotelBooking.Services
                 !r.Bookings.Any(b =>
                     !b.IsDeleted &&
                     !b.IsCancelled &&
-                    !b.IsCompleted &&
                     b.FromDate < checkOut &&
                     b.ToDate > checkIn
                 )
-            );
+            ); 
 
             // Filtrera på kapacitet
             return available
