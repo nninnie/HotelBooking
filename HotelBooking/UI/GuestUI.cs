@@ -158,7 +158,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             string? firstName;
             while (true)
             {
-                firstName = AskWithEsc("Ange förnamn:");
+                firstName = AskWithEsc("Ange förnamn: ");
                 if (firstName == null) return;
                 if (!string.IsNullOrWhiteSpace(firstName)) break;
                 AnsiConsole.MarkupLine("[red]Förnamn får inte vara tomt![/]");
@@ -167,13 +167,13 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             string? lastName;
             while (true)
             {
-                lastName = AskWithEsc("Ange efternamn:");
+                lastName = AskWithEsc("Ange efternamn: ");
                 if (lastName == null) return;
                 if (!string.IsNullOrWhiteSpace(lastName)) break;
                 AnsiConsole.MarkupLine("[red]Efternamn får inte vara tomt![/]");
             }
 
-            string? birthInput = AskWithEsc("Födelsedatum (yyyy-MM-dd):");
+            string? birthInput = AskWithEsc("Födelsedatum (yyyy-MM-dd): ");
             if (birthInput == null) return;
 
             if (!DateTime.TryParse(birthInput, out DateTime birthDate))
@@ -186,7 +186,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             string? phone;
             while (true)
             {
-                phone = AskWithEsc("Telefonnummer:");
+                phone = AskWithEsc("Telefonnummer: ");
                 if (phone == null) return;
                 if (string.IsNullOrWhiteSpace(phone) || phone.All(char.IsDigit)) break;
                 AnsiConsole.MarkupLine("[red]Telefonnummer får bara innehålla siffror![/]");
@@ -195,7 +195,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             string? email;
             while (true)
             {
-                email = AskWithEsc("Email:");
+                email = AskWithEsc("Email: ");
                 if (email == null) return;
                 if (string.IsNullOrWhiteSpace(email) || email.Contains("@")) break;
                 AnsiConsole.MarkupLine("[red]Ogiltig email! Måste innehålla @[/]");
@@ -343,7 +343,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
-            int? id = AskIntOrEsc("\nAnge gäst-ID att ta bort: ");
+            int? id = AskIntOrEsc("\nAnge gäst-ID att ta bort:");
             if (id == null) return;
 
             var guest = _guestService.GetGuest(id.Value);
@@ -370,7 +370,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
-            bool success = _guestService.DeleteGuest(id.Value);
+            bool success = _guestService.SoftDelete(id.Value);
 
             AnsiConsole.MarkupLine(success
                 ? "[green]Gäst borttagen![/]"

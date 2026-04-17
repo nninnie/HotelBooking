@@ -1,5 +1,6 @@
 ﻿using HotelBooking.Models;
 using HotelBooking.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Services
 {
@@ -16,17 +17,22 @@ namespace HotelBooking.Services
         public IEnumerable<Guest> GetAllGuests()
         {
             return _db.Guests
-                .OrderBy(g => g.LastName)   
+                .Include(g => g.Bookings)
+                    .ThenInclude(b => b.Room)
+                .OrderBy(g => g.LastName)
                 .ThenBy(g => g.FirstName)
                 .ToList();
         }
 
-        // Hämta en gäst baserat på ID
+        // Hämta en gäst med alla bokningar och rum
         public Guest? GetGuest(int id)
         {
             return _db.Guests
+                .Include(g => g.Bookings)
+                    .ThenInclude(b => b.Room)
                 .FirstOrDefault(g => g.Id == id);
         }
+
 
         // Skapa en ny gäst
         public Guest CreateGuest(string firstName, string lastName, DateTime birthDate, string? phone, string? email)
@@ -112,5 +118,7 @@ namespace HotelBooking.Services
             _db.SaveChanges();
             return true;
         }
+
+
     }
 }
