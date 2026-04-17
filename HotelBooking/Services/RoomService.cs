@@ -14,13 +14,16 @@ namespace HotelBooking.Services
             _db = db;
         }
 
-        // Hämtar alla rum (både aktiva och ur funktion)
+        // Hämtar alla rum 
         public IEnumerable<Room> GetAllRooms()
         {
             return _db.Rooms
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.Guest)
                 .OrderBy(r => r.RoomNumber)
                 .ToList();
         }
+
 
         // Hämtar endast aktiva rum
         public IEnumerable<Room> GetActiveRooms()

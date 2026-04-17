@@ -6,21 +6,25 @@ namespace HotelBooking.UI
 {
     public static class BookingRenderer
     {
-        public static void ShowBookingDetails(Booking booking, Guest? guest, Room? room)
+        public static Panel ShowBookingDetails(Booking booking, Guest? guest, Room? room)
         {
-            // Prisberäkning
             int nights = (booking.ToDate.Date - booking.FromDate.Date).Days;
             if (nights < 1) nights = 1;
 
             decimal pricePerNight = room?.PricePerNight ?? 0;
             decimal totalPrice = nights * pricePerNight;
 
-            // Betald-status
-            string paid = booking.Invoice?.IsPaid == true
-                ? "[green]✔[/]"
-                : "[red]✘[/]";
+            string status =
+                booking.IsCancelled ? "[red]● Avbokad[/]" :
+                booking.IsActive ? "[green]● Aktiv[/]" :
+                booking.IsCheckedIn ? "[blue]● Incheckad[/]" :
+                booking.IsCompleted ? "[grey]● Slutförd[/]" :
+                "[yellow]● Kommande[/]";
 
-            // Rumsegenskaper
+            string paid = booking.Invoice?.IsPaid == true
+                ? "[green]✔ Betald[/]"
+                : "[red]✘ Obetald[/]";
+
             string features = room == null
                 ? "-"
                 : $@"Kapacitet: {room.Capacity}
@@ -31,35 +35,41 @@ Husdjur tillåtet: {(room.IsPetFriendly ? "Ja" : "Nej")}
 Balkong: {(room.HasBalcony ? "Ja" : "Nej")}
 Badkar: {(room.HasBathtub ? "Ja" : "Nej")}";
 
-            var panel = new Panel($@"
-[white]ID:[/] {booking.Id}
+            return new Panel($@"
+[bold dodgerblue1]Bokning[/]
+[grey]ID:[/] [white]{booking.Id}[/]
+[grey]Skapad:[/] [white]{booking.BookingDate:yyyy-MM-dd HH:mm}[/]
+[grey]Status:[/] {status}
 
-[white]Gäst:[/] {(guest != null ? $"{guest.LastName}, {guest.FirstName}" : "Okänd")}
-[white]Kontakt:[/] {guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}
+[bold dodgerblue1]Gäst[/]
+[grey]Namn:[/] [white]{guest?.FirstName} {guest?.LastName}[/]
+[grey]Kontakt:[/] [white]{guest?.Email ?? "-"} / {guest?.PhoneNumber ?? "-"}[/]
 
-[white]Rum:[/] {(room != null ? $"{room.RoomNumber} ({room.RoomType})" : booking.RoomId)}
+[bold dodgerblue1]Rum[/]
+[grey]Rum:[/] [white]{room?.RoomNumber} ({room?.RoomType})[/]
+[grey]Pris per natt:[/] [white]{pricePerNight} kr[/]
 
-[white]Från:[/] {booking.FromDate:yyyy-MM-dd}
-[white]Till:[/] {booking.ToDate:yyyy-MM-dd}
-[white]Antal nätter:[/] {nights}
-[white]Antal gäster:[/] {booking.NumberOfGuests}
+[bold dodgerblue1]Datum[/]
+[grey]Incheckning:[/] [white]{booking.FromDate:yyyy-MM-dd HH:mm}[/]
+[grey]Utcheckning:[/] [white]{booking.ToDate:yyyy-MM-dd HH:mm}[/]
+[grey]Antal nätter:[/] [white]{nights}[/]
+[grey]Antal gäster:[/] [white]{booking.NumberOfGuests}[/]
 
-[white]Pris per natt:[/] {pricePerNight} kr
-[white]Totalpris:[/] {totalPrice} kr
-[white]Betald:[/] {paid}
+[bold dodgerblue1]Pris[/]
+[grey]Totalpris:[/] [bold white]{totalPrice} kr[/]
+[grey]Betald:[/] {paid}
 
-[grey]Rumsdetaljer[/]
+[bold dodgerblue1]Rumsdetaljer[/]
 {features}
 ")
             {
-                Header = new PanelHeader("[green]Bokningsinformation[/]"),
-                Border = BoxBorder.Rounded
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1, 1, 1)
             };
-
-            AnsiConsole.Write(panel);
         }
 
-        // Dessa två ersätts av ErrorService
+
+
         public static void ShowError(string message)
         {
             ErrorService.Error(message);
@@ -91,18 +101,17 @@ Badkar: {(room.HasBathtub ? "Ja" : "Nej")}";
             table.AddColumn("[yellow]Datum[/]");
             table.AddColumn("[yellow]Totalpris[/]");
             table.AddColumn("[yellow]Betald[/]");
+            table.AddColumn("[yellow]Status[/]");
 
             foreach (var b in bookings)
             {
                 var guest = getGuest(b.GuestId);
                 var room = getRoom(b.RoomId);
 
-                // Korrekt IsPaid-logik
                 var paid = b.Invoice?.IsPaid == true
                     ? "[green]✔[/]"
                     : "[red]✘[/]";
 
-                // Totalpris
                 decimal total = 0;
                 if (room != null)
                 {
@@ -111,17 +120,26 @@ Badkar: {(room.HasBathtub ? "Ja" : "Nej")}";
                     total = nights * room.PricePerNight;
                 }
 
+                string status =
+                    b.IsCancelled ? "[red]Avbokad[/]" :
+                    b.IsCompleted ? "[grey]Slutförd[/]" :
+                    b.IsCheckedIn ? "[green]Incheckad[/]" :
+                    DateTime.Today < b.FromDate ? "[yellow]Kommande[/]" :
+                    DateTime.Today > b.ToDate ? "[grey]Utcheckad[/]" :
+                    "[blue]Aktiv[/]";
+
                 table.AddRow(
                     b.Id.ToString(),
                     guest != null ? $"{guest.FirstName} {guest.LastName}" : "Okänd",
                     room != null ? room.RoomNumber.ToString() : "-",
                     $"{b.FromDate:yyyy-MM-dd} → {b.ToDate:yyyy-MM-dd}",
                     $"{total} kr",
-                    paid
+                    paid,
+                    status
                 );
             }
 
             AnsiConsole.Write(table);
         }
+        }
     }
-}
