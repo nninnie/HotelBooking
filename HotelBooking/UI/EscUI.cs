@@ -333,16 +333,16 @@ namespace HotelBooking.UI
 
         public bool? AskBoolOrEsc(string question, bool defaultValue)
         {
-            AnsiConsole.Markup($"{question} [grey](j/n, ENTER = {defaultValue}, ESC = avbryt)[/]: ");
+            AnsiConsole.Markup($"{question}: ");
 
             while (true)
             {
                 switch (Console.ReadKey(true).Key)
                 {
-                    case ConsoleKey.J: return true;
-                    case ConsoleKey.N: return false;
-                    case ConsoleKey.Enter: return defaultValue;
-                    case ConsoleKey.Escape: return null;
+                    case ConsoleKey.J: Console.WriteLine(); return true;
+                    case ConsoleKey.N: Console.WriteLine(); return false;
+                    case ConsoleKey.Enter: Console.WriteLine(); return defaultValue;
+                    case ConsoleKey.Escape: Console.WriteLine(); return null;
                 }
             }
         }

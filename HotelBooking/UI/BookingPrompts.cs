@@ -351,7 +351,7 @@ namespace HotelBooking.UI
             AnsiConsole.MarkupLine("[green]Tryck ENTER för att behålla nuvarande värde.[/]\n");
 
             string? newGuest = ui.AskWithEsc(
-                $"[gray]Ny gäst-ID[/] [green](tomt = {Markup.Escape(booking.GuestId.ToString())})[/]:"
+                $"[gray]Ny gäst-ID[/] [white](ENTER = behåll[/] [green]{Markup.Escape(booking.GuestId.ToString())})[/]:"
             );
             if (newGuest == null) return null;
 
@@ -362,7 +362,7 @@ namespace HotelBooking.UI
             }
 
             string? newRoom = ui.AskWithEsc(
-                $"[gray]Nytt rum-ID[/] [green](tomt = {Markup.Escape(booking.RoomId.ToString())})[/]:"
+                $"[gray]Nytt rum-ID[/] [white](ENTER = behåll[/] {Markup.Escape(booking.RoomId.ToString())})[/]:"
             );
             if (newRoom == null) return null;
 
@@ -373,7 +373,7 @@ namespace HotelBooking.UI
             }
 
             string? newFrom = ui.AskWithEsc(
-                $"[gray]Nytt från-datum (yyyy-MM-dd)[/] [green](tomt = {Markup.Escape(booking.FromDate.ToString("yyyy-MM-dd"))})[/]:"
+                $"[gray]Nytt från-datum (yyyy-MM-dd)[/] [white](ENTER = behåll[/] {Markup.Escape(booking.FromDate.ToString("yyyy-MM-dd"))})[/]:"
             );
             if (newFrom == null) return null;
 
@@ -384,7 +384,7 @@ namespace HotelBooking.UI
             }
 
             string? newTo = ui.AskWithEsc(
-                $"[gray]Nytt till-datum (yyyy-MM-dd)[/] [green](tomt = {Markup.Escape(booking.ToDate.ToString("yyyy-MM-dd"))})[/]:"
+                $"[gray]Nytt till-datum (yyyy-MM-dd)[/] [white](ENTER = behåll[/] {Markup.Escape(booking.ToDate.ToString("yyyy-MM-dd"))})[/]:"
             );
             if (newTo == null) return null;
 
@@ -395,7 +395,7 @@ namespace HotelBooking.UI
             }
 
             string? newGuests = ui.AskWithEsc(
-                $"[gray]Nytt antal gäster[/] [green](tomt = {Markup.Escape(booking.NumberOfGuests.ToString())})[/]:"
+                $"[gray]Nytt antal gäster [white](ENTER = behåll[/] {Markup.Escape(booking.NumberOfGuests.ToString())})[/]:"
             );
             if (newGuests == null) return null;
 
@@ -658,6 +658,33 @@ namespace HotelBooking.UI
             }
         }
 
+        public static bool ConfirmRoomUpdate(string message)
+        {
+            // Lägg till radbrytning automatiskt
+            AnsiConsole.WriteLine();
+
+            // ENTER = behåll (JA)
+            AnsiConsole.Markup($"{message} [grey](ENTER = behåll)[/]: ");
+
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Escape)
+                    return false;
+
+                if (key.Key == ConsoleKey.Enter)
+                    return true;
+
+                if (key.KeyChar == 'j' || key.KeyChar == 'J')
+                    return true;
+
+                if (key.KeyChar == 'n' || key.KeyChar == 'N')
+                    return false;
+
+                ErrorService.Error("Ogiltigt val. Tryck ENTER för ja  och ESC för att avbryta.");
+            }
+        }
 
     }
 }

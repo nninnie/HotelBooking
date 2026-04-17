@@ -128,6 +128,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 [white]Antal bokningar:[/] {bookings.Count}
 [white]Aktiva bokningar:[/] {active}
 [white]Historiska bokningar:[/] {history}
+[white]Har aktiv bokning:[/] {(active > 0 ? "[green]Ja[/]" : "[red]Nej[/]")}
 
 [white]Totalt spenderat:[/] {totalSpent} kr
 
@@ -138,6 +139,7 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 Header = new PanelHeader("[green]Gästinformation[/]"),
                 Border = BoxBorder.Rounded
             };
+
 
             AnsiConsole.Write(panel);
             WaitForEsc();
@@ -341,10 +343,18 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             var guests = _guestService.GetAllGuests();
             ShowGuestTable(guests);
 
-            int? id = AskIntOrEsc("Ange gäst-ID att ta bort:");
+            int? id = AskIntOrEsc("\nAnge gäst-ID att ta bort: ");
             if (id == null) return;
 
             var guest = _guestService.GetGuest(id.Value);
+
+            bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera denna gäst som borttagen?");
+            if (!confirm)
+            {
+                BookingRenderer.ShowError("Åtgärden avbröts.");
+                WaitForEsc();
+                return;
+            }
 
             if (guest == null)
             {

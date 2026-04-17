@@ -129,12 +129,16 @@ namespace HotelBooking.Services
         // Återställ soft deleted rum
         public bool Restore(int id)
         {
-            var room = GetRoom(id);
-            if (room == null) return false;
+            var guest = _db.Guests
+                .FirstOrDefault(g => g.Id == id);
 
-            room.IsOutOfService = false;
+            if (guest == null)
+                return false;
+
+            guest.IsDeleted = false;
             _db.SaveChanges();
             return true;
         }
+
     }
 }

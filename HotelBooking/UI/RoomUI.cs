@@ -148,20 +148,33 @@ namespace HotelBooking.UI
 
             int? capacity = AskIntOrEsc("[grey]Antal ordinarie gäster[/]: ");
             if (capacity == null) return;
-
+            AnsiConsole.WriteLine();
             int? extraBeds = AskIntOrEsc("[grey]Antal extrabäddar (0–2)[/]: ");
             if (extraBeds == null) return;
+            AnsiConsole.WriteLine();
 
             decimal? price = AskDecimalOrEsc("[grey]Pris per natt (kr)[/]: ");
             if (price == null) return;
 
-            // Nu använder vi DIN Confirm-metod
-            bool outOfService = BookingPrompts.Confirm("[grey]Är rummet ur funktion[/]");
-            bool hasSeaView = BookingPrompts.Confirm("[grey]Har rummet havsutsikt[/]");
-            bool hasMinibar = BookingPrompts.Confirm("[grey]Har rummet minibar[/]");
-            bool isPetFriendly = BookingPrompts.Confirm("[grey]Är rummet husdjursvänligt[/]");
-            bool hasBalcony = BookingPrompts.Confirm("[grey]Har rummet balkong[/]");
-            bool hasBathtub = BookingPrompts.Confirm("[grey]Har rummet badkar[/]");
+
+            AnsiConsole.WriteLine();
+            bool outOfService = BookingPrompts.ConfirmRoomUpdate("[grey]Är rummet ur funktion[/]");
+
+            AnsiConsole.WriteLine();
+            bool hasSeaView = BookingPrompts.ConfirmRoomUpdate("[grey]Har rummet havsutsikt[/]");
+
+            AnsiConsole.WriteLine();
+            bool hasMinibar = BookingPrompts.ConfirmRoomUpdate("[grey]Har rummet minibar[/]");
+
+            AnsiConsole.WriteLine();
+            bool isPetFriendly = BookingPrompts.ConfirmRoomUpdate("[grey]Är rummet husdjursvänligt[/]");
+
+            AnsiConsole.WriteLine();
+            bool hasBalcony = BookingPrompts.ConfirmRoomUpdate("[grey]Har rummet balkong[/]");
+
+            AnsiConsole.WriteLine();
+            bool hasBathtub = BookingPrompts.ConfirmRoomUpdate("[grey]Har rummet badkar[/]");
+
 
             var room = _roomService.CreateRoom(
                 number, type, squareMeters, capacity.Value, extraBeds.Value, price.Value,
@@ -347,7 +360,7 @@ namespace HotelBooking.UI
 
             ShowRoomTable(rooms);
 
-            int? id = AskIntOrEsc("Ange rums-ID att markera som ur funktion");
+            int? id = AskIntOrEsc("\nAnge rums-ID att markera som ur funktion: ");
             if (id == null) return;
 
             bool confirm = BookingPrompts.Confirm("Är du säker att du vill markera detta rum som ur funktion?");
@@ -388,7 +401,7 @@ namespace HotelBooking.UI
 
             ShowRoomTable(deletedRooms);
 
-            int? id = AskIntOrEsc("Ange rums-ID att återställa");
+            int? id = AskIntOrEsc("\nAnge rums-ID att återställa: ");
             if (id == null) return;
 
             bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa detta rum?");
