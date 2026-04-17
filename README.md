@@ -128,7 +128,13 @@ Databasen skapas och seedas automatiskt.
 - Autofac (DI)  
 - Spectre.Console  
 - C#  
-- LINQ  
+- LINQ
+
+## 📄 Dokument
+
+- ER‑diagram
+- 3NF‑dokument
+- SQL‑frågor 
 
 ### 🧩 Arkitektur, SOLID & lärdomar
 Jag har arbetat enligt **SOLID‑principerna**, framför allt **Single Responsibility Principle**, där varje klass har ett tydligt och avgränsat ansvar.  
