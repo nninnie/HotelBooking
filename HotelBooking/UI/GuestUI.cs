@@ -99,8 +99,18 @@ namespace HotelBooking.UI
             var lastBooking = bookings.OrderByDescending(b => b.FromDate).FirstOrDefault();
 
             string lastBookingText = lastBooking == null
-                ? "[grey]Ingen bokningshistorik[/]"
-                : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:yyyy-MM-dd} → {lastBooking.ToDate:yyyy-MM-dd})";
+    ? "[grey]Ingen bokningshistorik[/]"
+    : $"Rum {lastBooking.Room?.RoomNumber ?? "-"} ({lastBooking.FromDate:yyyy-MM-dd} → {lastBooking.ToDate:yyyy-MM-dd})";
+
+            string lastBookingStatus = lastBooking == null
+                ? "[grey]-[/]"
+                : lastBooking.IsCheckedIn
+                    ? "[green]Incheckad[/]"
+                    : lastBooking.IsCompleted
+                        ? "[grey]Utcheckad[/]"
+                        : lastBooking.IsActive
+                            ? "[yellow]Kommande[/]"
+                            : "[red]Okänd[/]";
 
             var panel = new Panel($@"
 [bold dodgerblue1]Gäst[/]
@@ -120,6 +130,7 @@ namespace HotelBooking.UI
 
 [bold dodgerblue1]Senaste bokning[/]
 {lastBookingText}
+[grey]Status:[/] {lastBookingStatus}
 ")
             {
                 Header = new PanelHeader("[green]Gästinformation[/]"),
@@ -130,7 +141,6 @@ namespace HotelBooking.UI
             AnsiConsole.Write(panel);
             WaitForEsc();
         }
-
 
         // SKAPA GÄST
         public void Create(string subtitle)
