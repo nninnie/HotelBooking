@@ -270,7 +270,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 
             AnsiConsole.Write(panel);
 
-            // Förnamn
             string newFirst = AnsiConsole.Prompt(
                 new TextPrompt<string>($"Nytt förnamn (ENTER = behåll [green]{guest.FirstName}[/]):")
                     .AllowEmpty()
@@ -278,7 +277,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             if (string.IsNullOrWhiteSpace(newFirst))
                 newFirst = guest.FirstName;
 
-            // Efternamn
             string newLast = AnsiConsole.Prompt(
                 new TextPrompt<string>($"Nytt efternamn (ENTER = behåll [green]{guest.LastName}[/]):")
                     .AllowEmpty()
@@ -286,7 +284,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
             if (string.IsNullOrWhiteSpace(newLast))
                 newLast = guest.LastName;
 
-            // Telefon
             string phone = AnsiConsole.Prompt(
                 new TextPrompt<string>($"Nytt telefonnummer (ENTER = behåll [green]{guest.PhoneNumber ?? "-"}[/]):")
                     .AllowEmpty()
@@ -301,7 +298,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
-            // Email
             string email = AnsiConsole.Prompt(
                 new TextPrompt<string>($"Ny email (ENTER = behåll [green]{guest.Email ?? "-"}[/]):")
                     .AllowEmpty()
@@ -395,7 +391,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
-            // Visa tabell
             var table = new Table().RoundedBorder();
             table.AddColumn("[yellow]ID[/]");
             table.AddColumn("[yellow]Namn[/]");
@@ -429,11 +424,9 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
 
             AnsiConsole.Write(table);
 
-            // Fråga efter ID
             var id = BookingPrompts.AskBookingId(this); 
             if (id == null) return;
 
-            // Bekräftelse
             bool confirm = BookingPrompts.Confirm("Är du säker att du vill återställa denna gäst?");
             if (!confirm)
             {
@@ -442,7 +435,6 @@ private void ShowGuestTable(IEnumerable<Guest> guests)
                 return;
             }
 
-            // Kör restore
             bool success = _guestService.Restore(id.Value);
 
             BookingRenderer.ShowResult(

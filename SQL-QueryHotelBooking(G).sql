@@ -19,5 +19,3 @@ WHERE IsOutOfService = 0;
 SELECT * 
 FROM Guests
 WHERE LastName LIKE 'S%';
-
-

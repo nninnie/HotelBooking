@@ -73,7 +73,7 @@ namespace HotelBooking.UI
                 {
                     Console.WriteLine();
 
-                    // ⭐ ENTER = behåll värde
+                    //  ENTER = behåll värde
                     if (string.IsNullOrWhiteSpace(input))
                         return defaultValue;
 

@@ -161,7 +161,7 @@ namespace HotelBooking.UI
                 return;
             }
 
-            // ❗ Stoppa betalning av annullerad faktura
+            // Stoppa betalning av annullerad faktura
             if (invoice.IsCancelled)
             {
                 BookingRenderer.ShowError("Bokningen är avbokad. Därför är fakturan annullerad och kan inte betalas.");
@@ -180,7 +180,7 @@ namespace HotelBooking.UI
 
             bool success = _iinvoiceService.MarkAsPaid(id.Value);
 
-            // ⭐ MINI-FAKTURA (endast UI, ingen logik ändrad)
+            // Faktura
             if (success)
             {
                 // Hämta om fakturan så PaidDate är uppdaterad
