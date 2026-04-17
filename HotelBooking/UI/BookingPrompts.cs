@@ -48,7 +48,7 @@ namespace HotelBooking.UI
             string? firstName;
             while (true)
             {
-                firstName = ui.AskWithEsc("\nFörnamn:");
+                firstName = ui.AskWithEsc("\nFörnamn: ");
                 if (firstName == null)
                     return null;
 
@@ -71,7 +71,7 @@ namespace HotelBooking.UI
             string? lastName;
             while (true)
             {
-                lastName = ui.AskWithEsc("Efternamn:");
+                lastName = ui.AskWithEsc("Efternamn: ");
                 if (lastName == null)
                     return null;
 
@@ -93,8 +93,8 @@ namespace HotelBooking.UI
             // BirthDate
             DateTime birthDate;
             while (true)
-            {
-                string? birthInput = ui.AskWithEsc("Födelsedatum (yyyy-MM-dd):");
+            { 
+                string? birthInput = ui.AskWithEsc("Födelsedatum (yyyy-MM-dd): ");
                 if (birthInput == null)
                     return null;
 
@@ -111,7 +111,7 @@ namespace HotelBooking.UI
             string? phone;
             while (true)
             {
-                phone = ui.AskWithEsc("Telefonnummer:");
+                phone = ui.AskWithEsc("Telefonnummer: ");
                 if (phone == null)
                     return null;
 
@@ -134,7 +134,7 @@ namespace HotelBooking.UI
             string? email;
             while (true)
             {
-                email = ui.AskWithEsc("Email:");
+                email = ui.AskWithEsc("Email: ");
                 if (email == null)
                     return null;
 
@@ -278,7 +278,7 @@ namespace HotelBooking.UI
 
             while (true)
             {
-                string? input = ui.AskWithEsc("Antal gäster:");
+                string? input = ui.AskWithEsc("Antal gäster: ");
                 if (input == null)
                     return null; 
 

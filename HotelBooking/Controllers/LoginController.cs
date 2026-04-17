@@ -21,7 +21,7 @@ namespace HotelBooking.Controllers
 
                 var esc = new TempEsc();
 
-                string? username = esc.AskWithEsc("[yellow]Användarnamn:[/]");
+                string? username = esc.AskWithEsc("[yellow]Användarnamn: [/]");
                 if (username == null)
                     return;
 
