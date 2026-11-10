@@ -7,6 +7,16 @@
 Ett komplett bokningssystem för ett mindre hotell, byggt som en .NET Core Console‑applikation med Entity Framework Core, Autofac och Spectre.Console.  
 All data lagras i en SQL‑databas som genereras via EF Core Code First.
 
+## 📸 Så ser det ut
+
+<p align="center">
+  <img src="screenshots/hotel-rum.png" alt="Rumsöversikt med typ, kapacitet, pris och status" width="800"/>
+</p>
+
+| Välj datum i kalendern | Bokningen är klar |
+|---|---|
+| <img src="screenshots/hotel-kalender.png" alt="Kalender för in- och utcheckning" width="400"/> | <img src="screenshots/hotel-bokning.png" alt="Bokningsbekräftelse med pris, faktura och nyckelkort" width="400"/> |
+
 ## ✨ Funktionalitet
 
 🛏️ **Rum**  
