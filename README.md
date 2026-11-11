@@ -1,9 +1,5 @@
 # 🏨 Hotel Booking – Console App
 
-<p align="center">
-  <img src="hotell-mz.png" alt="Hotell M2" width="600"/>
-</p>
-
 Ett komplett bokningssystem för ett mindre hotell, byggt som en .NET Core Console‑applikation med Entity Framework Core, Autofac och Spectre.Console.  
 All data lagras i en SQL‑databas som genereras via EF Core Code First.
 
