@@ -20,6 +20,7 @@ namespace HotelBooking.Services.Interfaces
         IEnumerable<Booking> GetDeleted();
         bool CheckIn(int bookingId);
         bool CheckOut(int bookingId, bool payInvoice);
+        int CancelOverdueUnpaidBookings();
 
 
     }
