@@ -1,29 +1,34 @@
 ﻿using HotelBooking.Controllers;
+using HotelBooking.Core;
 using HotelBooking.Data;
+using HotelBooking.Services.Interfaces;
 
 namespace HotelBooking
 {
     public class Application
     {
-        // BuildDB kör migrering + seed (startar databasen åt oss)
-        private readonly BuildDB _buildDB;
-
         // Huvudmenyn som visas efter inloggning
         private readonly MainMenuController _mainMenuController;
 
         // Databascontext – behövs för login och menyer
         private readonly HotelDBContext _db;
 
-        // DI: allt injiceras automatiskt från Program.cs
-        public Application(BuildDB buildDB, MainMenuController mainMenuController, HotelDBContext db)
+        // Bokningslogik – används för att annullera obetalda bokningar vid start
+        private readonly IBookingService _bookingService;
+
+        // DI: allt injiceras automatiskt från Program.cs (databasen byggs i Program.cs innan Run)
+        public Application(MainMenuController mainMenuController, HotelDBContext db, IBookingService bookingService)
         {
-            _buildDB = buildDB;
             _mainMenuController = mainMenuController;
             _db = db;
+            _bookingService = bookingService;
         }
 
         public void Run()
         {
+            // Bokningar med obetald faktura efter förfallodatum annulleras automatiskt
+            _bookingService.CancelOverdueUnpaidBookings();
+
             // Applikationen körs i en loop så man kan logga ut och in igen
             while (true)
             {
@@ -40,7 +45,8 @@ namespace HotelBooking
                 // När login lyckas - starta huvudmenyn
                 _mainMenuController.Run();
 
-                // När användaren loggar ut - loopen fortsätter och login visas igen
+                // När användaren loggar ut - nollställ inloggad anställd, loopen fortsätter och login visas igen
+                LoginService.Logout();
             }
         }
     }

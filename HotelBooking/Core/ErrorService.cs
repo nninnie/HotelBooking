@@ -12,14 +12,8 @@ namespace HotelBooking.Core
         public static void Error(string message) =>
             Print("✖", "red", message);
 
-        public static void Warning(string message) =>
-            Print("⚠", "yellow", message);
-
         public static void Success(string message) =>
             Print("✔", "green", message);
-
-        public static void Info(string message) =>
-            Print("ℹ", "cyan", message);
 
         public static void FieldEmpty() =>
             Error("Fältet får inte vara tomt.");
@@ -32,8 +26,5 @@ namespace HotelBooking.Core
 
         public static void NotFound(string item) =>
             Error($"{item} hittades inte.");
-
-        public static void AlreadyExists(string item) =>
-            Error($"{item} finns redan.");
     }
 }

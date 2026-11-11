@@ -124,14 +124,29 @@ namespace HotelBooking.Services
             return true;
         }
 
-        public bool CancelDueToUnpaidInvoice(int bookingId)
+        // Annullera bokningar vars faktura inte är betald efter förfallodatum (10 dagar efter bokning).
+        // Körs när programmet startar. Incheckade och avslutade bokningar rörs inte.
+        public int CancelOverdueUnpaidBookings()
         {
-            var booking = _db.Bookings.FirstOrDefault(b => b.Id == bookingId);
-            if (booking == null) return false;
+            var overdue = _db.Bookings
+                .Include(b => b.Invoice)
+                .Where(b => !b.IsDeleted && !b.IsCancelled && !b.IsCheckedIn && !b.IsCompleted &&
+                            b.Invoice != null &&
+                            !b.Invoice.IsPaid &&
+                            !b.Invoice.IsCancelled &&
+                            b.Invoice.DueDate < DateTime.Today)
+                .ToList();
 
-            booking.IsCancelled = true;
-            _db.SaveChanges();
-            return true;
+            foreach (var booking in overdue)
+            {
+                booking.IsCancelled = true;
+                booking.Invoice!.IsCancelled = true;
+            }
+
+            if (overdue.Count > 0)
+                _db.SaveChanges();
+
+            return overdue.Count;
         }
 
         // Soft delete – markera bokningen som borttagen utan att radera den
