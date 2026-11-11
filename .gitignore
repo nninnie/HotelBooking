@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Egna dokument, kursmaterial och backupfiler från draw.io
+\!Documents/
+*.docx
+*.bkp
+*.dtmp
