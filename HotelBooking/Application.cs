@@ -1,4 +1,5 @@
 ﻿using HotelBooking.Controllers;
+using HotelBooking.Core;
 using HotelBooking.Data;
 
 namespace HotelBooking
@@ -40,7 +41,8 @@ namespace HotelBooking
                 // När login lyckas - starta huvudmenyn
                 _mainMenuController.Run();
 
-                // När användaren loggar ut - loopen fortsätter och login visas igen
+                // När användaren loggar ut - nollställ inloggad anställd, loopen fortsätter och login visas igen
+                LoginService.Logout();
             }
         }
     }
